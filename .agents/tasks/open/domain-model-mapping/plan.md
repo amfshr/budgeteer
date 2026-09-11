@@ -805,3 +805,41 @@ are final. If something is genuinely underspecified, stop and ask rather than gu
 
 **Definition of Done:** every *Acceptance Criteria* box ticked, all tests in *Test Strategy*
 written and passing, and `/check` (checkstyle + unit + integration) green before opening the PR.
+
+---
+
+## PR #87 Review Findings (Alexander, 2026-09-07) — resolve before merge
+
+Working list from the file-per-file review. Each item gets a decision (fix on this branch /
+defer to ticket / no change + why) before the PR merges. Postman collection
+`scripts/postman/budgeteer-domain-api.postman_collection.json` added for the boot-and-follow
+walk-through.
+
+- [ ] **Layering: services return API DTOs** — `AccountService`/`TransactionQueryService`
+      import `api/**/dto` types (service layer depends on the wire format). Decide the mapping
+      boundary: services return domain objects / internal read models; the api layer owns
+      DTO mapping (mapper next to the controller). ← the structurally important one
+- [ ] **DTO field types** — `provider`/`accountType`/`status` are `String`; type them with the
+      enums (wire JSON unchanged — Jackson writes `name()`). Trade-off to accept knowingly:
+      domain-enum renames would change the public contract; dedicated API enums are the
+      escape hatch if that ever bites
+- [ ] **Controller try/catch for zone** — bind `ZoneId` natively as the `@RequestParam` type;
+      bad values → `MethodArgumentTypeMismatchException` → existing 400 handler. Same pattern
+      for any future enum request params (they should bind natively too)
+- [ ] **Orchestration** — `ingestAll(); refreshAll();` pairing duplicated in 3 places (hourly
+      job, end of `backfill()`, dev controller). Extract one orchestrator method that owns the
+      pairing + error isolation
+- [ ] **`api/v1/` package structure** — mirror the URL version in packages
+      (`api/v1/account/...`) to demarcate versions and leave room for v2; decide dto/ subdir
+      placement at the same time
+- [ ] **RESTfulness + validation audit** — endpoint shapes, error contract consistency,
+      constraint handlers coverage
+- [ ] **401 vs 403 for unauthenticated** — app-wide today: 403 (no `AuthenticationEntryPoint`).
+      Decide: own ticket or fold in here
+- [ ] **Ingest observability** (live-run finding, 2026-09-07) — ~24s of silent work between
+      "Backfill finished" and the balance fetch: MonzoIngestor/IngestService log nothing on
+      success. Add per-account completion logs (rows mapped, cursor advanced-to) + a pass
+      summary in IngestService
+- [ ] **Ingest throughput note** — ~2,400 rows mapped in ~24s (~100/s; one upsert round-trip
+      per row inside the per-account tx). Acceptable at current scale/cadence; batch the
+      upserts if it ever grows. Record as known trade-off, no change now
