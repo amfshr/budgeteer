@@ -1,7 +1,5 @@
 package dev.amfshr.budgeteer.service.account;
 
-import dev.amfshr.budgeteer.api.account.dto.AccountResponse;
-import dev.amfshr.budgeteer.api.account.dto.AccountSummaryResponse;
 import dev.amfshr.budgeteer.api.common.ErrorCode;
 import dev.amfshr.budgeteer.domain.account.Account;
 import dev.amfshr.budgeteer.domain.account.AccountType;
@@ -64,17 +62,11 @@ class AccountServiceTest {
         Account account = domainAccount("acc_1");
         when(accountRepository.findActiveByUserId(userId)).thenReturn(List.of(account));
 
-        List<AccountResponse> result = service.listAccounts(userId, false);
+        List<Account> result = service.listAccounts(userId, false);
 
         verify(accountRepository).findActiveByUserId(userId);
         verify(accountRepository, never()).findByUserId(any());
-        assertThat(result).hasSize(1);
-        AccountResponse response = result.getFirst();
-        assertThat(response.provider()).isEqualTo("MONZO");
-        assertThat(response.accountType()).isEqualTo("CURRENT");
-        assertThat(response.institutionName()).isEqualTo("Monzo");
-        assertThat(response.currency()).isEqualTo("GBP");
-        assertThat(response.archived()).isFalse();
+        assertThat(result).containsExactly(account);
     }
 
     @Test
@@ -84,10 +76,10 @@ class AccountServiceTest {
         archived.archive();
         when(accountRepository.findByUserId(userId)).thenReturn(List.of(archived));
 
-        List<AccountResponse> result = service.listAccounts(userId, true);
+        List<Account> result = service.listAccounts(userId, true);
 
         verify(accountRepository).findByUserId(userId);
-        assertThat(result.getFirst().archived()).isTrue();
+        assertThat(result.getFirst().isArchived()).isTrue();
     }
 
     @Test
@@ -125,7 +117,7 @@ class AccountServiceTest {
         when(transactionRepository.sumWindows(any(), any(), any(), any(), any(), any()))
                 .thenReturn(sums(1000, -250, 5000, -1250, 20000, -7500));
 
-        AccountSummaryResponse summary = service.getSummary(userId, accountId, ZoneId.of("Europe/London"));
+        AccountSummary summary = service.getSummary(userId, accountId, ZoneId.of("Europe/London"));
 
         assertThat(summary.today().inMinorUnits()).isEqualTo(1000);
         assertThat(summary.today().outMinorUnits()).isEqualTo(250);

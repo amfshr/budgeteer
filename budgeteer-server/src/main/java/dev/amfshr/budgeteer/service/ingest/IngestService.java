@@ -31,20 +31,20 @@ public class IngestService {
     public void ingestAll() {
         for (ProviderIngestor ingestor : ingestors) {
             List<Account> accounts = txTemplate.execute(s -> ingestor.ingestAccounts());
-            if (accounts == null) {
-                continue;
-            }
+            int totalMapped = 0;
+            int failed = 0;
             for (Account account : accounts) {
                 try {
-                    txTemplate.execute(s -> {
-                        ingestor.ingestTransactions(account);
-                        return null;
-                    });
+                    Integer mapped = txTemplate.execute(s -> ingestor.ingestTransactions(account));
+                    totalMapped += mapped != null ? mapped : 0;
                 } catch (Exception e) {
+                    failed++;
                     log.error("Ingest failed [provider={}, account={}] - {}",
                             ingestor.provider(), account.getId(), e.getMessage(), e);
                 }
             }
+            log.info("Ingest pass complete [provider={}, accounts={}, transactionsMapped={}, failedAccounts={}]",
+                    ingestor.provider(), accounts.size(), totalMapped, failed);
         }
     }
 }

@@ -93,7 +93,7 @@ public class MonzoIngestor implements ProviderIngestor {
     }
 
     @Override
-    public void ingestTransactions(Account account) {
+    public int ingestTransactions(Account account) {
         Instant cursor = account.getRawSyncedThrough() != null
                 ? account.getRawSyncedThrough()
                 : Instant.EPOCH;
@@ -101,6 +101,7 @@ public class MonzoIngestor implements ProviderIngestor {
                 monzoTransactionRepository.findByAccountIdUpdatedAfter(account.getProviderAccountId(), cursor);
 
         Instant maxUpdated = cursor;
+        int mapped = 0;
         for (MonzoTransaction raw : rows) {
             if (raw.getUpdatedAt().isAfter(maxUpdated)) {
                 maxUpdated = raw.getUpdatedAt();
@@ -123,12 +124,21 @@ public class MonzoIngestor implements ProviderIngestor {
                     raw.getMonzoCreatedAt(),
                     raw.getMonzoSettledAt()
             );
+            mapped++;
         }
 
         if (maxUpdated.isAfter(cursor)) {
             account.setRawSyncedThrough(maxUpdated);
             accountRepository.save(account);
         }
+
+        if (!rows.isEmpty()) {
+            log.info("Ingested {} transactions [account={}, rawRows={}, cursor → {}]",
+                    mapped, account.getId(), rows.size(), maxUpdated);
+        } else {
+            log.debug("No raw rows past the cursor [account={}, cursor={}]", account.getId(), cursor);
+        }
+        return mapped;
     }
 
     private AccountType normalise(String rawType) {

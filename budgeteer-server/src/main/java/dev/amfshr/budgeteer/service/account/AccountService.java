@@ -1,7 +1,5 @@
 package dev.amfshr.budgeteer.service.account;
 
-import dev.amfshr.budgeteer.api.account.dto.AccountResponse;
-import dev.amfshr.budgeteer.api.account.dto.AccountSummaryResponse;
 import dev.amfshr.budgeteer.api.common.ErrorCode;
 import dev.amfshr.budgeteer.domain.account.Account;
 import dev.amfshr.budgeteer.exception.ApiException;
@@ -17,8 +15,8 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Read side for domain bank accounts. Balances are stored provider snapshots — this service
- * never derives them from transactions (L3).
+ * Read side for domain bank accounts. Speaks domain types only — DTO mapping belongs to the
+ * api layer. Balances are stored provider snapshots, never derived from transactions (L3).
  */
 @Service
 public class AccountService {
@@ -32,11 +30,10 @@ public class AccountService {
     }
 
     /** All of a user's bank accounts, ordered display_order then created_at. */
-    public List<AccountResponse> listAccounts(UUID userId, boolean includeArchived) {
-        List<Account> accounts = includeArchived
+    public List<Account> listAccounts(UUID userId, boolean includeArchived) {
+        return includeArchived
                 ? accountRepository.findByUserId(userId)
                 : accountRepository.findActiveByUserId(userId);
-        return accounts.stream().map(this::toResponse).toList();
     }
 
     /**
@@ -46,7 +43,7 @@ public class AccountService {
      *
      * @throws ApiException RESOURCE_NOT_FOUND for an unknown or other-user's account
      */
-    public AccountSummaryResponse getSummary(UUID userId, UUID accountId, ZoneId zone) {
+    public AccountSummary getSummary(UUID userId, UUID accountId, ZoneId zone) {
         accountRepository.findByIdAndUserId(accountId, userId)
                 .orElseThrow(() -> new ApiException(ErrorCode.RESOURCE_NOT_FOUND,
                         "Account not found: " + accountId));
@@ -61,25 +58,10 @@ public class AccountService {
         TransactionRepository.WindowSumsProjection sums = transactionRepository.sumWindows(
                 userId, accountId, todayStart, weekStart, monthStart, floor);
 
-        return new AccountSummaryResponse(
+        return new AccountSummary(
                 accountId, zone.getId(),
-                new AccountSummaryResponse.WindowSums(sums.getTodayIn(), Math.abs(sums.getTodayOut())),
-                new AccountSummaryResponse.WindowSums(sums.getWeekIn(), Math.abs(sums.getWeekOut())),
-                new AccountSummaryResponse.WindowSums(sums.getMonthIn(), Math.abs(sums.getMonthOut())));
-    }
-
-    private AccountResponse toResponse(Account account) {
-        return new AccountResponse(
-                account.getId(),
-                account.getProvider().name(),
-                account.getAccountType().name(),
-                account.getInstitutionName(),
-                account.getDisplayName(),
-                account.getCurrency(),
-                account.getBalanceMinorUnits(),
-                account.getBalanceAsOf(),
-                account.getCreditLimitMinorUnits(),
-                account.getDisplayOrder(),
-                account.isArchived());
+                new AccountSummary.WindowSums(sums.getTodayIn(), Math.abs(sums.getTodayOut())),
+                new AccountSummary.WindowSums(sums.getWeekIn(), Math.abs(sums.getWeekOut())),
+                new AccountSummary.WindowSums(sums.getMonthIn(), Math.abs(sums.getMonthOut())));
     }
 }

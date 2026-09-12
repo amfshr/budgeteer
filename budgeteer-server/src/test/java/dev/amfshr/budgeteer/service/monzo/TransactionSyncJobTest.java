@@ -2,8 +2,7 @@ package dev.amfshr.budgeteer.service.monzo;
 
 import dev.amfshr.budgeteer.domain.monzo.MonzoAccount;
 import dev.amfshr.budgeteer.repository.MonzoAccountRepository;
-import dev.amfshr.budgeteer.service.ingest.BalanceRefreshService;
-import dev.amfshr.budgeteer.service.ingest.IngestService;
+import dev.amfshr.budgeteer.service.ingest.IngestOrchestrator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,8 +21,7 @@ class TransactionSyncJobTest {
 
     @Mock private TransactionSyncService syncService;
     @Mock private MonzoAccountRepository accountRepository;
-    @Mock private IngestService ingestService;
-    @Mock private BalanceRefreshService balanceRefreshService;
+    @Mock private IngestOrchestrator ingestOrchestrator;
 
     @InjectMocks
     private TransactionSyncJob job;
@@ -66,33 +64,20 @@ class TransactionSyncJobTest {
 
         job.syncAllAccounts();
 
-        verifyNoInteractions(syncService, ingestService, balanceRefreshService);
+        verifyNoInteractions(syncService, ingestOrchestrator);
     }
 
     @Test
-    @DisplayName("chains ingest then balances after the sync loop")
-    void chainsIngestThenBalancesAfterSync() {
+    @DisplayName("runs the ingest+balance pass after the sync loop")
+    void chainsIngestPassAfterSync() {
         MonzoAccount account = mockAccount("acc_001");
         when(accountRepository.findAllSyncable()).thenReturn(List.of(account));
 
         job.syncAllAccounts();
 
-        InOrder inOrder = inOrder(syncService, ingestService, balanceRefreshService);
+        InOrder inOrder = inOrder(syncService, ingestOrchestrator);
         inOrder.verify(syncService).deltaSync("acc_001");
-        inOrder.verify(ingestService).ingestAll();
-        inOrder.verify(balanceRefreshService).refreshAll();
-    }
-
-    @Test
-    @DisplayName("ingest failure does not block the balance refresh")
-    void ingestFailureDoesNotBlockBalances() {
-        MonzoAccount account = mockAccount("acc_001");
-        when(accountRepository.findAllSyncable()).thenReturn(List.of(account));
-        doThrow(new RuntimeException("ingest failed")).when(ingestService).ingestAll();
-
-        job.syncAllAccounts();
-
-        verify(balanceRefreshService).refreshAll();
+        inOrder.verify(ingestOrchestrator).runFullPass();
     }
 
     private MonzoAccount mockAccount(String id) {

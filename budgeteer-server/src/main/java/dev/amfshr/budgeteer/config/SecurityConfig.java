@@ -1,5 +1,6 @@
 package dev.amfshr.budgeteer.config;
 
+import dev.amfshr.budgeteer.security.ApiAuthenticationEntryPoint;
 import dev.amfshr.budgeteer.security.JweAuthenticationFilter;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,6 +38,7 @@ public class SecurityConfig {
         + "frame-ancestors 'none'";
 
     private final JweAuthenticationFilter jweAuthenticationFilter;
+    private final ApiAuthenticationEntryPoint apiAuthenticationEntryPoint;
     private final List<String> corsAllowedOrigins;
 
     /**
@@ -47,8 +49,10 @@ public class SecurityConfig {
      */
     public SecurityConfig(
             JweAuthenticationFilter jweAuthenticationFilter,
+            ApiAuthenticationEntryPoint apiAuthenticationEntryPoint,
             @Value("${app.cors.allowed-origins}") List<String> corsAllowedOrigins) {
         this.jweAuthenticationFilter = jweAuthenticationFilter;
+        this.apiAuthenticationEntryPoint = apiAuthenticationEntryPoint;
         this.corsAllowedOrigins = corsAllowedOrigins;
     }
 
@@ -65,6 +69,8 @@ public class SecurityConfig {
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
+            // Unauthenticated on a protected route -> 401 ApiError envelope (default is a bare 403)
+            .exceptionHandling(ex -> ex.authenticationEntryPoint(apiAuthenticationEntryPoint))
             .addFilterBefore(jweAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .authorizeHttpRequests(auth -> auth

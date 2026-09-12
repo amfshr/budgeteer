@@ -47,9 +47,9 @@ class TransactionEndpointsIT extends AbstractMonzoWireMockIT {
     }
 
     @Test
-    @DisplayName("GET /api/v1/transactions rejects unauthenticated requests (403, house-wide default)")
-    void unauthenticated403() {
-        given().get("/api/v1/transactions").then().statusCode(403);
+    @DisplayName("GET /api/v1/transactions returns 401 when unauthenticated")
+    void unauthenticated401() {
+        given().get("/api/v1/transactions").then().statusCode(401);
     }
 
     @Test

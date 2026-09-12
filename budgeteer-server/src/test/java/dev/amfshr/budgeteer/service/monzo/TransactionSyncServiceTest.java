@@ -17,8 +17,7 @@ import dev.amfshr.budgeteer.repository.MonzoAccountRepository;
 import dev.amfshr.budgeteer.repository.MonzoConnectionRepository;
 import dev.amfshr.budgeteer.repository.MonzoTransactionRepository;
 import dev.amfshr.budgeteer.service.common.EncryptionService;
-import dev.amfshr.budgeteer.service.ingest.BalanceRefreshService;
-import dev.amfshr.budgeteer.service.ingest.IngestService;
+import dev.amfshr.budgeteer.service.ingest.IngestOrchestrator;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
@@ -54,8 +53,7 @@ class TransactionSyncServiceTest {
     @Mock private MonzoAccountRepository accountRepository;
     @Mock private MonzoTransactionRepository transactionRepository;
     @Mock private EncryptionService encryptionService;
-    @Mock private IngestService ingestService;
-    @Mock private BalanceRefreshService balanceRefreshService;
+    @Mock private IngestOrchestrator ingestOrchestrator;
     @Mock private PlatformTransactionManager txManager;
 
     @InjectMocks
@@ -215,30 +213,15 @@ class TransactionSyncServiceTest {
     class BackfillChaining {
 
         @Test
-        @DisplayName("runs ingest then balance refresh after the backfill finishes")
-        void backfillChainsIngestAndBalances() {
+        @DisplayName("runs the ingest+balance pass after the backfill finishes")
+        void backfillRunsIngestPass() {
             when(connectionRepository.findById(connectionId)).thenReturn(Optional.of(connection));
             when(connectionService.getDecryptedAccessToken(connectionId, userId)).thenReturn(ACCESS_TOKEN);
             when(accountsCapability.getAccounts(ACCESS_TOKEN)).thenReturn(List.of());
 
             service.backfill(connectionId);
 
-            var inOrder = inOrder(ingestService, balanceRefreshService);
-            inOrder.verify(ingestService).ingestAll();
-            inOrder.verify(balanceRefreshService).refreshAll();
-        }
-
-        @Test
-        @DisplayName("ingest failure after backfill does not block the balance refresh")
-        void ingestFailureDoesNotBlockBalances() {
-            when(connectionRepository.findById(connectionId)).thenReturn(Optional.of(connection));
-            when(connectionService.getDecryptedAccessToken(connectionId, userId)).thenReturn(ACCESS_TOKEN);
-            when(accountsCapability.getAccounts(ACCESS_TOKEN)).thenReturn(List.of());
-            doThrow(new RuntimeException("ingest failed")).when(ingestService).ingestAll();
-
-            service.backfill(connectionId);
-
-            verify(balanceRefreshService).refreshAll();
+            verify(ingestOrchestrator).runFullPass();
         }
     }
 

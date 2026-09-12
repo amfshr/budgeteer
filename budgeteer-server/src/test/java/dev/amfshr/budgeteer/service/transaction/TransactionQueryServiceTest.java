@@ -1,11 +1,7 @@
 package dev.amfshr.budgeteer.service.transaction;
 
 import dev.amfshr.budgeteer.api.common.ErrorCode;
-import dev.amfshr.budgeteer.api.common.PageResponse;
-import dev.amfshr.budgeteer.api.transaction.dto.TransactionResponse;
-import dev.amfshr.budgeteer.domain.account.Account;
 import dev.amfshr.budgeteer.domain.transaction.Transaction;
-import dev.amfshr.budgeteer.domain.transaction.TransactionStatus;
 import dev.amfshr.budgeteer.exception.ApiException;
 import dev.amfshr.budgeteer.repository.TransactionRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -16,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -72,30 +69,14 @@ class TransactionQueryServiceTest {
     }
 
     @Test
-    @DisplayName("maps the Spring page onto the house PageResponse")
-    void mapsPageToPageResponse() {
-        UUID accountId = UUID.randomUUID();
-        Transaction tx = mock(Transaction.class);
-        Account account = mock(Account.class);
-        when(account.getId()).thenReturn(accountId);
-        when(tx.getId()).thenReturn(UUID.randomUUID());
-        when(tx.getAccount()).thenReturn(account);
-        when(tx.getAmountMinorUnits()).thenReturn(-500L);
-        when(tx.getCurrency()).thenReturn("GBP");
-        when(tx.getStatus()).thenReturn(TransactionStatus.SETTLED);
-        when(tx.getOccurredAt()).thenReturn(Instant.parse("2026-01-01T10:00:00Z"));
+    @DisplayName("returns the repository page untouched (mapping is the api layer's job)")
+    void returnsRepositoryPage() {
+        Page<Transaction> page = new PageImpl<>(List.of(mock(Transaction.class)), PageRequest.of(2, 1), 5);
         when(transactionRepository.findFiltered(any(), any(), any(), any(), any(Pageable.class)))
-                .thenReturn(new PageImpl<>(List.of(tx), PageRequest.of(2, 1), 5));
+                .thenReturn(page);
 
-        PageResponse<TransactionResponse> result = service.list(userId, null, null, null, 2, 1);
+        Page<Transaction> result = service.list(userId, null, null, null, 2, 1);
 
-        assertThat(result.items()).hasSize(1);
-        assertThat(result.items().getFirst().accountId()).isEqualTo(accountId);
-        assertThat(result.items().getFirst().amountMinorUnits()).isEqualTo(-500L);
-        assertThat(result.items().getFirst().status()).isEqualTo("SETTLED");
-        assertThat(result.page()).isEqualTo(2);
-        assertThat(result.size()).isEqualTo(1);
-        assertThat(result.totalElements()).isEqualTo(5);
-        assertThat(result.totalPages()).isEqualTo(5);
+        assertThat(result).isSameAs(page);
     }
 }

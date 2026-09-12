@@ -50,6 +50,7 @@ public class BalanceRefreshService {
 
     /** Refreshes every syncable account's balance, isolating failures per account/connection. */
     public void refreshAll() {
+        int refreshed = 0;
         Map<UUID, List<MonzoAccount>> byConnection = monzoAccountRepository.findAllSyncable().stream()
                 .collect(Collectors.groupingBy(a -> a.getConnection().getId(),
                         LinkedHashMap::new, Collectors.toList()));
@@ -67,11 +68,13 @@ public class BalanceRefreshService {
                 continue;
             }
 
-            refreshConnection(connectionId, rawAccounts, accessToken);
+            refreshed += refreshConnection(connectionId, rawAccounts, accessToken);
         }
+        log.info("Balance refresh complete [accountsRefreshed={}]", refreshed);
     }
 
-    private void refreshConnection(UUID connectionId, List<MonzoAccount> rawAccounts, String accessToken) {
+    private int refreshConnection(UUID connectionId, List<MonzoAccount> rawAccounts, String accessToken) {
+        int refreshed = 0;
         for (MonzoAccount raw : rawAccounts) {
             Optional<Account> domain =
                     accountRepository.findByProviderAndProviderAccountId(Provider.MONZO, raw.getId());
@@ -86,6 +89,7 @@ public class BalanceRefreshService {
                 }
                 domain.get().recordBalance(balance.balanceMinorUnits(), Instant.now());
                 accountRepository.save(domain.get());
+                refreshed++;
             } catch (ProviderConnectionRevokedException e) {
                 log.warn("Balance refresh: connection {} revoked — abandoning its remaining accounts",
                         connectionId);
@@ -94,5 +98,6 @@ public class BalanceRefreshService {
                 log.warn("Balance refresh failed [account={}] - {}", raw.getId(), e.getMessage());
             }
         }
+        return refreshed;
     }
 }

@@ -8,8 +8,7 @@ import dev.amfshr.budgeteer.repository.MonzoAccountRepository;
 import dev.amfshr.budgeteer.repository.MonzoConnectionRepository;
 import dev.amfshr.budgeteer.repository.MonzoTransactionRepository;
 import dev.amfshr.budgeteer.security.CurrentUserId;
-import dev.amfshr.budgeteer.service.ingest.BalanceRefreshService;
-import dev.amfshr.budgeteer.service.ingest.IngestService;
+import dev.amfshr.budgeteer.service.ingest.IngestOrchestrator;
 import dev.amfshr.budgeteer.service.monzo.TransactionSyncService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,21 +39,18 @@ public class DevMonzoController {
     private final MonzoConnectionRepository connectionRepository;
     private final MonzoAccountRepository accountRepository;
     private final MonzoTransactionRepository transactionRepository;
-    private final IngestService ingestService;
-    private final BalanceRefreshService balanceRefreshService;
+    private final IngestOrchestrator ingestOrchestrator;
 
     public DevMonzoController(TransactionSyncService transactionSyncService,
                               MonzoConnectionRepository connectionRepository,
                               MonzoAccountRepository accountRepository,
                               MonzoTransactionRepository transactionRepository,
-                              IngestService ingestService,
-                              BalanceRefreshService balanceRefreshService) {
+                              IngestOrchestrator ingestOrchestrator) {
         this.transactionSyncService = transactionSyncService;
         this.connectionRepository = connectionRepository;
         this.accountRepository = accountRepository;
         this.transactionRepository = transactionRepository;
-        this.ingestService = ingestService;
-        this.balanceRefreshService = balanceRefreshService;
+        this.ingestOrchestrator = ingestOrchestrator;
     }
 
     /**
@@ -89,8 +85,7 @@ public class DevMonzoController {
     public ResponseEntity<ApiResponse<Void>> triggerIngest(@CurrentUserId UUID userId) {
         log.warn("DEV: Triggering manual ingest + balance refresh for user {}", userId);
 
-        ingestService.ingestAll();
-        balanceRefreshService.refreshAll();
+        ingestOrchestrator.runFullPass();
 
         return ResponseEntity.ok(ApiResponse.of(null));
     }

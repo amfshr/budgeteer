@@ -2,8 +2,7 @@ package dev.amfshr.budgeteer.service.monzo;
 
 import dev.amfshr.budgeteer.domain.monzo.MonzoAccount;
 import dev.amfshr.budgeteer.repository.MonzoAccountRepository;
-import dev.amfshr.budgeteer.service.ingest.BalanceRefreshService;
-import dev.amfshr.budgeteer.service.ingest.IngestService;
+import dev.amfshr.budgeteer.service.ingest.IngestOrchestrator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -18,15 +17,13 @@ public class TransactionSyncJob {
 
     private final TransactionSyncService syncService;
     private final MonzoAccountRepository accountRepository;
-    private final IngestService ingestService;
-    private final BalanceRefreshService balanceRefreshService;
+    private final IngestOrchestrator ingestOrchestrator;
 
     public TransactionSyncJob(TransactionSyncService syncService, MonzoAccountRepository accountRepository,
-                              IngestService ingestService, BalanceRefreshService balanceRefreshService) {
+                              IngestOrchestrator ingestOrchestrator) {
         this.syncService = syncService;
         this.accountRepository = accountRepository;
-        this.ingestService = ingestService;
-        this.balanceRefreshService = balanceRefreshService;
+        this.ingestOrchestrator = ingestOrchestrator;
     }
 
     /** Hourly chained run: sync → ingest → balances (decision 7 — one cron, no race). */
@@ -56,15 +53,6 @@ public class TransactionSyncJob {
 
         log.info("Transaction sync job complete: {}/{} synced, {} failed", synced, accounts.size(), failed);
 
-        try {
-            ingestService.ingestAll();
-        } catch (Exception e) {
-            log.error("Ingest failed after sync", e);
-        }
-        try {
-            balanceRefreshService.refreshAll();
-        } catch (Exception e) {
-            log.error("Balance refresh failed after sync", e);
-        }
+        ingestOrchestrator.runFullPass();
     }
 }

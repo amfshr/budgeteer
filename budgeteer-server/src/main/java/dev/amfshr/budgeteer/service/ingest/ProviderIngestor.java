@@ -21,6 +21,10 @@ public interface ProviderIngestor {
      */
     List<Account> ingestAccounts();
 
-    /** Map raw transactions re-touched since the account's cursor; advance the cursor. */
-    void ingestTransactions(Account account);
+    /**
+     * Map raw transactions re-touched since the account's cursor; advance the cursor.
+     *
+     * @return the number of transactions upserted into the domain (declined rows excluded)
+     */
+    int ingestTransactions(Account account);
 }
