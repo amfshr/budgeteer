@@ -145,7 +145,7 @@ public class AuthService {
         SessionService.SessionTokens sessionTokens = sessionService.createSession(user, userAgent, ipAddress);
 
         log.info("User authenticated successfully via magic link [userId={}, ipAddress={}, userAgent={}]", 
-                user.getId(), LogSanitizer.sanitize(ipAddress), maskUserAgent(userAgent));
+                user.getId(), LogSanitizer.sanitize(ipAddress), LogSanitizer.sanitize(maskUserAgent(userAgent)));
 
         return Optional.of(sessionTokens);
     }

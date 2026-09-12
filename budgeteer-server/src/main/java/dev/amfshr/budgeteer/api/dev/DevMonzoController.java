@@ -8,6 +8,7 @@ import dev.amfshr.budgeteer.repository.MonzoAccountRepository;
 import dev.amfshr.budgeteer.repository.MonzoConnectionRepository;
 import dev.amfshr.budgeteer.repository.MonzoTransactionRepository;
 import dev.amfshr.budgeteer.security.CurrentUserId;
+import dev.amfshr.budgeteer.util.LogSanitizer;
 import dev.amfshr.budgeteer.service.ingest.IngestOrchestrator;
 import dev.amfshr.budgeteer.service.monzo.TransactionSyncService;
 import org.slf4j.Logger;
@@ -102,7 +103,7 @@ public class DevMonzoController {
             @CurrentUserId UUID userId,
             @PathVariable String accountId
     ) {
-        log.warn("DEV: Resetting backfill for account {} (user {})", accountId, userId);
+        log.warn("DEV: Resetting backfill for account {} (user {})", LogSanitizer.sanitize(accountId), userId);
 
         MonzoAccount account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new ApiException(ErrorCode.RESOURCE_NOT_FOUND,
@@ -112,14 +113,15 @@ public class DevMonzoController {
             throw new ApiException(ErrorCode.ACCESS_DENIED, "Account does not belong to this user");
         }
 
-        transactionRepository.deleteByAccountId(accountId);
+        int deleted = transactionRepository.deleteByAccountId(accountId);
 
         account.setBackfillStatus(null);
         account.setBackfillProgressAt(null);
         account.setBackfillProgressCursor(null);
         accountRepository.save(account);
 
-        log.warn("DEV: Backfill reset complete for account {} — {} transactions deleted", accountId, accountId);
+        log.warn("DEV: Backfill reset complete for account {} — {} transactions deleted",
+                LogSanitizer.sanitize(accountId), deleted);
         return ResponseEntity.ok(ApiResponse.of(null));
     }
 }

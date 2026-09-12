@@ -32,7 +32,7 @@ public interface MonzoTransactionRepository extends JpaRepository<MonzoTransacti
 
     @Modifying
     @Query("DELETE FROM MonzoTransaction t WHERE t.account.id = :accountId")
-    void deleteByAccountId(@Param("accountId") String accountId);
+    int deleteByAccountId(@Param("accountId") String accountId);
 
     /**
      * Native upsert for backfill — handles re-runs and pending→settled transitions
