@@ -10,7 +10,7 @@
 
 | # | Task | Priority | Estimate | Plan |
 |---|------|----------|----------|------|
-| 11 | 🧱 Domain Model Mapping — raw→domain ingest + first product endpoints. **Implementation complete 2026-08-31, PR raised — awaiting Alexander's review/merge.** Built in three reviewed slices: V11 raw capture (encrypted `Sourced.rawJson()`), V12/V13 domain schema (`bank_accounts` — renamed from `user_accounts` in review — + `transactions`) with `MonzoIngestor`/`IngestService`/`BalanceRefreshService` + job/backfill chaining, then the read path (`GET /api/v1/accounts`, `/accounts/{id}/summary`, `/transactions` on `PageResponse`). 654 tests green incl. `IngestIT`/`SyncPipelineIT`/endpoint ITs. Noted in-flight: unauthenticated = **403** app-wide (no `AuthenticationEntryPoint`; spec said 401 — candidate ticket). Branch: `feature/domain-model-mapping` | 🟡 P2 | 2–3d | [plan](open/domain-model-mapping/plan.md) |
+| 13 | 🧰 E1 Web platform foundation — scaffold `budgeteer-web`: Vite+TS+React, react-bootstrap (mobile-first), TanStack Query, React Router, Vitest/RTL, ESLint+Prettier, Vite `/api` proxy (same-origin cookies), envelope-aware API client with central 401 handling, CI job (Session 01 dec 1–5). Branch: `feature/web-scaffold` | 🟡 P2 | 0.5–1d | [plan](open/web-platform-foundation/plan.md) |
 
 ---
 
@@ -27,7 +27,6 @@
 
 | # | Task | Priority | Estimate | Plan |
 |---|------|----------|----------|------|
-| 13 | 🧰 E1 Web platform foundation — scaffold `budgeteer-web`: Vite+TS+React, react-bootstrap, TanStack Query, React Router, Vitest/RTL, ESLint+Prettier, Vite `/api` proxy, CI job (Session 01 dec 1–5) | 🟡 P2 | 0.5–1d | [session](../notes/product/design-session-01-top-down.md) |
 | 14 | 🔑 E2 Real login — re-create Resend (zero code, config exists) + verify EmailService; entry/login page (landing folded in), signup, magic-link-sent + verify handoff, client session handling, logout (dec 6–8, 19) | 🟡 P2 | 1–2d | [session](../notes/product/design-session-01-top-down.md) |
 | 15 | 🛡️ E3 Settings & data rights — settings page: profile, Disconnect Monzo, Export JSON, **Delete+Purge** (instant, typed confirm, Monzo consent revoke). New server endpoints — **`/grill-me` the delete/export spec before build** (dec 9–12) | 🟡 P2 | 1–2d | [session](../notes/product/design-session-01-top-down.md) |
 | 16 | 💸 E4 Money views v1 — Monzo connect from client (incl. prod redirect-URI config), accounts view, dashboard v1 (fixed composition on existing APIs), transactions view v1. **Design Session 02 (user stories/views) before the dashboard build** (dec 18, 20–21) | 🟡 P2 | 2–3d | [session](../notes/product/design-session-01-top-down.md) |
@@ -80,6 +79,24 @@
 ---
 
 ## ✅ Done
+
+### September 2026
+- [x] **#11 Domain Model Mapping** (PR #87, merged 2026-09-12, squash `ddd3fd0`) — raw→domain
+      ingest pipeline + first product endpoints, built in three reviewed slices (V11 encrypted
+      raw capture, V12/V13 `bank_accounts`+`transactions` with cursor-driven
+      `MonzoIngestor`/`IngestService`/`BalanceRefreshService`, read path on `PageResponse`),
+      then the E0 contract close-out (services return domain types, `api/v1` packages, DTO
+      enums, 401 `ApiAuthenticationEntryPoint`, `IngestOrchestrator`) and a live IDE debug
+      session (full connect→backfill→ingest walked through; invariant 4,804 raw − 247 declined
+      = 4,557 domain verified). CodeQL log-injection gate cleared by making `LogSanitizer` a
+      recognized barrier (char-rebuild) + sanitizing the two genuinely-unsanitized dev-controller
+      sites. Docs shipped: `docs/architecture/INGEST-PIPELINE.md` +
+      `.agents/notes/ingest-debug-guide.md` (12 scenarios). **8 follow-up findings recorded at
+      the bottom of [plan](closed/domain-model-mapping/plan.md)** — targeted ingest dispatch,
+      cross-user isolation IT, joint-account edge, callback slimming, dead event path,
+      first-connect frontend contract, acceptance-test strategy, favicon 404.
+      Dev QoL landed en route: `.env` imported by dev profile (IDE boot without dev.sh),
+      `clean-on-startup=false`.
 
 ### August 2026
 - [x] **#12 Provider Contract Hardening** (PR #85, merged 2026-08-31) — sealed `SyncPosition`
@@ -176,8 +193,7 @@
 
 ---
 
-*Last updated: 2026-08-31 — #12 provider-contract hardening executed and merged (PR #85: sealed
-`SyncPosition` + `Sourced<T>` envelope; design pivoted from a second capability interface to
-Alexander's polymorphic-position proposal). `feature/domain-model-mapping` rebased onto the new
-contract, #11 spec current — **next: hand #11's Implementer Kickoff Prompt to the implementing
-model.***
+*Last updated: 2026-09-12 — #11 merged (PR #87) after the E0 contract close-out, live debug
+session and CodeQL gate clear; board cut over to the frontend epics. #13 web platform
+foundation promoted to In Progress on `feature/web-scaffold` — **next: scaffold
+`budgeteer-web`, then #14 real login (re-create Resend first).***
