@@ -843,3 +843,60 @@ walk-through.
 - [x] **Ingest throughput note** — ~2,400 rows mapped in ~24s (~100/s; one upsert round-trip
       per row inside the per-account tx). Acceptable at current scale/cadence; batch the
       upserts if it ever grows. Record as known trade-off, no change now
+
+---
+
+## Debug-session findings (2026-09-12, Alexander stepping through in the IDE)
+
+Raised during the live debug of the ingest flow on PR #87. **None block the merge** — each is a
+follow-up to schedule after; decisions to be made once the debug pass is complete.
+
+1. **Targeted ingest dispatch vs blanket `runFullPass()`** — `ProviderIngestor` is already a
+   DI-registered strategy (`IngestService` injects `List<ProviderIngestor>`), but every trigger
+   sweeps all providers × all accounts. Flows that *know* the owner of the incoming data
+   (webhooks #5, per-connection sync) should invoke the matching ingestor for just that
+   provider/account — e.g. `ingest(Provider, accountId)`. Blanket pass stays as the
+   re-ingest/repair tool. Folds into the sync-layer-generalisation work on the TrueLayer row;
+   becomes mandatory when webhooks land.
+2. **Cross-user isolation integration test** — the multi-user guarantee (token → `@CurrentUserId`
+   → `WHERE user_id` on every read; ownership derived token → connection → raw → domain on
+   writes) is designed in but never proven: only one real user has ever existed. Add an IT that
+   creates two users with synced data and asserts user B's endpoints return zero of user A's
+   rows — makes CI defend the isolation forever.
+3. **Joint-account identity edge (household scope)** — `findByProviderAndProviderAccountId` has
+   no user in the key and raw `monzo_accounts` is keyed by Monzo's account id with a single
+   `user_id` column: two app users connecting the same joint Monzo account would fight over one
+   row (first owner wins). Irrelevant at personal scope; must be answered by the Session 01
+   "household" ambition before any second real user shares an account.
+4. **Callback controller does orchestration** (`MonzoController.handleCallback`) — state
+   verification, denial branch, token exchange, Monzo user fetch, connection creation, backfill
+   trigger all inline in the controller. Collapse to one service call (e.g.
+   `connectionService.completeConnection(...)`); controller maps HTTP only. Also home for the
+   inline `// todo` about param validation extraction.
+5. **Dead event path + diverged async semantics** — `MonzoConnectionCreatedEvent` +
+   `TransactionSyncEventListener` exist but nothing publishes the event; the controller calls
+   `backfillAsync()` directly. The two paths differ dangerously: `backfillAsync` has the 8×2s
+   SCA retry loop, the listener's plain `backfill()` has none — reviving the event path naively
+   would silently lose SCA tolerance. Decide one mechanism: publish the event from
+   `createConnection`, move async+retry policy into the listener, delete `backfillAsync` (and
+   its mechanism-in-the-name naming) — or delete the dead listener/event. Fold into #4 /
+   sync-layer generalisation.
+6. **First-connect frontend contract (for epic #16)** — connect returns immediately; data
+   surfaces progressively (deliberate). UI must communicate it: poll
+   `GET /api/v1/monzo/sync/progress` (TanStack Query refetchInterval while IN_PROGRESS),
+   progress indicator, auto-invalidate account/transaction queries, manual refresh affordance.
+   Polling suffices at MVP; SSE post-MVP. Known wart rides along: `getSyncProgress` returns an
+   API DTO from the service layer (audit-lite finding, fix with sync generalisation).
+7. **Acceptance-test strategy (Alexander, end of debug session)** — the debug-guide scenarios
+   (`.agents/notes/ingest-debug-guide.md`) are good acceptance-test candidates. Direction
+   agreed in principle, scale to decide later: (a) cheapest/highest value — extend the existing
+   WireMock + Testcontainers IT suite to cover the uncovered scenarios (failure isolation via a
+   throwing ingestor, archive flip, pending→settled delta, user-owned column survival); the
+   in-process WireMock stubs already ARE the provider simulator; (b) Postman/newman smoke suite
+   against a deployed env — belongs to epic #17 (edge/deploy), collection exists; (c) a
+   standalone provider-simulator app + RestAssured — deferred: only pays off with a persistent
+   staging env, webhooks, or a second provider; WireMock standalone covers most of it if needed.
+8. **`/favicon.ico` → 500** — browser requests during the OAuth callback hit
+   `NoResourceFoundException`, which falls through to the generic handler and returns 500
+   INTERNAL_ERROR. Map `NoResourceFoundException` to 404 in the exception handlers (tiny fix,
+   nice log-noise reduction).
