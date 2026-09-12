@@ -16,16 +16,22 @@
 
 ## 📋 Queue (Next Up)
 
-> Execution order: **#11 → #5 → TrueLayer smoke test** (#12 done 2026-08-31, PR #85 — the
-> contract #11 builds on is final: `Sourced<T>` envelopes + sealed `SyncPosition`).
-> #5 sits behind #11 so webhook payloads
-> drop into an existing raw→domain ingest pipeline instead of being wired to the raw-only world
-> and reworked later. The TrueLayer Console signup + own-account smoke test is deliberately
-> deferred until #11 is done (decided 2026-08-17).
+> **Strategy reset (Design Session 01, 2026-09-11 — see
+> [.agents/notes/product/design-session-01-top-down.md](../notes/product/design-session-01-top-down.md)):
+> frontend-first, feature-light, demand-driven APIs.** Execution order:
+> **E0 (finish #11/PR #87 contract review) → #13 → #14 → (#15 ∥ #16, Session 02 before #16's
+> dashboard) → #17**. Webhooks and TrueLayer move to Backlog behind the frontend epics —
+> near-real-time sync and a second bank are invisible without a UI. Platform decided:
+> TypeScript React web app (Vite, react-bootstrap, TanStack Query), mobile-first,
+> browser-only (Electron retired, PWA later); Cloudflare Tunnel + Access in front.
 
 | # | Task | Priority | Estimate | Plan |
 |---|------|----------|----------|------|
-| 5 | 🪝 Phase 5: Webhooks — after #11: a webhook becomes a second trigger into the existing raw→domain pipeline + near-real-time balance refresh | 🟢 P3 | TBD | [plan](open/webhooks/plan.md) |
+| 13 | 🧰 E1 Web platform foundation — scaffold `budgeteer-web`: Vite+TS+React, react-bootstrap, TanStack Query, React Router, Vitest/RTL, ESLint+Prettier, Vite `/api` proxy, CI job (Session 01 dec 1–5) | 🟡 P2 | 0.5–1d | [session](../notes/product/design-session-01-top-down.md) |
+| 14 | 🔑 E2 Real login — re-create Resend (zero code, config exists) + verify EmailService; entry/login page (landing folded in), signup, magic-link-sent + verify handoff, client session handling, logout (dec 6–8, 19) | 🟡 P2 | 1–2d | [session](../notes/product/design-session-01-top-down.md) |
+| 15 | 🛡️ E3 Settings & data rights — settings page: profile, Disconnect Monzo, Export JSON, **Delete+Purge** (instant, typed confirm, Monzo consent revoke). New server endpoints — **`/grill-me` the delete/export spec before build** (dec 9–12) | 🟡 P2 | 1–2d | [session](../notes/product/design-session-01-top-down.md) |
+| 16 | 💸 E4 Money views v1 — Monzo connect from client (incl. prod redirect-URI config), accounts view, dashboard v1 (fixed composition on existing APIs), transactions view v1. **Design Session 02 (user stories/views) before the dashboard build** (dec 18, 20–21) | 🟡 P2 | 2–3d | [session](../notes/product/design-session-01-top-down.md) |
+| 17 | 🌐 E5 Edge & deploy — Dockerfile, NUC deploy, Cloudflare Tunnel + Access identity allowlist, one URL everywhere, security headers/CSP/CORS (dec 13–15). Any time after #14; required before daily phone use | 🟡 P2 | 1–2d | [session](../notes/product/design-session-01-top-down.md) |
 
 ---
 
@@ -35,20 +41,19 @@
 
 | Feature | Priority | Effort | Notes |
 |---------|----------|--------|-------|
+| 🪝 #5 Webhooks | P3 | TBD | [plan](open/webhooks/plan.md) — second trigger into the raw→domain pipeline + near-real-time balance refresh. **Moved behind frontend epics (Session 01)**; ⚠️ Monzo's servers can't pass Cloudflare Access — needs a deliberate bypass route with its own signature verification (Session 01 dec 17) |
+| 🏺 Pots & budgeting | P2 | TBD | Virtual pots as a double-entry overlay ledger — **any spec must cite §2a of the Session 01 doc** (two-legged transfers, conservation invariant, real balances as ground truth). After money views prove daily use |
+| 🧩 Widget dashboard | P3 | TBD | Customisable pick-and-choose widget summary (Session 01 dec 18 recorded the vision; dashboard v1 ships fixed). Design in/after Session 02 |
 | 📣 Event-driven post-sync hooks | P3 | 0.5d | [plan](closed/oauth-callback-events/plan.md) — `BackfillCompletedEvent` / `BackfillPausedEvent` + listeners (email, domain mapping, webhook registration). Natural fit alongside #11's `DomainMappingJob` |
-| 🏦 TrueLayer Integration (Lloyds/HSBC/Barclays) | P2 | 3–4d | [plan](open/truelayer-integration/plan.md) — add `provider-truelayer` jar as a 2nd implementation of the capability contracts (`ProviderConnectionAuth` + `AccountsCapability`/`BalanceCapability`/`TransactionsCapability`, split in PR #84; cards/standing-orders/direct-debits land as further capability interfaces), copying the `provider-monzo` template from #10. Interface already validated against TrueLayer's Data API in the #6 plan. **Aug 2026 re-check:** Data API still active (now positioned as an "add-on" product — mild vendor-risk signal); Console signup is self-serve, sandbox free, live own-account testing looks viable for a solo dev — **first action when picked up: Console signup + live smoke test (deferred until after #11)**. Token model: 90-day consent, reconfirmation-of-consent renewal, refresh token must be used within a 30-day sliding window. Transactions are date-windowed (`from`/`to`), no page cursor → impl returns null `nextCursor`. ⚠️ plan.md predates the multi-module split (BankAdapter pattern, old paths, V7 migration) — rewrite around the provider contract before build. Provider-contract rename (PR #80) + capability split (PR #84) already executed: jar lands as `provider-truelayer` implementing the capability interfaces. ⚠️ Delta sync: after #12, the fetch start is the sealed `SyncPosition` (`FromTime` \| `AfterTransaction` \| `NextPage`) on `TransactionsCapability.getTransactions` — TrueLayer's impl must switch exhaustively and **throw on `AfterTransaction`** (no id-based deltas). This task must add the time-window delta fallback (`FromTime(last synced − overlap)`, idempotent upserts) incl. the persisted last-synced timestamp (column + migration) and the routing in `TransactionSyncService`. Future payments = separate `PaymentInitiationProvider` interface; one TrueLayer class implements both. ⚠️ Sync-layer generalisation (Alexander, 2026-08-31): everything in `service/monzo/` that isn't OAuth-specific — `TransactionSyncJob`, `TransactionSyncService`, `TransactionSyncEventListener` + `MonzoConnectionCreatedEvent` — is Monzo-shaped and must generalise here, following the `IngestService`/`ProviderIngestor` orchestrator-plus-strategy pattern from #11 (e.g. generic `ProviderConnectionCreatedEvent(provider, connectionId)` + per-provider sync strategy; listeners out of the monzo subpackage) |
+| 🏦 TrueLayer Integration (Lloyds/HSBC/Barclays) | P2 | 3–4d | [plan](open/truelayer-integration/plan.md) — add `provider-truelayer` jar as a 2nd implementation of the capability contracts (`ProviderConnectionAuth` + `AccountsCapability`/`BalanceCapability`/`TransactionsCapability`, split in PR #84; cards/standing-orders/direct-debits land as further capability interfaces), copying the `provider-monzo` template from #10. Interface already validated against TrueLayer's Data API in the #6 plan. **Aug 2026 re-check:** Data API still active (now positioned as an "add-on" product — mild vendor-risk signal); Console signup is self-serve, sandbox free, live own-account testing looks viable for a solo dev — **first action when picked up: Console signup + live smoke test (deferred until after #11)**. Token model: 90-day consent, reconfirmation-of-consent renewal, refresh token must be used within a 30-day sliding window. Transactions are date-windowed (`from`/`to`), no page cursor → impl returns null `nextCursor`. ⚠️ plan.md predates the multi-module split (BankAdapter pattern, old paths, V7 migration) — rewrite around the provider contract before build. Provider-contract rename (PR #80) + capability split (PR #84) already executed: jar lands as `provider-truelayer` implementing the capability interfaces. ⚠️ Delta sync: after #12, the fetch start is the sealed `SyncPosition` (`FromTime` \| `AfterTransaction` \| `NextPage`) on `TransactionsCapability.getTransactions` — TrueLayer's impl must switch exhaustively and **throw on `AfterTransaction`** (no id-based deltas). This task must add the time-window delta fallback (`FromTime(last synced − overlap)`, idempotent upserts) incl. the persisted last-synced timestamp (column + migration) and the routing in `TransactionSyncService`. Future payments = separate `PaymentInitiationProvider` interface; one TrueLayer class implements both. **Deprioritised 2026-09-11 (Session 01): sits behind the frontend epics #13–#17 — no second bank before a frontend, real login, and basic features exist** ⚠️ Sync-layer generalisation (Alexander, 2026-08-31): everything in `service/monzo/` that isn't OAuth-specific — `TransactionSyncJob`, `TransactionSyncService`, `TransactionSyncEventListener` + `MonzoConnectionCreatedEvent` — is Monzo-shaped and must generalise here, following the `IngestService`/`ProviderIngestor` orchestrator-plus-strategy pattern from #11 (e.g. generic `ProviderConnectionCreatedEvent(provider, connectionId)` + per-provider sync strategy; listeners out of the monzo subpackage) |
 | 🧩 Per-page backfill commits (true mid-window resume) | P3 | 0.5d | Backfill commits one `TransactionTemplate` tx per ≤350-day window; an SCA 403 mid-window rolls the whole window back, so resume re-fetches it. `backfill_progress_cursor` is written per page but rolled back with the window — it never actually resumes mid-window. Commit each page (`REQUIRES_NEW`) so partial progress in a large window survives re-auth. Only bites if a single >90-day-old window can't be pulled within one 5-min SCA budget — low urgency for personal accounts |
 | 🔌 REST Client Refactoring & Config Consolidation | P2 | 1.5–2d | [plan](closed/rest-client-refactoring/plan.md) — Eliminate config sprawl, create `BankRestClient` base class, organize under `config/clients/` & `config/properties/`. Foundation for TrueLayer. Phase: after transaction sync + webhooks |
 | 🔄 MonzoClient Resilience | P3 | 0.5d | Connection pooling, timeouts, retries, circuit breaker |
 | 🔐 WebAuthn/Passkey Authentication | P2 | 2d | Touch ID / biometric login for fast re-auth |
 | Monitoring Infrastructure | P3 | 0.5d | Prometheus/Grafana on NUC |
 | Request Correlation | P3 | 0.25d | Trace IDs to external APIs |
-| Frontend OAuth Redirects | P2 | 0.5d | When frontend exists |
 | Architecture Diagrams | P3 | 0.5d | Mermaid diagrams for docs |
 | Branch Protection | P2 | 0.5h | GitHub settings |
-| Dockerfile | P2 | 0.5d | For deployment |
-| NUC Deployment | P2 | 1–2d | Domain, Cloudflare, deploy |
-| Frontend | P2 | TBD | Framework TBD (React/Vue/HTMX) |
 | 🔒 Remaining Security Headers | P3 | 0.25d | `Referrer-Policy: strict-origin-when-cross-origin` + `Permissions-Policy: camera=(), microphone=(), geolocation=()` — defer until frontend build; also configure Vite proxy (`/api` → `localhost:8080`) to avoid CORS/SameSite issues in dev |
 
 ---
