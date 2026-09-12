@@ -1,7 +1,7 @@
 package dev.amfshr.budgeteer.service.monzo;
 
 import dev.amfshr.budgeteer.api.common.ErrorCode;
-import dev.amfshr.budgeteer.api.monzo.dto.MonzoSyncProgressResponse;
+import dev.amfshr.budgeteer.api.v1.monzo.dto.MonzoSyncProgressResponse;
 import dev.amfshr.budgeteer.provider.AccountsCapability;
 import dev.amfshr.budgeteer.provider.TransactionsCapability;
 import dev.amfshr.budgeteer.provider.model.BankAccount;
@@ -18,6 +18,8 @@ import dev.amfshr.budgeteer.exception.ApiException;
 import dev.amfshr.budgeteer.repository.MonzoAccountRepository;
 import dev.amfshr.budgeteer.repository.MonzoConnectionRepository;
 import dev.amfshr.budgeteer.repository.MonzoTransactionRepository;
+import dev.amfshr.budgeteer.service.common.EncryptionService;
+import dev.amfshr.budgeteer.service.ingest.IngestOrchestrator;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +50,8 @@ public class TransactionSyncService {
     private final MonzoConnectionRepository connectionRepository;
     private final MonzoAccountRepository accountRepository;
     private final MonzoTransactionRepository transactionRepository;
+    private final EncryptionService encryptionService;
+    private final IngestOrchestrator ingestOrchestrator;
     private final TransactionTemplate txTemplate;
 
     public TransactionSyncService(
@@ -57,6 +61,8 @@ public class TransactionSyncService {
             MonzoConnectionRepository connectionRepository,
             MonzoAccountRepository accountRepository,
             MonzoTransactionRepository transactionRepository,
+            EncryptionService encryptionService,
+            IngestOrchestrator ingestOrchestrator,
             PlatformTransactionManager txManager
     ) {
         this.accountsCapability = accountsCapability;
@@ -65,6 +71,8 @@ public class TransactionSyncService {
         this.connectionRepository = connectionRepository;
         this.accountRepository = accountRepository;
         this.transactionRepository = transactionRepository;
+        this.encryptionService = encryptionService;
+        this.ingestOrchestrator = ingestOrchestrator;
         this.txTemplate = new TransactionTemplate(txManager);
     }
 
@@ -125,7 +133,7 @@ public class TransactionSyncService {
 
         for (Sourced<BankAccount> sourced : accountResponses) {
             BankAccount ar = sourced.payload();
-            MonzoAccount account = upsertAccount(ar, connection, connection.getUser());
+            MonzoAccount account = upsertAccount(sourced, connection, connection.getUser());
 
             if (ar.closed()) {
                 log.info("Skipping closed account [account={}]", label(account));
@@ -145,6 +153,12 @@ public class TransactionSyncService {
         }
 
         log.info("Backfill finished [connectionId={}, accounts={}]", connectionId, accountResponses.size());
+
+        // One-shot ingest + balance stamp so first-connect data surfaces without waiting for the
+        // hourly job (decision 7). Hooked here — not in backfillAsync — so every backfill entry
+        // point (OAuth event listener, manual endpoint, dev trigger) gets it, including the
+        // NEEDS_REAUTH pause path where partial data should still surface.
+        ingestOrchestrator.runFullPass();
     }
 
     @Transactional
@@ -182,7 +196,8 @@ public class TransactionSyncService {
 
     // ============ Private Methods ============
 
-    private MonzoAccount upsertAccount(BankAccount ar, MonzoConnection connection, User user) {
+    private MonzoAccount upsertAccount(Sourced<BankAccount> sourced, MonzoConnection connection, User user) {
+        BankAccount ar = sourced.payload();
         Instant monzoCreatedAt = ar.createdAt();
         Optional<MonzoAccount> existing = accountRepository.findById(ar.externalId());
         if (existing.isPresent()) {
@@ -191,12 +206,14 @@ public class TransactionSyncService {
             if (account.getMonzoCreatedAt() == null && monzoCreatedAt != null) {
                 account.setMonzoCreatedAt(monzoCreatedAt);
             }
+            account.setRawPayloadEncrypted(encryptRaw(sourced.rawJson()));
             return accountRepository.save(account);
         }
         MonzoAccount account = new MonzoAccount(
                 ar.externalId(), connection, user, ar.type(), ar.description(), ar.currency(), ar.closed()
         );
         account.setMonzoCreatedAt(monzoCreatedAt);
+        account.setRawPayloadEncrypted(encryptRaw(sourced.rawJson()));
         return accountRepository.save(account);
     }
 
@@ -336,7 +353,7 @@ public class TransactionSyncService {
                     from.toString().substring(0, 10), to.toString().substring(0, 10));
 
             for (Sourced<BankTransaction> sourced : page.transactions()) {
-                upsertTransaction(sourced.payload(), account);
+                upsertTransaction(sourced, account);
                 latestTxId = sourced.payload().externalId();
             }
 
@@ -376,7 +393,7 @@ public class TransactionSyncService {
             );
 
             for (Sourced<BankTransaction> sourced : page.transactions()) {
-                upsertTransaction(sourced.payload(), account);
+                upsertTransaction(sourced, account);
                 latestTxId = sourced.payload().externalId();
             }
 
@@ -393,7 +410,8 @@ public class TransactionSyncService {
         return latestTxId;
     }
 
-    private void upsertTransaction(BankTransaction tx, MonzoAccount account) {
+    private void upsertTransaction(Sourced<BankTransaction> sourced, MonzoAccount account) {
+        BankTransaction tx = sourced.payload();
         transactionRepository.upsert(
                 tx.externalId(),
                 account.getId(),
@@ -406,8 +424,15 @@ public class TransactionSyncService {
                 tx.notes(),
                 tx.declined(),
                 tx.createdAt(),
-                tx.settledAt()
+                tx.settledAt(),
+                encryptRaw(sourced.rawJson())
         );
+    }
+
+    /** EncryptionService.encrypt throws on null/empty — raw capture stores NULL instead. */
+    @Nullable
+    private String encryptRaw(@Nullable String rawJson) {
+        return (rawJson == null || rawJson.isEmpty()) ? null : encryptionService.encrypt(rawJson);
     }
 
     private MonzoSyncProgressResponse.AccountProgress toAccountProgress(MonzoAccount account) {

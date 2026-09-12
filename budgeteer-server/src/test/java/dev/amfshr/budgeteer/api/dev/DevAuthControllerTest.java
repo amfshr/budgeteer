@@ -2,6 +2,7 @@ package dev.amfshr.budgeteer.api.dev;
 
 import dev.amfshr.budgeteer.api.common.GlobalExceptionHandler;
 import dev.amfshr.budgeteer.config.SecurityConfig;
+import dev.amfshr.budgeteer.security.ApiAuthenticationEntryPoint;
 import dev.amfshr.budgeteer.domain.user.User;
 import dev.amfshr.budgeteer.service.auth.AuthService;
 import dev.amfshr.budgeteer.service.auth.DevAuthService;
@@ -34,7 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * use @ActiveProfiles("dev") to activate it.
  */
 @WebMvcTest(DevAuthController.class)
-@Import({SecurityConfig.class, GlobalExceptionHandler.class})
+@Import({SecurityConfig.class, GlobalExceptionHandler.class, ApiAuthenticationEntryPoint.class})
 @ActiveProfiles("dev")
 @DisplayName("DevAuthController")
 class DevAuthControllerTest {

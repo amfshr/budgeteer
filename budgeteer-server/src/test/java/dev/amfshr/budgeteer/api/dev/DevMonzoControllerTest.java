@@ -10,11 +10,13 @@ import dev.amfshr.budgeteer.api.common.ErrorCode;
 import dev.amfshr.budgeteer.repository.MonzoAccountRepository;
 import dev.amfshr.budgeteer.repository.MonzoConnectionRepository;
 import dev.amfshr.budgeteer.repository.MonzoTransactionRepository;
+import dev.amfshr.budgeteer.security.ApiAuthenticationEntryPoint;
 import dev.amfshr.budgeteer.security.CurrentUserArgumentResolver;
 import dev.amfshr.budgeteer.security.JweAuthenticationFilter.JweAuthentication;
 import dev.amfshr.budgeteer.service.auth.AuthService;
 import dev.amfshr.budgeteer.service.auth.JweTokenService;
 import dev.amfshr.budgeteer.service.common.CookieService;
+import dev.amfshr.budgeteer.service.ingest.IngestOrchestrator;
 import dev.amfshr.budgeteer.service.monzo.TransactionSyncService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -40,7 +42,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(DevMonzoController.class)
 @Import({SecurityConfig.class, GlobalExceptionHandler.class, WebMvcConfig.class,
-        CurrentUserArgumentResolver.class})
+        CurrentUserArgumentResolver.class, ApiAuthenticationEntryPoint.class})
 @ActiveProfiles("dev")
 @DisplayName("DevMonzoController")
 class DevMonzoControllerTest {
@@ -59,6 +61,9 @@ class DevMonzoControllerTest {
 
     @MockitoBean
     private MonzoTransactionRepository transactionRepository;
+
+    @MockitoBean
+    private IngestOrchestrator ingestOrchestrator;
 
     // Required by SecurityConfig → JweAuthenticationFilter and CurrentUserArgumentResolver
     @MockitoBean

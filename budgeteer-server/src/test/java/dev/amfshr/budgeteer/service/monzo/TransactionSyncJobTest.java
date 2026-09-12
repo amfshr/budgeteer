@@ -2,9 +2,11 @@ package dev.amfshr.budgeteer.service.monzo;
 
 import dev.amfshr.budgeteer.domain.monzo.MonzoAccount;
 import dev.amfshr.budgeteer.repository.MonzoAccountRepository;
+import dev.amfshr.budgeteer.service.ingest.IngestOrchestrator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -19,6 +21,7 @@ class TransactionSyncJobTest {
 
     @Mock private TransactionSyncService syncService;
     @Mock private MonzoAccountRepository accountRepository;
+    @Mock private IngestOrchestrator ingestOrchestrator;
 
     @InjectMocks
     private TransactionSyncJob job;
@@ -61,7 +64,20 @@ class TransactionSyncJobTest {
 
         job.syncAllAccounts();
 
-        verifyNoInteractions(syncService);
+        verifyNoInteractions(syncService, ingestOrchestrator);
+    }
+
+    @Test
+    @DisplayName("runs the ingest+balance pass after the sync loop")
+    void chainsIngestPassAfterSync() {
+        MonzoAccount account = mockAccount("acc_001");
+        when(accountRepository.findAllSyncable()).thenReturn(List.of(account));
+
+        job.syncAllAccounts();
+
+        InOrder inOrder = inOrder(syncService, ingestOrchestrator);
+        inOrder.verify(syncService).deltaSync("acc_001");
+        inOrder.verify(ingestOrchestrator).runFullPass();
     }
 
     private MonzoAccount mockAccount(String id) {

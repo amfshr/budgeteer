@@ -19,7 +19,10 @@ services:
     ports:
       - "127.0.0.1:5432:5432"   # localhost only — never expose Postgres to the network
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      # postgres:18 moved PGDATA under /var/lib/postgresql/18/... — mount the parent so the
+      # named volume actually holds the data (the old /var/lib/postgresql/data target left it
+      # in an anonymous volume that died on every container recreate)
+      - pgdata:/var/lib/postgresql
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "${DB_USER}"]
       interval: 10s

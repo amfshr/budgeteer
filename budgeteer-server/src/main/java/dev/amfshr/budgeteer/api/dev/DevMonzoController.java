@@ -8,6 +8,8 @@ import dev.amfshr.budgeteer.repository.MonzoAccountRepository;
 import dev.amfshr.budgeteer.repository.MonzoConnectionRepository;
 import dev.amfshr.budgeteer.repository.MonzoTransactionRepository;
 import dev.amfshr.budgeteer.security.CurrentUserId;
+import dev.amfshr.budgeteer.util.LogSanitizer;
+import dev.amfshr.budgeteer.service.ingest.IngestOrchestrator;
 import dev.amfshr.budgeteer.service.monzo.TransactionSyncService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,15 +40,18 @@ public class DevMonzoController {
     private final MonzoConnectionRepository connectionRepository;
     private final MonzoAccountRepository accountRepository;
     private final MonzoTransactionRepository transactionRepository;
+    private final IngestOrchestrator ingestOrchestrator;
 
     public DevMonzoController(TransactionSyncService transactionSyncService,
                               MonzoConnectionRepository connectionRepository,
                               MonzoAccountRepository accountRepository,
-                              MonzoTransactionRepository transactionRepository) {
+                              MonzoTransactionRepository transactionRepository,
+                              IngestOrchestrator ingestOrchestrator) {
         this.transactionSyncService = transactionSyncService;
         this.connectionRepository = connectionRepository;
         this.accountRepository = accountRepository;
         this.transactionRepository = transactionRepository;
+        this.ingestOrchestrator = ingestOrchestrator;
     }
 
     /**
@@ -72,6 +77,21 @@ public class DevMonzoController {
     }
 
     /**
+     * Triggers a raw → domain ingest pass plus a balance refresh, without re-syncing from Monzo.
+     * Useful during development to re-map after schema or mapping changes.
+     *
+     * <p>POST /api/dev/monzo/ingest
+     */
+    @PostMapping("/ingest")
+    public ResponseEntity<ApiResponse<Void>> triggerIngest(@CurrentUserId UUID userId) {
+        log.warn("DEV: Triggering manual ingest + balance refresh for user {}", userId);
+
+        ingestOrchestrator.runFullPass();
+
+        return ResponseEntity.ok(ApiResponse.of(null));
+    }
+
+    /**
      * Resets backfill progress for a specific account and deletes all its transactions.
      * Useful for re-testing the full backfill flow without recreating the database.
      *
@@ -83,7 +103,7 @@ public class DevMonzoController {
             @CurrentUserId UUID userId,
             @PathVariable String accountId
     ) {
-        log.warn("DEV: Resetting backfill for account {} (user {})", accountId, userId);
+        log.warn("DEV: Resetting backfill for account {} (user {})", LogSanitizer.sanitize(accountId), userId);
 
         MonzoAccount account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new ApiException(ErrorCode.RESOURCE_NOT_FOUND,
@@ -93,14 +113,15 @@ public class DevMonzoController {
             throw new ApiException(ErrorCode.ACCESS_DENIED, "Account does not belong to this user");
         }
 
-        transactionRepository.deleteByAccountId(accountId);
+        int deleted = transactionRepository.deleteByAccountId(accountId);
 
         account.setBackfillStatus(null);
         account.setBackfillProgressAt(null);
         account.setBackfillProgressCursor(null);
         accountRepository.save(account);
 
-        log.warn("DEV: Backfill reset complete for account {} — {} transactions deleted", accountId, accountId);
+        log.warn("DEV: Backfill reset complete for account {} — {} transactions deleted",
+                LogSanitizer.sanitize(accountId), deleted);
         return ResponseEntity.ok(ApiResponse.of(null));
     }
 }

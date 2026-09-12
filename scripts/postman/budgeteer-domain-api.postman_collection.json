@@ -1,0 +1,419 @@
+{
+ "info": {
+  "_postman_id": "budgeteer-domain-api-collection",
+  "name": "Budgeteer — Domain API (#11)",
+  "description": "Manual walk-through of the #11 domain endpoints: raw→domain ingest + the first product reads.\n\n## Recommended Order\n\n1. **Setup** — Quick Login, then Trigger Ingest (maps existing raw rows into bank_accounts/transactions and stamps balances)\n2. **Accounts** — list, includeArchived, summary (default + explicit zone), then the 400/404 failure shapes\n3. **Transactions** — default page, explicit paging, from/to (half-open [from,to)), accountId filter, then the 400 failure shapes\n\n## Prerequisites\n- App running with `dev` profile (`./scripts/dev.sh start`)\n- Monzo OAuth completed earlier + at least one backfill/sync run (raw tables populated)\n- Import `budgeteer-local.postman_environment.json` and select it\n- Run `⚡ Quick Login` first to set auth cookies\n\n## What This Tests\n- POST /api/dev/monzo/ingest (dev trigger: ingest + balance refresh)\n- GET /api/v1/accounts (+ includeArchived)\n- GET /api/v1/accounts/{id}/summary (+ zone param, 400 bad zone, 404 unknown)\n- GET /api/v1/transactions (paging, from/to, accountId filter, 400 validation shapes)\n\nNote: unauthenticated requests to these endpoints return **403** (app-wide Spring Security default — no AuthenticationEntryPoint). To see it, clear the Postman cookie jar for localhost and re-send any request.",
+  "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+ },
+ "item": [
+  {
+   "name": "0. Setup",
+   "item": [
+    {
+     "name": "⚡ Quick Login (Dev Only)",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "exec": [
+         "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+         "",
+         "var json = pm.response.json();",
+         "pm.environment.set(\"access_token\", json.data.accessToken);",
+         "pm.environment.set(\"refresh_token\", json.data.refreshToken);",
+         "pm.environment.set(\"user_id\", json.data.userId);",
+         "pm.environment.set(\"user_email\", json.data.email);",
+         "",
+         "console.log(\"✅ Logged in as: \" + json.data.email);"
+        ],
+        "type": "text/javascript"
+       }
+      }
+     ],
+     "request": {
+      "method": "POST",
+      "header": [{ "key": "Content-Type", "value": "application/json" }],
+      "body": { "mode": "raw", "raw": "{\n    \"email\": \"{{user_email}}\"\n}" },
+      "url": {
+       "raw": "{{base_url}}/api/dev/auth/quick-login",
+       "host": ["{{base_url}}"],
+       "path": ["api", "dev", "auth", "quick-login"]
+      },
+      "description": "Log in without a magic link. Sets the auth cookies used by every request below."
+     }
+    },
+    {
+     "name": "Trigger Ingest + Balance Refresh",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "exec": [
+         "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+         "console.log(\"✅ Ingest pass complete — raw rows mapped to bank_accounts/transactions, balances stamped\");"
+        ],
+        "type": "text/javascript"
+       }
+      }
+     ],
+     "request": {
+      "method": "POST",
+      "url": {
+       "raw": "{{base_url}}/api/dev/monzo/ingest",
+       "host": ["{{base_url}}"],
+       "path": ["api", "dev", "monzo", "ingest"]
+      },
+      "description": "Dev-only: runs IngestService.ingestAll() then BalanceRefreshService.refreshAll() against whatever raw data the last sync/backfill left. Flow: monzo_* raw tables → MonzoIngestor (cursor on raw updated_at) → bank_accounts + transactions; then getBalance per account → balance snapshot columns."
+     }
+    }
+   ]
+  },
+  {
+   "name": "1. Accounts",
+   "item": [
+    {
+     "name": "List accounts",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "exec": [
+         "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+         "var json = pm.response.json();",
+         "pm.test(\"Envelope: success=true\", () => pm.expect(json.success).to.be.true);",
+         "pm.test(\"data is an array\", () => pm.expect(json.data).to.be.an(\"array\"));",
+         "",
+         "if (json.data.length > 0) {",
+         "    pm.environment.set(\"account_id\", json.data[0].id);",
+         "    console.log(\"✅ \" + json.data.length + \" account(s). First: \" + json.data[0].institutionName + \" / \" + json.data[0].accountType + \" — balance \" + json.data[0].balanceMinorUnits + \" \" + json.data[0].currency);",
+         "    console.log(\"🆔 account_id set to \" + json.data[0].id);",
+         "} else {",
+         "    console.log(\"⚠️ No accounts — run Trigger Ingest first (and make sure a backfill has run)\");",
+         "}"
+        ],
+        "type": "text/javascript"
+       }
+      }
+     ],
+     "request": {
+      "method": "GET",
+      "url": {
+       "raw": "{{base_url}}/api/v1/accounts",
+       "host": ["{{base_url}}"],
+       "path": ["api", "v1", "accounts"]
+      },
+      "description": "The user's active bank accounts, ordered display_order then created_at. Flow: AccountController → AccountService.listAccounts → AccountRepository.findActiveByUserId (user-scoped JPQL) → AccountResponse DTOs in the ApiResponse envelope. Balance fields are null until the first balance refresh."
+     }
+    },
+    {
+     "name": "List accounts (includeArchived)",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "exec": [
+         "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+         "var json = pm.response.json();",
+         "console.log(\"✅ \" + json.data.length + \" account(s) incl. archived: \" + json.data.filter(a => a.archived).length + \" archived\");"
+        ],
+        "type": "text/javascript"
+       }
+      }
+     ],
+     "request": {
+      "method": "GET",
+      "url": {
+       "raw": "{{base_url}}/api/v1/accounts?includeArchived=true",
+       "host": ["{{base_url}}"],
+       "path": ["api", "v1", "accounts"],
+       "query": [{ "key": "includeArchived", "value": "true" }]
+      },
+      "description": "Same as above but via findByUserId — archived (closed/disconnected) accounts included, flagged archived=true."
+     }
+    },
+    {
+     "name": "Account summary (default zone)",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "exec": [
+         "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+         "var json = pm.response.json();",
+         "pm.test(\"Zone defaulted to Europe/London\", () => pm.expect(json.data.zone).to.eql(\"Europe/London\"));",
+         "pm.test(\"out sums are non-negative magnitudes\", () => {",
+         "    pm.expect(json.data.today.outMinorUnits).to.be.at.least(0);",
+         "    pm.expect(json.data.monthToDate.outMinorUnits).to.be.at.least(0);",
+         "});",
+         "console.log(\"✅ today in/out: \" + json.data.today.inMinorUnits + \"/\" + json.data.today.outMinorUnits + \" | week: \" + json.data.thisWeek.inMinorUnits + \"/\" + json.data.thisWeek.outMinorUnits + \" | month: \" + json.data.monthToDate.inMinorUnits + \"/\" + json.data.monthToDate.outMinorUnits);"
+        ],
+        "type": "text/javascript"
+       }
+      }
+     ],
+     "request": {
+      "method": "GET",
+      "url": {
+       "raw": "{{base_url}}/api/v1/accounts/{{account_id}}/summary",
+       "host": ["{{base_url}}"],
+       "path": ["api", "v1", "accounts", "{{account_id}}", "summary"]
+      },
+      "description": "today / Monday-start week / month-to-date sums. Flow: AccountController (parses zone, defaults Europe/London) → AccountService.getSummary (404 if not the caller's account; computes window boundaries in the zone; floor = min(weekStart, monthStart)) → TransactionRepository.sumWindows (one native query, six FILTER sums, excludes excluded_from_analytics, includes PENDING) → out converted to positive magnitude."
+     }
+    },
+    {
+     "name": "Account summary (explicit zone)",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "exec": [
+         "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+         "pm.test(\"Zone echoed\", () => pm.expect(pm.response.json().data.zone).to.eql(\"America/New_York\"));"
+        ],
+        "type": "text/javascript"
+       }
+      }
+     ],
+     "request": {
+      "method": "GET",
+      "url": {
+       "raw": "{{base_url}}/api/v1/accounts/{{account_id}}/summary?zone=America/New_York",
+       "host": ["{{base_url}}"],
+       "path": ["api", "v1", "accounts", "{{account_id}}", "summary"],
+       "query": [{ "key": "zone", "value": "America/New_York" }]
+      },
+      "description": "Same sums with the day/week/month boundaries computed in New York time — 'today' can differ from the London answer around midnight."
+     }
+    },
+    {
+     "name": "❌ Summary — invalid zone (400)",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "exec": [
+         "pm.test(\"Status 400\", () => pm.response.to.have.status(400));",
+         "console.log(\"✅ VALIDATION_ERROR: \" + pm.response.json().message);"
+        ],
+        "type": "text/javascript"
+       }
+      }
+     ],
+     "request": {
+      "method": "GET",
+      "url": {
+       "raw": "{{base_url}}/api/v1/accounts/{{account_id}}/summary?zone=Mars/Olympus_Mons",
+       "host": ["{{base_url}}"],
+       "path": ["api", "v1", "accounts", "{{account_id}}", "summary"],
+       "query": [{ "key": "zone", "value": "Mars/Olympus_Mons" }]
+      },
+      "description": "ZoneId.of fails → 400 VALIDATION_ERROR (currently via try/catch in the controller — flagged in PR review for native ZoneId binding instead)."
+     }
+    },
+    {
+     "name": "❌ Summary — unknown account (404)",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "exec": [
+         "pm.test(\"Status 404\", () => pm.response.to.have.status(404));"
+        ],
+        "type": "text/javascript"
+       }
+      }
+     ],
+     "request": {
+      "method": "GET",
+      "url": {
+       "raw": "{{base_url}}/api/v1/accounts/00000000-0000-0000-0000-000000000000/summary",
+       "host": ["{{base_url}}"],
+       "path": ["api", "v1", "accounts", "00000000-0000-0000-0000-000000000000", "summary"]
+      },
+      "description": "Unknown (or another user's) account id → 404 RESOURCE_NOT_FOUND. Never 403: existence is not confirmed."
+     }
+    }
+   ]
+  },
+  {
+   "name": "2. Transactions",
+   "item": [
+    {
+     "name": "List transactions (defaults)",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "exec": [
+         "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+         "var json = pm.response.json();",
+         "pm.test(\"House paging envelope\", () => {",
+         "    pm.expect(json.data).to.have.keys(\"items\", \"page\", \"size\", \"totalElements\", \"totalPages\");",
+         "});",
+         "pm.test(\"Defaults page=0 size=50\", () => {",
+         "    pm.expect(json.data.page).to.eql(0);",
+         "    pm.expect(json.data.size).to.eql(50);",
+         "});",
+         "console.log(\"✅ \" + json.data.totalElements + \" transaction(s) total, \" + json.data.items.length + \" on this page (newest first)\");",
+         "if (json.data.items.length > 0) {",
+         "    var t = json.data.items[0];",
+         "    console.log(\"   newest: \" + t.occurredAt + \" \" + t.amountMinorUnits + \" \" + t.currency + \" \" + (t.merchantName || t.description) + \" [\" + t.status + \"]\");",
+         "}"
+        ],
+        "type": "text/javascript"
+       }
+      }
+     ],
+     "request": {
+      "method": "GET",
+      "url": {
+       "raw": "{{base_url}}/api/v1/transactions",
+       "host": ["{{base_url}}"],
+       "path": ["api", "v1", "transactions"]
+      },
+      "description": "Newest-first page of the user's transactions. Flow: TransactionController (bean-validated page/size) → TransactionQueryService (defaults open-ended range EPOCH→far-future) → TransactionRepository.findFiltered (user-scoped JPQL, order in the query, unsorted Pageable) → PageResponse envelope."
+     }
+    },
+    {
+     "name": "List transactions (page 1, size 5)",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "exec": [
+         "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+         "var json = pm.response.json();",
+         "pm.test(\"Requested page metadata echoed\", () => {",
+         "    pm.expect(json.data.page).to.eql(1);",
+         "    pm.expect(json.data.size).to.eql(5);",
+         "});"
+        ],
+        "type": "text/javascript"
+       }
+      }
+     ],
+     "request": {
+      "method": "GET",
+      "url": {
+       "raw": "{{base_url}}/api/v1/transactions?page=1&size=5",
+       "host": ["{{base_url}}"],
+       "path": ["api", "v1", "transactions"],
+       "query": [
+        { "key": "page", "value": "1" },
+        { "key": "size", "value": "5" }
+       ]
+      }
+     }
+    },
+    {
+     "name": "List transactions (from/to window)",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "exec": [
+         "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+         "var json = pm.response.json();",
+         "console.log(\"✅ \" + json.data.totalElements + \" transaction(s) in the window — remember [from, to) is half-open: a tx exactly at 'to' is EXCLUDED\");"
+        ],
+        "type": "text/javascript"
+       }
+      }
+     ],
+     "request": {
+      "method": "GET",
+      "url": {
+       "raw": "{{base_url}}/api/v1/transactions?from=2026-08-01T00:00:00Z&to=2026-09-01T00:00:00Z",
+       "host": ["{{base_url}}"],
+       "path": ["api", "v1", "transactions"],
+       "query": [
+        { "key": "from", "value": "2026-08-01T00:00:00Z" },
+        { "key": "to", "value": "2026-09-01T00:00:00Z" }
+       ]
+      },
+      "description": "ISO-8601 Instants bind natively. Half-open [from, to): occurred_at >= from AND < to. The frontend owns timezone policy by choosing the instants."
+     }
+    },
+    {
+     "name": "List transactions (accountId filter)",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "exec": [
+         "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+         "var json = pm.response.json();",
+         "console.log(\"✅ \" + json.data.totalElements + \" transaction(s) for account {{account_id}}\");",
+         "console.log(\"ℹ️ Filtering by an accountId you don't own returns an EMPTY PAGE, not 404 (user-scoped query, no info leak)\");"
+        ],
+        "type": "text/javascript"
+       }
+      }
+     ],
+     "request": {
+      "method": "GET",
+      "url": {
+       "raw": "{{base_url}}/api/v1/transactions?accountId={{account_id}}",
+       "host": ["{{base_url}}"],
+       "path": ["api", "v1", "transactions"],
+       "query": [{ "key": "accountId", "value": "{{account_id}}" }]
+      }
+     }
+    },
+    {
+     "name": "❌ size=201 (400)",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "exec": [
+         "pm.test(\"Status 400\", () => pm.response.to.have.status(400));"
+        ],
+        "type": "text/javascript"
+       }
+      }
+     ],
+     "request": {
+      "method": "GET",
+      "url": {
+       "raw": "{{base_url}}/api/v1/transactions?size=201",
+       "host": ["{{base_url}}"],
+       "path": ["api", "v1", "transactions"],
+       "query": [{ "key": "size", "value": "201" }]
+      },
+      "description": "@Max(200) on size → ConstraintViolationException → 400 via GlobalExceptionHandler."
+     }
+    },
+    {
+     "name": "❌ from >= to (400)",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "exec": [
+         "pm.test(\"Status 400\", () => pm.response.to.have.status(400));",
+         "console.log(\"✅ \" + pm.response.json().message);"
+        ],
+        "type": "text/javascript"
+       }
+      }
+     ],
+     "request": {
+      "method": "GET",
+      "url": {
+       "raw": "{{base_url}}/api/v1/transactions?from=2026-09-01T00:00:00Z&to=2026-08-01T00:00:00Z",
+       "host": ["{{base_url}}"],
+       "path": ["api", "v1", "transactions"],
+       "query": [
+        { "key": "from", "value": "2026-09-01T00:00:00Z" },
+        { "key": "to", "value": "2026-08-01T00:00:00Z" }
+       ]
+      },
+      "description": "Service-level validation: from must be strictly before to → 400 VALIDATION_ERROR."
+     }
+    }
+   ]
+  }
+ ]
+}

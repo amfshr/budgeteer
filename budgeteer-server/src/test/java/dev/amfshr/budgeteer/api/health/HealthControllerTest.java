@@ -2,6 +2,7 @@ package dev.amfshr.budgeteer.api.health;
 
 import dev.amfshr.budgeteer.api.common.GlobalExceptionHandler;
 import dev.amfshr.budgeteer.config.SecurityConfig;
+import dev.amfshr.budgeteer.security.ApiAuthenticationEntryPoint;
 import dev.amfshr.budgeteer.service.auth.AuthService;
 import dev.amfshr.budgeteer.service.common.CookieService;
 import dev.amfshr.budgeteer.service.auth.JweTokenService;
@@ -29,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * <p>Tests health check endpoints which are public (no auth required).
  */
 @WebMvcTest(HealthController.class)
-@Import({SecurityConfig.class, GlobalExceptionHandler.class})
+@Import({SecurityConfig.class, GlobalExceptionHandler.class, ApiAuthenticationEntryPoint.class})
 @DisplayName("HealthController")
 class HealthControllerTest {
 

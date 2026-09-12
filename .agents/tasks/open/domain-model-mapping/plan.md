@@ -5,7 +5,7 @@
 ## Goal
 
 Build the provider-agnostic domain layer above the raw `monzo_*` tables: unified
-`user_accounts` / `transactions` fed by an idempotent raw→domain ingest pipeline chained onto the
+`bank_accounts` / `transactions` fed by an idempotent raw→domain ingest pipeline chained onto the
 existing hourly sync, balance snapshots via `BalanceCapability.getBalance`, encrypted raw-payload capture,
 and the first three product-facing read endpoints. This unblocks every budgeting feature
 (categories, budgets, virtual pots, reports) and gives a frontend real data to render.
@@ -17,19 +17,19 @@ any.
 
 ## Acceptance Criteria
 
-- [ ] After OAuth + backfill + one ingest run, `GET /api/v1/accounts`, `GET /api/v1/accounts/{id}/summary`
+- [x] After OAuth + backfill + one ingest run, `GET /api/v1/accounts`, `GET /api/v1/accounts/{id}/summary`
       and `GET /api/v1/transactions` return real synced data, user-scoped
-- [ ] Re-running the ingest creates zero duplicates, flips `PENDING → SETTLED` when raw learns of
+- [x] Re-running the ingest creates zero duplicates, flips `PENDING → SETTLED` when raw learns of
       settlement, and never overwrites `notes` or `excluded_from_analytics` on existing domain rows
-- [ ] Declined raw transactions are never mapped
-- [ ] `raw_payload_encrypted` is populated (AES-256-GCM) on both raw tables during sync; NULL when
+- [x] Declined raw transactions are never mapped
+- [x] `raw_payload_encrypted` is populated (AES-256-GCM) on both raw tables during sync; NULL when
       the provider gave no `rawJson`; never logged
-- [ ] Balance snapshots land on `user_accounts` with `balance_as_of` stamped, refreshed hourly and
+- [x] Balance snapshots land on `bank_accounts` with `balance_as_of` stamped, refreshed hourly and
       after backfill
-- [ ] Closed raw accounts / disconnected connections surface as `archived_at` set; reopened
+- [x] Closed raw accounts / disconnected connections surface as `archived_at` set; reopened
       accounts un-archive
-- [ ] User A cannot read user B's accounts or transactions (asserted by an IT)
-- [ ] `/check` green (checkstyle + unit + integration)
+- [x] User A cannot read user B's accounts or transactions (asserted by an IT)
+- [x] `/check` green (checkstyle + unit + integration)
 
 ## Out of Scope
 
@@ -111,7 +111,7 @@ Grilled 2026-08-22:
 | # | Decision | Rationale | Rejected alternative |
 |---|----------|-----------|----------------------|
 | 1 | Slice-1 API = three reads only (`GET /accounts`, `GET /accounts/{id}/summary`, `GET /transactions`) | Smallest slice proving the pipeline end-to-end | PATCH + balance-refresh POST — additive later, no schema impact |
-| 2 | Mapping cursor = `raw_synced_through` on `user_accounts`, tracking max raw `updated_at` mapped; query `updated_at > cursor` | Raw upsert bumps `updated_at` on every re-touch, so the cursor catches settlement flips and late-arriving backfill windows | `monzo_created_at` cursor (misses flips); full remap per run (wasteful, grows forever) |
+| 2 | Mapping cursor = `raw_synced_through` on `bank_accounts`, tracking max raw `updated_at` mapped; query `updated_at > cursor` | Raw upsert bumps `updated_at` on every re-touch, so the cursor catches settlement flips and late-arriving backfill windows | `monzo_created_at` cursor (misses flips); full remap per run (wasteful, grows forever) |
 | 3 | `notes` seeded on insert only — ON CONFLICT update set never includes it | Cheapest honest implementation of L2; future PATCH owns it | Dual provider/user columns; edited-flag |
 | 4 | `AccountType` enum gains `OTHER` fallback; unknown raw types map to OTHER + WARN | Never lies to the UI, never blocks mapping | Default-to-CURRENT (mislabels); skip account (vanishes) |
 | 5 | Pagination = explicit `page`/`size` params + owned `PageResponse<T>` record inside `ApiResponse` | Stable JSON we own; totals for the UI; house pattern for all future lists | Spring `PagedModel` (inherits Spring's wire format); keyset (YAGNI at this volume) |
@@ -144,12 +144,17 @@ alter table monzo_transactions
 create index idx_monzo_txn_account_updated on monzo_transactions(account_id, updated_at);
 ```
 
-### V12 — `user_accounts`
+### V12 — `bank_accounts`
 
-`V12__create_user_accounts.sql`
+> Renamed from `user_accounts` during implementation (Alexander, 2026-08-31): too easily
+> mistaken for `users`. `bank_accounts` says what each row is — a bank account at an
+> institution, delivered by a provider. Java entity stays `Account` (a `BankAccount` entity
+> would collide with provider-api's `BankAccount` record in imports).
+
+`V12__create_bank_accounts.sql`
 
 ```sql
-create table user_accounts (
+create table bank_accounts (
     id                       uuid primary key,
     user_id                  uuid not null references users(id) on delete cascade,
     provider                 varchar(32)  not null,
@@ -166,11 +171,11 @@ create table user_accounts (
     raw_synced_through       timestamp with time zone,
     created_at               timestamp with time zone not null default now(),
     updated_at               timestamp with time zone not null default now(),
-    constraint uq_user_accounts_provider_account unique (provider, provider_account_id)
+    constraint uq_bank_accounts_provider_account unique (provider, provider_account_id)
 );
 
-create index idx_user_accounts_user        on user_accounts(user_id);
-create index idx_user_accounts_user_active on user_accounts(user_id) where archived_at is null;
+create index idx_bank_accounts_user        on bank_accounts(user_id);
+create index idx_bank_accounts_user_active on bank_accounts(user_id) where archived_at is null;
 ```
 
 Notes: id is app-generated (`GenerationType.UUID`, matching `User`). Balance columns nullable —
@@ -185,7 +190,7 @@ Deliberately **no FK to `monzo_connections`** (L-locked).
 create table transactions (
     id                      uuid primary key,
     user_id                 uuid not null references users(id)         on delete cascade,
-    account_id              uuid not null references user_accounts(id) on delete cascade,
+    account_id              uuid not null references bank_accounts(id) on delete cascade,
     provider                varchar(32)  not null,
     provider_transaction_id varchar(255) not null,
     amount_minor_units      bigint       not null,
@@ -273,7 +278,7 @@ their `name()` strings. Summary sums include PENDING transactions (they're real 
 
 `domain/transaction/TransactionStatus.java` — `enum TransactionStatus { PENDING, SETTLED }`.
 
-`domain/account/Account.java` — JPA entity for `user_accounts`, modelled on `MonzoAccount`
+`domain/account/Account.java` — JPA entity for `bank_accounts`, modelled on `MonzoAccount`
 (same timestamp handling), `@GeneratedValue(strategy = GenerationType.UUID)`, `@ManyToOne User`,
 `@Enumerated(EnumType.STRING)` for `provider`/`accountType`. Helper methods:
 
@@ -669,7 +674,7 @@ or profile differences.
 | Path (under `budgeteer-server/src/` unless noted) | Purpose |
 |---|---|
 | `main/resources/db/migration/V11__add_raw_payload_and_mapping_index.sql` | Raw capture columns + cursor index |
-| `main/resources/db/migration/V12__create_user_accounts.sql` | Domain accounts table |
+| `main/resources/db/migration/V12__create_bank_accounts.sql` | Domain accounts table |
 | `main/resources/db/migration/V13__create_transactions.sql` | Domain transactions table |
 | `main/java/.../domain/account/Account.java` | Domain account entity |
 | `main/java/.../domain/account/AccountType.java` | CURRENT/SAVINGS/CREDIT_CARD/OTHER |
@@ -800,3 +805,98 @@ are final. If something is genuinely underspecified, stop and ask rather than gu
 
 **Definition of Done:** every *Acceptance Criteria* box ticked, all tests in *Test Strategy*
 written and passing, and `/check` (checkstyle + unit + integration) green before opening the PR.
+
+---
+
+## PR #87 Review Findings (Alexander, 2026-09-07) — resolve before merge
+
+Working list from the file-per-file review. Each item gets a decision (fix on this branch /
+defer to ticket / no change + why) before the PR merges. Postman collection
+`scripts/postman/budgeteer-domain-api.postman_collection.json` added for the boot-and-follow
+walk-through.
+
+- [x] **Layering: services return API DTOs** — `AccountService`/`TransactionQueryService`
+      import `api/**/dto` types (service layer depends on the wire format). Decide the mapping
+      boundary: services return domain objects / internal read models; the api layer owns
+      DTO mapping (mapper next to the controller). ← the structurally important one
+- [x] **DTO field types** — `provider`/`accountType`/`status` are `String`; type them with the
+      enums (wire JSON unchanged — Jackson writes `name()`). Trade-off to accept knowingly:
+      domain-enum renames would change the public contract; dedicated API enums are the
+      escape hatch if that ever bites
+- [x] **Controller try/catch for zone** — bind `ZoneId` natively as the `@RequestParam` type;
+      bad values → `MethodArgumentTypeMismatchException` → existing 400 handler. Same pattern
+      for any future enum request params (they should bind natively too)
+- [x] **Orchestration** — `ingestAll(); refreshAll();` pairing duplicated in 3 places (hourly
+      job, end of `backfill()`, dev controller). Extract one orchestrator method that owns the
+      pairing + error isolation
+- [x] **`api/v1/` package structure** — mirror the URL version in packages
+      (`api/v1/account/...`) to demarcate versions and leave room for v2; decide dto/ subdir
+      placement at the same time
+- [x] **RESTfulness + validation audit** — endpoint shapes, error contract consistency,
+      constraint handlers coverage
+- [x] **401 vs 403 for unauthenticated** — app-wide today: 403 (no `AuthenticationEntryPoint`).
+      Decide: own ticket or fold in here
+- [x] **Ingest observability** (live-run finding, 2026-09-07) — ~24s of silent work between
+      "Backfill finished" and the balance fetch: MonzoIngestor/IngestService log nothing on
+      success. Add per-account completion logs (rows mapped, cursor advanced-to) + a pass
+      summary in IngestService
+- [x] **Ingest throughput note** — ~2,400 rows mapped in ~24s (~100/s; one upsert round-trip
+      per row inside the per-account tx). Acceptable at current scale/cadence; batch the
+      upserts if it ever grows. Record as known trade-off, no change now
+
+---
+
+## Debug-session findings (2026-09-12, Alexander stepping through in the IDE)
+
+Raised during the live debug of the ingest flow on PR #87. **None block the merge** — each is a
+follow-up to schedule after; decisions to be made once the debug pass is complete.
+
+1. **Targeted ingest dispatch vs blanket `runFullPass()`** — `ProviderIngestor` is already a
+   DI-registered strategy (`IngestService` injects `List<ProviderIngestor>`), but every trigger
+   sweeps all providers × all accounts. Flows that *know* the owner of the incoming data
+   (webhooks #5, per-connection sync) should invoke the matching ingestor for just that
+   provider/account — e.g. `ingest(Provider, accountId)`. Blanket pass stays as the
+   re-ingest/repair tool. Folds into the sync-layer-generalisation work on the TrueLayer row;
+   becomes mandatory when webhooks land.
+2. **Cross-user isolation integration test** — the multi-user guarantee (token → `@CurrentUserId`
+   → `WHERE user_id` on every read; ownership derived token → connection → raw → domain on
+   writes) is designed in but never proven: only one real user has ever existed. Add an IT that
+   creates two users with synced data and asserts user B's endpoints return zero of user A's
+   rows — makes CI defend the isolation forever.
+3. **Joint-account identity edge (household scope)** — `findByProviderAndProviderAccountId` has
+   no user in the key and raw `monzo_accounts` is keyed by Monzo's account id with a single
+   `user_id` column: two app users connecting the same joint Monzo account would fight over one
+   row (first owner wins). Irrelevant at personal scope; must be answered by the Session 01
+   "household" ambition before any second real user shares an account.
+4. **Callback controller does orchestration** (`MonzoController.handleCallback`) — state
+   verification, denial branch, token exchange, Monzo user fetch, connection creation, backfill
+   trigger all inline in the controller. Collapse to one service call (e.g.
+   `connectionService.completeConnection(...)`); controller maps HTTP only. Also home for the
+   inline `// todo` about param validation extraction.
+5. **Dead event path + diverged async semantics** — `MonzoConnectionCreatedEvent` +
+   `TransactionSyncEventListener` exist but nothing publishes the event; the controller calls
+   `backfillAsync()` directly. The two paths differ dangerously: `backfillAsync` has the 8×2s
+   SCA retry loop, the listener's plain `backfill()` has none — reviving the event path naively
+   would silently lose SCA tolerance. Decide one mechanism: publish the event from
+   `createConnection`, move async+retry policy into the listener, delete `backfillAsync` (and
+   its mechanism-in-the-name naming) — or delete the dead listener/event. Fold into #4 /
+   sync-layer generalisation.
+6. **First-connect frontend contract (for epic #16)** — connect returns immediately; data
+   surfaces progressively (deliberate). UI must communicate it: poll
+   `GET /api/v1/monzo/sync/progress` (TanStack Query refetchInterval while IN_PROGRESS),
+   progress indicator, auto-invalidate account/transaction queries, manual refresh affordance.
+   Polling suffices at MVP; SSE post-MVP. Known wart rides along: `getSyncProgress` returns an
+   API DTO from the service layer (audit-lite finding, fix with sync generalisation).
+7. **Acceptance-test strategy (Alexander, end of debug session)** — the debug-guide scenarios
+   (`.agents/notes/ingest-debug-guide.md`) are good acceptance-test candidates. Direction
+   agreed in principle, scale to decide later: (a) cheapest/highest value — extend the existing
+   WireMock + Testcontainers IT suite to cover the uncovered scenarios (failure isolation via a
+   throwing ingestor, archive flip, pending→settled delta, user-owned column survival); the
+   in-process WireMock stubs already ARE the provider simulator; (b) Postman/newman smoke suite
+   against a deployed env — belongs to epic #17 (edge/deploy), collection exists; (c) a
+   standalone provider-simulator app + RestAssured — deferred: only pays off with a persistent
+   staging env, webhooks, or a second provider; WireMock standalone covers most of it if needed.
+8. **`/favicon.ico` → 500** — browser requests during the OAuth callback hit
+   `NoResourceFoundException`, which falls through to the generic handler and returns 500
+   INTERNAL_ERROR. Map `NoResourceFoundException` to 404 in the exception handlers (tiny fix,
+   nice log-noise reduction).
