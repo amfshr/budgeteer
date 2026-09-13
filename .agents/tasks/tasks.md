@@ -10,7 +10,7 @@
 
 | # | Task | Priority | Estimate | Plan |
 |---|------|----------|----------|------|
-| 13 | 🧰 E1 Web platform foundation — scaffold `budgeteer-web`: Vite+TS+React, react-bootstrap (mobile-first), TanStack Query, React Router, Vitest/RTL, ESLint+Prettier, Vite `/api` proxy (same-origin cookies), envelope-aware API client with central 401 handling, CI job (Session 01 dec 1–5). Branch: `feature/web-scaffold` | 🟡 P2 | 0.5–1d | [plan](open/web-platform-foundation/plan.md) |
+| — | *(nothing in progress — next: #14 real login)* | | | |
 
 ---
 
@@ -19,7 +19,7 @@
 > **Strategy reset (Design Session 01, 2026-09-11 — see
 > [.agents/notes/product/design-session-01-top-down.md](../notes/product/design-session-01-top-down.md)):
 > frontend-first, feature-light, demand-driven APIs.** Execution order:
-> **E0 (finish #11/PR #87 contract review) → #13 → OpenAPI (backlog row) → #14 (public shell
+> **E0 (finish #11/PR #87 contract review) → #13 ✅ → OpenAPI ✅ → #14 (public shell
 > only) → Design Session 02 (user-story grill → interaction model + authenticated-chrome
 > decision + claude.ai/design pass — Alexander 2026-09-13: chrome must be derived from user
 > stories, not pattern-matched from console apps; see notes/web/03 §1a) → (#15 ∥ #16) → #17**. Webhooks and TrueLayer move to Backlog behind the frontend epics —
@@ -42,7 +42,6 @@
 
 | Feature | Priority | Effort | Notes |
 |---------|----------|--------|-------|
-| 📜 OpenAPI contract (springdoc) | P2 | 0.5d | Alexander 2026-09-13: Postman doesn't work as API documentation for frontend design/impl. Add `springdoc-openapi-starter-webmvc-ui` (spec generated from the MVC annotations + DTO records we already have; Swagger UI dev-profile-gated), snapshot the spec to `docs/api/openapi.json` via script/test so contract changes show in PR diffs, later `openapi-typescript` generates `budgeteer-web/src/api/types.ts` from it (server rename ⇒ frontend compile error). **Pull in before/at the start of #14**; type-gen step joins by #16. Plan sketch: `.agents/notes/web/03-frontend-shape.md` §3 |
 | 🪝 #5 Webhooks | P3 | TBD | [plan](open/webhooks/plan.md) — second trigger into the raw→domain pipeline + near-real-time balance refresh. **Moved behind frontend epics (Session 01)**; ⚠️ Monzo's servers can't pass Cloudflare Access — needs a deliberate bypass route with its own signature verification (Session 01 dec 17) |
 | 🏺 Pots & budgeting | P2 | TBD | Virtual pots as a double-entry overlay ledger — **any spec must cite §2a of the Session 01 doc** (two-legged transfers, conservation invariant, real balances as ground truth). After money views prove daily use |
 | 🧩 Widget dashboard | P3 | TBD | Customisable pick-and-choose widget summary (Session 01 dec 18 recorded the vision; dashboard v1 ships fixed). Design in/after Session 02 |
@@ -84,6 +83,21 @@
 ## ✅ Done
 
 ### September 2026
+- [x] **#13 E1 Web Platform Foundation** (PR #92, merged 2026-09-13) — `budgeteer-web/`
+      scaffolded: Vite 8 + React 19 + TS (strict), react-bootstrap mobile-first, TanStack
+      Query, React Router v7, Vitest/RTL (5 smoke tests), ESLint flat + Prettier (template's
+      oxlint swapped out), Vite `/api` proxy (same-origin cookies, zero CORS), envelope-aware
+      API client with central 401 handling, `Web Lint, Test & Build` CI job. Learning series
+      shipped alongside: `.agents/notes/web/01–03`. Authenticated-chrome decision deferred to
+      Design Session 02 (03 §1a). [plan](closed/web-platform-foundation/plan.md)
+- [x] **OpenAPI contract (springdoc)** (2026-09-13) — `springdoc-openapi-starter-webmvc-ui`
+      2.8.6 (runs clean on Boot 4.1), disabled by default + dev-profile-enabled; Swagger UI at
+      `/swagger-ui.html`; contract snapshot committed at `docs/api/openapi.json` (23 paths /
+      51 schemas incl. dev endpoints — quick-login documented for frontend dev), regenerated
+      via `scripts/generate-openapi.sh` (jq-sorted for clean diffs). Follow-ups: drift-check
+      IT (spec vs snapshot; needs server-URL normalisation), `openapi-typescript` type-gen
+      into `budgeteer-web` by #16. Origin: Alexander — Postman doesn't work as API docs;
+      plan sketch `.agents/notes/web/03-frontend-shape.md` §3
 - [x] **#11 Domain Model Mapping** (PR #87, merged 2026-09-12, squash `ddd3fd0`) — raw→domain
       ingest pipeline + first product endpoints, built in three reviewed slices (V11 encrypted
       raw capture, V12/V13 `bank_accounts`+`transactions` with cursor-driven
