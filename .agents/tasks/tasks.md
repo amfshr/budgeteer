@@ -10,7 +10,7 @@
 
 | # | Task | Priority | Estimate | Plan |
 |---|------|----------|----------|------|
-| — | *(nothing in progress — next: #14 real login)* | | | |
+| 14 | 🔑 E2 Real login — magic-link auth end to end: PublicLayout + login/magic-link-sent/verify pages, `useSession` hook, `RequireAuth` guard, 401→login wiring, logout. Public shell only (chrome waits for Session 02). Resend re-creation = Alexander, gates real email not dev. Branch: `feature/real-login` | 🟡 P2 | 1–2d | [plan](open/real-login/plan.md) |
 
 ---
 
@@ -29,7 +29,6 @@
 
 | # | Task | Priority | Estimate | Plan |
 |---|------|----------|----------|------|
-| 14 | 🔑 E2 Real login — re-create Resend (zero code, config exists) + verify EmailService; entry/login page (landing folded in), signup, magic-link-sent + verify handoff, client session handling, logout (dec 6–8, 19) | 🟡 P2 | 1–2d | [session](../notes/product/design-session-01-top-down.md) |
 | 15 | 🛡️ E3 Settings & data rights — settings page: profile, Disconnect Monzo, Export JSON, **Delete+Purge** (instant, typed confirm, Monzo consent revoke). New server endpoints — **`/grill-me` the delete/export spec before build** (dec 9–12) | 🟡 P2 | 1–2d | [session](../notes/product/design-session-01-top-down.md) |
 | 16 | 💸 E4 Money views v1 — Monzo connect from client (incl. prod redirect-URI config), accounts view, dashboard v1 (fixed composition on existing APIs), transactions view v1. **Design Session 02 (user stories/views) before the dashboard build** (dec 18, 20–21) | 🟡 P2 | 2–3d | [session](../notes/product/design-session-01-top-down.md) |
 | 17 | 🌐 E5 Edge & deploy — Dockerfile, NUC deploy, Cloudflare Tunnel + Access identity allowlist, one URL everywhere, security headers/CSP/CORS (dec 13–15). Any time after #14; required before daily phone use | 🟡 P2 | 1–2d | [session](../notes/product/design-session-01-top-down.md) |
