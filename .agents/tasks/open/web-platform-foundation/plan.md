@@ -15,21 +15,21 @@ features cheap.
 
 ## Scope
 
-- [ ] `budgeteer-web/` at repo root: Vite + React + TypeScript scaffold
-- [ ] Dependencies: `bootstrap` + `react-bootstrap` (mobile-first shell), `@tanstack/react-query`,
+- [x] `budgeteer-web/` at repo root: Vite + React + TypeScript scaffold
+- [x] Dependencies: `bootstrap` + `react-bootstrap` (mobile-first shell), `@tanstack/react-query`,
       `react-router` — versions pinned, lockfile committed
-- [ ] Tooling: ESLint + Prettier (flat config), Vitest + React Testing Library
-- [ ] Vite dev proxy: `/api` → `http://localhost:8080` so session cookies stay same-origin —
+- [x] Tooling: ESLint + Prettier (flat config), Vitest + React Testing Library
+- [x] Vite dev proxy: `/api` → `http://localhost:8080` so session cookies stay same-origin —
       no CORS/SameSite config needed in dev (also noted on the security-headers backlog row)
-- [ ] App shell: mobile-first layout frame, Router with placeholder routes (entry/login,
+- [x] App shell: mobile-first layout frame, Router with placeholder routes (entry/login,
       authenticated home), `QueryClientProvider` wired
-- [ ] API client module: thin fetch wrapper speaking the house `ApiResponse`/`ApiError`
+- [x] API client module: thin fetch wrapper speaking the house `ApiResponse`/`ApiError`
       envelope, `credentials: include`, central 401 handling (contract:
       `ApiAuthenticationEntryPoint` returns 401 + JSON envelope — E0 decision)
-- [ ] Smoke tests: shell renders + API-client envelope/401 unit tests (Vitest/RTL)
-- [ ] CI: frontend job in GitHub Actions (setup-node, `npm ci`, lint, test, build) alongside
+- [x] Smoke tests: shell renders + API-client envelope/401 unit tests (Vitest/RTL)
+- [x] CI: frontend job in GitHub Actions (setup-node, `npm ci`, lint, test, build) alongside
       the existing Build & Test gates
-- [ ] Docs: `.agents/context/commands.md` gains the web commands; short `budgeteer-web/README.md`
+- [x] Docs: `.agents/context/commands.md` gains the web commands; short `budgeteer-web/README.md`
 
 ## Non-goals
 
