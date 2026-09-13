@@ -10,7 +10,7 @@
 
 | # | Task | Priority | Estimate | Plan |
 |---|------|----------|----------|------|
-| 11 | 🧱 Domain Model Mapping — raw→domain ingest + first product endpoints. **Implementation complete 2026-08-31, PR raised — awaiting Alexander's review/merge.** Built in three reviewed slices: V11 raw capture (encrypted `Sourced.rawJson()`), V12/V13 domain schema (`bank_accounts` — renamed from `user_accounts` in review — + `transactions`) with `MonzoIngestor`/`IngestService`/`BalanceRefreshService` + job/backfill chaining, then the read path (`GET /api/v1/accounts`, `/accounts/{id}/summary`, `/transactions` on `PageResponse`). 654 tests green incl. `IngestIT`/`SyncPipelineIT`/endpoint ITs. Noted in-flight: unauthenticated = **403** app-wide (no `AuthenticationEntryPoint`; spec said 401 — candidate ticket). Branch: `feature/domain-model-mapping` | 🟡 P2 | 2–3d | [plan](open/domain-model-mapping/plan.md) |
+| 13 | 🧰 E1 Web platform foundation — scaffold `budgeteer-web`: Vite+TS+React, react-bootstrap (mobile-first), TanStack Query, React Router, Vitest/RTL, ESLint+Prettier, Vite `/api` proxy (same-origin cookies), envelope-aware API client with central 401 handling, CI job (Session 01 dec 1–5). Branch: `feature/web-scaffold` | 🟡 P2 | 0.5–1d | [plan](open/web-platform-foundation/plan.md) |
 
 ---
 
@@ -19,15 +19,16 @@
 > **Strategy reset (Design Session 01, 2026-09-11 — see
 > [.agents/notes/product/design-session-01-top-down.md](../notes/product/design-session-01-top-down.md)):
 > frontend-first, feature-light, demand-driven APIs.** Execution order:
-> **E0 (finish #11/PR #87 contract review) → #13 → #14 → (#15 ∥ #16, Session 02 before #16's
-> dashboard) → #17**. Webhooks and TrueLayer move to Backlog behind the frontend epics —
+> **E0 (finish #11/PR #87 contract review) → #13 → OpenAPI (backlog row) → #14 (public shell
+> only) → Design Session 02 (user-story grill → interaction model + authenticated-chrome
+> decision + claude.ai/design pass — Alexander 2026-09-13: chrome must be derived from user
+> stories, not pattern-matched from console apps; see notes/web/03 §1a) → (#15 ∥ #16) → #17**. Webhooks and TrueLayer move to Backlog behind the frontend epics —
 > near-real-time sync and a second bank are invisible without a UI. Platform decided:
 > TypeScript React web app (Vite, react-bootstrap, TanStack Query), mobile-first,
 > browser-only (Electron retired, PWA later); Cloudflare Tunnel + Access in front.
 
 | # | Task | Priority | Estimate | Plan |
 |---|------|----------|----------|------|
-| 13 | 🧰 E1 Web platform foundation — scaffold `budgeteer-web`: Vite+TS+React, react-bootstrap, TanStack Query, React Router, Vitest/RTL, ESLint+Prettier, Vite `/api` proxy, CI job (Session 01 dec 1–5) | 🟡 P2 | 0.5–1d | [session](../notes/product/design-session-01-top-down.md) |
 | 14 | 🔑 E2 Real login — re-create Resend (zero code, config exists) + verify EmailService; entry/login page (landing folded in), signup, magic-link-sent + verify handoff, client session handling, logout (dec 6–8, 19) | 🟡 P2 | 1–2d | [session](../notes/product/design-session-01-top-down.md) |
 | 15 | 🛡️ E3 Settings & data rights — settings page: profile, Disconnect Monzo, Export JSON, **Delete+Purge** (instant, typed confirm, Monzo consent revoke). New server endpoints — **`/grill-me` the delete/export spec before build** (dec 9–12) | 🟡 P2 | 1–2d | [session](../notes/product/design-session-01-top-down.md) |
 | 16 | 💸 E4 Money views v1 — Monzo connect from client (incl. prod redirect-URI config), accounts view, dashboard v1 (fixed composition on existing APIs), transactions view v1. **Design Session 02 (user stories/views) before the dashboard build** (dec 18, 20–21) | 🟡 P2 | 2–3d | [session](../notes/product/design-session-01-top-down.md) |
@@ -41,6 +42,7 @@
 
 | Feature | Priority | Effort | Notes |
 |---------|----------|--------|-------|
+| 📜 OpenAPI contract (springdoc) | P2 | 0.5d | Alexander 2026-09-13: Postman doesn't work as API documentation for frontend design/impl. Add `springdoc-openapi-starter-webmvc-ui` (spec generated from the MVC annotations + DTO records we already have; Swagger UI dev-profile-gated), snapshot the spec to `docs/api/openapi.json` via script/test so contract changes show in PR diffs, later `openapi-typescript` generates `budgeteer-web/src/api/types.ts` from it (server rename ⇒ frontend compile error). **Pull in before/at the start of #14**; type-gen step joins by #16. Plan sketch: `.agents/notes/web/03-frontend-shape.md` §3 |
 | 🪝 #5 Webhooks | P3 | TBD | [plan](open/webhooks/plan.md) — second trigger into the raw→domain pipeline + near-real-time balance refresh. **Moved behind frontend epics (Session 01)**; ⚠️ Monzo's servers can't pass Cloudflare Access — needs a deliberate bypass route with its own signature verification (Session 01 dec 17) |
 | 🏺 Pots & budgeting | P2 | TBD | Virtual pots as a double-entry overlay ledger — **any spec must cite §2a of the Session 01 doc** (two-legged transfers, conservation invariant, real balances as ground truth). After money views prove daily use |
 | 🧩 Widget dashboard | P3 | TBD | Customisable pick-and-choose widget summary (Session 01 dec 18 recorded the vision; dashboard v1 ships fixed). Design in/after Session 02 |
@@ -80,6 +82,24 @@
 ---
 
 ## ✅ Done
+
+### September 2026
+- [x] **#11 Domain Model Mapping** (PR #87, merged 2026-09-12, squash `ddd3fd0`) — raw→domain
+      ingest pipeline + first product endpoints, built in three reviewed slices (V11 encrypted
+      raw capture, V12/V13 `bank_accounts`+`transactions` with cursor-driven
+      `MonzoIngestor`/`IngestService`/`BalanceRefreshService`, read path on `PageResponse`),
+      then the E0 contract close-out (services return domain types, `api/v1` packages, DTO
+      enums, 401 `ApiAuthenticationEntryPoint`, `IngestOrchestrator`) and a live IDE debug
+      session (full connect→backfill→ingest walked through; invariant 4,804 raw − 247 declined
+      = 4,557 domain verified). CodeQL log-injection gate cleared by making `LogSanitizer` a
+      recognized barrier (char-rebuild) + sanitizing the two genuinely-unsanitized dev-controller
+      sites. Docs shipped: `docs/architecture/INGEST-PIPELINE.md` +
+      `.agents/notes/ingest-debug-guide.md` (12 scenarios). **8 follow-up findings recorded at
+      the bottom of [plan](closed/domain-model-mapping/plan.md)** — targeted ingest dispatch,
+      cross-user isolation IT, joint-account edge, callback slimming, dead event path,
+      first-connect frontend contract, acceptance-test strategy, favicon 404.
+      Dev QoL landed en route: `.env` imported by dev profile (IDE boot without dev.sh),
+      `clean-on-startup=false`.
 
 ### August 2026
 - [x] **#12 Provider Contract Hardening** (PR #85, merged 2026-08-31) — sealed `SyncPosition`
@@ -176,8 +196,7 @@
 
 ---
 
-*Last updated: 2026-08-31 — #12 provider-contract hardening executed and merged (PR #85: sealed
-`SyncPosition` + `Sourced<T>` envelope; design pivoted from a second capability interface to
-Alexander's polymorphic-position proposal). `feature/domain-model-mapping` rebased onto the new
-contract, #11 spec current — **next: hand #11's Implementer Kickoff Prompt to the implementing
-model.***
+*Last updated: 2026-09-12 — #11 merged (PR #87) after the E0 contract close-out, live debug
+session and CodeQL gate clear; board cut over to the frontend epics. #13 web platform
+foundation promoted to In Progress on `feature/web-scaffold` — **next: scaffold
+`budgeteer-web`, then #14 real login (re-create Resend first).***

@@ -79,3 +79,18 @@ scripts/sql/queries.sql
 ```bash
 openssl rand -base64 32       # Generate JWE_SECRET_KEY or MONZO_ENCRYPTION_KEY
 ```
+
+## Frontend (budgeteer-web)
+
+```bash
+cd budgeteer-web
+npm install            # once
+npm run dev            # Vite dev server on :5173 — /api proxied to Spring :8080
+npm test               # Vitest run (npm run test:watch for watch mode)
+npm run lint           # ESLint
+npm run format         # Prettier write (format:check is the CI variant)
+npm run build          # tsc type-check + production bundle → dist/
+```
+
+Dev flow: start the backend first (IDE debug run or `./scripts/dev.sh`), then `npm run dev` —
+the Vite proxy keeps the app same-origin with the API so session cookies just work.
