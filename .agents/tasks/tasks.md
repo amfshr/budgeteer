@@ -19,8 +19,10 @@
 > **Strategy reset (Design Session 01, 2026-09-11 — see
 > [.agents/notes/product/design-session-01-top-down.md](../notes/product/design-session-01-top-down.md)):
 > frontend-first, feature-light, demand-driven APIs.** Execution order:
-> **E0 (finish #11/PR #87 contract review) → #13 → #14 → (#15 ∥ #16, Session 02 before #16's
-> dashboard) → #17**. Webhooks and TrueLayer move to Backlog behind the frontend epics —
+> **E0 (finish #11/PR #87 contract review) → #13 → OpenAPI (backlog row) → #14 (public shell
+> only) → Design Session 02 (user-story grill → interaction model + authenticated-chrome
+> decision + claude.ai/design pass — Alexander 2026-09-13: chrome must be derived from user
+> stories, not pattern-matched from console apps; see notes/web/03 §1a) → (#15 ∥ #16) → #17**. Webhooks and TrueLayer move to Backlog behind the frontend epics —
 > near-real-time sync and a second bank are invisible without a UI. Platform decided:
 > TypeScript React web app (Vite, react-bootstrap, TanStack Query), mobile-first,
 > browser-only (Electron retired, PWA later); Cloudflare Tunnel + Access in front.
@@ -40,6 +42,7 @@
 
 | Feature | Priority | Effort | Notes |
 |---------|----------|--------|-------|
+| 📜 OpenAPI contract (springdoc) | P2 | 0.5d | Alexander 2026-09-13: Postman doesn't work as API documentation for frontend design/impl. Add `springdoc-openapi-starter-webmvc-ui` (spec generated from the MVC annotations + DTO records we already have; Swagger UI dev-profile-gated), snapshot the spec to `docs/api/openapi.json` via script/test so contract changes show in PR diffs, later `openapi-typescript` generates `budgeteer-web/src/api/types.ts` from it (server rename ⇒ frontend compile error). **Pull in before/at the start of #14**; type-gen step joins by #16. Plan sketch: `.agents/notes/web/03-frontend-shape.md` §3 |
 | 🪝 #5 Webhooks | P3 | TBD | [plan](open/webhooks/plan.md) — second trigger into the raw→domain pipeline + near-real-time balance refresh. **Moved behind frontend epics (Session 01)**; ⚠️ Monzo's servers can't pass Cloudflare Access — needs a deliberate bypass route with its own signature verification (Session 01 dec 17) |
 | 🏺 Pots & budgeting | P2 | TBD | Virtual pots as a double-entry overlay ledger — **any spec must cite §2a of the Session 01 doc** (two-legged transfers, conservation invariant, real balances as ground truth). After money views prove daily use |
 | 🧩 Widget dashboard | P3 | TBD | Customisable pick-and-choose widget summary (Session 01 dec 18 recorded the vision; dashboard v1 ships fixed). Design in/after Session 02 |
