@@ -94,3 +94,14 @@ npm run build          # tsc type-check + production bundle → dist/
 
 Dev flow: start the backend first (IDE debug run or `./scripts/dev.sh`), then `npm run dev` —
 the Vite proxy keeps the app same-origin with the API so session cookies just work.
+
+## OpenAPI
+
+```bash
+# Regenerate the committed API contract snapshot (backend must be running, dev profile)
+./scripts/generate-openapi.sh          # writes docs/api/openapi.json (jq-sorted for clean diffs)
+# Swagger UI (dev only): http://localhost:8080/swagger-ui.html
+```
+
+Regenerate + commit the snapshot alongside any API change — the diff in docs/api/openapi.json
+is the reviewable contract change.

@@ -1,6 +1,6 @@
 # E1 Web Platform Foundation — scaffold `budgeteer-web`
 
-> **Priority:** 🟡 P2 | **Estimate:** 0.5–1d | **Status:** In Progress
+> **Priority:** 🟡 P2 | **Estimate:** 0.5–1d | **Status:** Done (PR #92, merged 2026-09-13)
 > **Branch:** `feature/web-scaffold` | **Source:** Session 01 decisions 1–5
 > ([design-session-01-top-down.md](../../notes/product/design-session-01-top-down.md))
 
