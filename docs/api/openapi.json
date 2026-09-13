@@ -1,0 +1,2268 @@
+{
+  "components": {
+    "schemas": {
+      "AccountProgress": {
+        "properties": {
+          "accountId": {
+            "type": "string"
+          },
+          "currentWindowDate": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "progressPercent": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "status": {
+            "type": "string"
+          },
+          "transactionCount": {
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "AccountResponse": {
+        "properties": {
+          "accountType": {
+            "enum": [
+              "CURRENT",
+              "SAVINGS",
+              "CREDIT_CARD",
+              "OTHER"
+            ],
+            "type": "string"
+          },
+          "archived": {
+            "type": "boolean"
+          },
+          "balanceAsOf": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "balanceMinorUnits": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "creditLimitMinorUnits": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "displayOrder": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "institutionName": {
+            "type": "string"
+          },
+          "provider": {
+            "enum": [
+              "MONZO",
+              "TRUELAYER"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "AccountSummaryResponse": {
+        "properties": {
+          "accountId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "monthToDate": {
+            "$ref": "#/components/schemas/WindowSums"
+          },
+          "thisWeek": {
+            "$ref": "#/components/schemas/WindowSums"
+          },
+          "today": {
+            "$ref": "#/components/schemas/WindowSums"
+          },
+          "zone": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ApiResponseAccountSummaryResponse": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/AccountSummaryResponse"
+          },
+          "success": {
+            "type": "boolean"
+          },
+          "timestamp": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ApiResponseAuthResponse": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/AuthResponse"
+          },
+          "success": {
+            "type": "boolean"
+          },
+          "timestamp": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ApiResponseDevLoginResponse": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/DevLoginResponse"
+          },
+          "success": {
+            "type": "boolean"
+          },
+          "timestamp": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ApiResponseHealthResponse": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/HealthResponse"
+          },
+          "success": {
+            "type": "boolean"
+          },
+          "timestamp": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ApiResponseListAccountResponse": {
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/AccountResponse"
+            },
+            "type": "array"
+          },
+          "success": {
+            "type": "boolean"
+          },
+          "timestamp": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ApiResponseListMonzoConnectionResponse": {
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/MonzoConnectionResponse"
+            },
+            "type": "array"
+          },
+          "success": {
+            "type": "boolean"
+          },
+          "timestamp": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ApiResponseMonzoConnectInitResponse": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/MonzoConnectInitResponse"
+          },
+          "success": {
+            "type": "boolean"
+          },
+          "timestamp": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ApiResponseMonzoConnectionResponse": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/MonzoConnectionResponse"
+          },
+          "success": {
+            "type": "boolean"
+          },
+          "timestamp": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ApiResponseMonzoStatusResponse": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/MonzoStatusResponse"
+          },
+          "success": {
+            "type": "boolean"
+          },
+          "timestamp": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ApiResponseMonzoSyncProgressResponse": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/MonzoSyncProgressResponse"
+          },
+          "success": {
+            "type": "boolean"
+          },
+          "timestamp": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ApiResponsePageResponseTransactionResponse": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/PageResponseTransactionResponse"
+          },
+          "success": {
+            "type": "boolean"
+          },
+          "timestamp": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ApiResponseReadinessResponse": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ReadinessResponse"
+          },
+          "success": {
+            "type": "boolean"
+          },
+          "timestamp": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ApiResponseRevokeResponse": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/RevokeResponse"
+          },
+          "success": {
+            "type": "boolean"
+          },
+          "timestamp": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ApiResponseUserResponse": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/UserResponse"
+          },
+          "success": {
+            "type": "boolean"
+          },
+          "timestamp": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ApiResponseVoid": {
+        "properties": {
+          "data": {
+            "type": "object"
+          },
+          "success": {
+            "type": "boolean"
+          },
+          "timestamp": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ApplicationContext": {
+        "properties": {
+          "applicationName": {
+            "type": "string"
+          },
+          "autowireCapableBeanFactory": {
+            "$ref": "#/components/schemas/AutowireCapableBeanFactory"
+          },
+          "beanDefinitionCount": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "beanDefinitionNames": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "classLoader": {
+            "properties": {
+              "defaultAssertionStatus": {
+                "type": "boolean",
+                "writeOnly": true
+              },
+              "definedPackages": {
+                "items": {
+                  "properties": {
+                    "annotations": {
+                      "items": {
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "declaredAnnotations": {
+                      "items": {
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "implementationTitle": {
+                      "type": "string"
+                    },
+                    "implementationVendor": {
+                      "type": "string"
+                    },
+                    "implementationVersion": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "sealed": {
+                      "type": "boolean"
+                    },
+                    "specificationTitle": {
+                      "type": "string"
+                    },
+                    "specificationVendor": {
+                      "type": "string"
+                    },
+                    "specificationVersion": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "name": {
+                "type": "string"
+              },
+              "registeredAsParallelCapable": {
+                "type": "boolean"
+              },
+              "unnamedModule": {
+                "properties": {
+                  "annotations": {
+                    "items": {
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "declaredAnnotations": {
+                    "items": {
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "descriptor": {
+                    "properties": {
+                      "automatic": {
+                        "type": "boolean"
+                      },
+                      "open": {
+                        "type": "boolean"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "layer": {
+                    "type": "object"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "named": {
+                    "type": "boolean"
+                  },
+                  "nativeAccessEnabled": {
+                    "type": "boolean"
+                  },
+                  "packages": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array",
+                    "uniqueItems": true
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "environment": {
+            "$ref": "#/components/schemas/Environment"
+          },
+          "id": {
+            "type": "string"
+          },
+          "parent": {
+            "$ref": "#/components/schemas/ApplicationContext"
+          },
+          "parentBeanFactory": {
+            "$ref": "#/components/schemas/BeanFactory"
+          },
+          "startupDate": {
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "AuthResponse": {
+        "properties": {
+          "accessToken": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "refreshToken": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "AutowireCapableBeanFactory": {
+        "type": "object"
+      },
+      "BeanFactory": {
+        "type": "object"
+      },
+      "DatabaseHealth": {
+        "properties": {
+          "error": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "DefaultHttpStatusCode": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/HttpStatusCode"
+          }
+        ]
+      },
+      "DevLoginRequest": {
+        "properties": {
+          "email": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "DevLoginResponse": {
+        "properties": {
+          "accessToken": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "hint": {
+            "type": "string"
+          },
+          "refreshToken": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "Environment": {
+        "properties": {
+          "activeProfiles": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "defaultProfiles": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "FilterRegistration": {
+        "properties": {
+          "className": {
+            "type": "string"
+          },
+          "initParameters": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "name": {
+            "type": "string"
+          },
+          "servletNameMappings": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "urlPatternMappings": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "HealthResponse": {
+        "properties": {
+          "profile": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "HttpStatus": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/HttpStatusCode"
+          }
+        ],
+        "enum": [
+          "100 CONTINUE",
+          "101 SWITCHING_PROTOCOLS",
+          "102 PROCESSING",
+          "103 EARLY_HINTS",
+          "200 OK",
+          "201 CREATED",
+          "202 ACCEPTED",
+          "203 NON_AUTHORITATIVE_INFORMATION",
+          "204 NO_CONTENT",
+          "205 RESET_CONTENT",
+          "206 PARTIAL_CONTENT",
+          "207 MULTI_STATUS",
+          "208 ALREADY_REPORTED",
+          "226 IM_USED",
+          "300 MULTIPLE_CHOICES",
+          "301 MOVED_PERMANENTLY",
+          "302 FOUND",
+          "303 SEE_OTHER",
+          "304 NOT_MODIFIED",
+          "307 TEMPORARY_REDIRECT",
+          "308 PERMANENT_REDIRECT",
+          "400 BAD_REQUEST",
+          "401 UNAUTHORIZED",
+          "402 PAYMENT_REQUIRED",
+          "403 FORBIDDEN",
+          "404 NOT_FOUND",
+          "405 METHOD_NOT_ALLOWED",
+          "406 NOT_ACCEPTABLE",
+          "407 PROXY_AUTHENTICATION_REQUIRED",
+          "408 REQUEST_TIMEOUT",
+          "409 CONFLICT",
+          "410 GONE",
+          "411 LENGTH_REQUIRED",
+          "412 PRECONDITION_FAILED",
+          "413 CONTENT_TOO_LARGE",
+          "413 PAYLOAD_TOO_LARGE",
+          "414 URI_TOO_LONG",
+          "415 UNSUPPORTED_MEDIA_TYPE",
+          "416 REQUESTED_RANGE_NOT_SATISFIABLE",
+          "417 EXPECTATION_FAILED",
+          "418 I_AM_A_TEAPOT",
+          "421 MISDIRECTED_REQUEST",
+          "422 UNPROCESSABLE_CONTENT",
+          "422 UNPROCESSABLE_ENTITY",
+          "423 LOCKED",
+          "424 FAILED_DEPENDENCY",
+          "425 TOO_EARLY",
+          "426 UPGRADE_REQUIRED",
+          "428 PRECONDITION_REQUIRED",
+          "429 TOO_MANY_REQUESTS",
+          "431 REQUEST_HEADER_FIELDS_TOO_LARGE",
+          "451 UNAVAILABLE_FOR_LEGAL_REASONS",
+          "500 INTERNAL_SERVER_ERROR",
+          "501 NOT_IMPLEMENTED",
+          "502 BAD_GATEWAY",
+          "503 SERVICE_UNAVAILABLE",
+          "504 GATEWAY_TIMEOUT",
+          "505 HTTP_VERSION_NOT_SUPPORTED",
+          "506 VARIANT_ALSO_NEGOTIATES",
+          "507 INSUFFICIENT_STORAGE",
+          "508 LOOP_DETECTED",
+          "509 BANDWIDTH_LIMIT_EXCEEDED",
+          "510 NOT_EXTENDED",
+          "511 NETWORK_AUTHENTICATION_REQUIRED"
+        ]
+      },
+      "HttpStatusCode": {
+        "properties": {
+          "error": {
+            "type": "boolean"
+          },
+          "is1xxInformational": {
+            "type": "boolean"
+          },
+          "is2xxSuccessful": {
+            "type": "boolean"
+          },
+          "is3xxRedirection": {
+            "type": "boolean"
+          },
+          "is4xxClientError": {
+            "type": "boolean"
+          },
+          "is5xxServerError": {
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "JspConfigDescriptor": {
+        "properties": {
+          "jspPropertyGroups": {
+            "items": {
+              "$ref": "#/components/schemas/JspPropertyGroupDescriptor"
+            },
+            "type": "array"
+          },
+          "taglibs": {
+            "items": {
+              "$ref": "#/components/schemas/TaglibDescriptor"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "JspPropertyGroupDescriptor": {
+        "properties": {
+          "buffer": {
+            "type": "string"
+          },
+          "defaultContentType": {
+            "type": "string"
+          },
+          "deferredSyntaxAllowedAsLiteral": {
+            "type": "string"
+          },
+          "elIgnored": {
+            "type": "string"
+          },
+          "errorOnELNotFound": {
+            "type": "string"
+          },
+          "errorOnUndeclaredNamespace": {
+            "type": "string"
+          },
+          "includeCodas": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "includePreludes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "isXml": {
+            "type": "string"
+          },
+          "pageEncoding": {
+            "type": "string"
+          },
+          "scriptingInvalid": {
+            "type": "string"
+          },
+          "trimDirectiveWhitespaces": {
+            "type": "string"
+          },
+          "urlPatterns": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "LoginRequest": {
+        "properties": {
+          "email": {
+            "maxLength": 255,
+            "minLength": 0,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "MonzoConnectInitResponse": {
+        "properties": {
+          "authorizationUrl": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "MonzoConnectionResponse": {
+        "properties": {
+          "connectedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "expiresAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "isTokenExpired": {
+            "type": "boolean"
+          },
+          "monzoUserId": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "MonzoStatusResponse": {
+        "properties": {
+          "backfillStatus": {
+            "enum": [
+              "NOT_STARTED",
+              "IN_PROGRESS",
+              "NEEDS_REAUTH",
+              "COMPLETED"
+            ],
+            "type": "string"
+          },
+          "connected": {
+            "type": "boolean"
+          },
+          "connectionCount": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "tokenStatus": {
+            "enum": [
+              "ACTIVE",
+              "EXPIRING_SOON",
+              "RECONNECT_REQUIRED"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "MonzoSyncProgressResponse": {
+        "properties": {
+          "accounts": {
+            "items": {
+              "$ref": "#/components/schemas/AccountProgress"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "PageResponseTransactionResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/TransactionResponse"
+            },
+            "type": "array"
+          },
+          "page": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "size": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "totalElements": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "totalPages": {
+            "format": "int32",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ReadinessResponse": {
+        "properties": {
+          "database": {
+            "$ref": "#/components/schemas/DatabaseHealth"
+          },
+          "profile": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "RedirectView": {
+        "properties": {
+          "applicationContext": {
+            "$ref": "#/components/schemas/ApplicationContext"
+          },
+          "attributes": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "writeOnly": true
+          },
+          "attributesCSV": {
+            "type": "string",
+            "writeOnly": true
+          },
+          "attributesMap": {
+            "additionalProperties": {
+              "type": "object"
+            },
+            "type": "object"
+          },
+          "beanName": {
+            "type": "string"
+          },
+          "contentType": {
+            "type": "string"
+          },
+          "contextRelative": {
+            "type": "boolean",
+            "writeOnly": true
+          },
+          "encodingScheme": {
+            "type": "string",
+            "writeOnly": true
+          },
+          "expandUriTemplateVariables": {
+            "type": "boolean",
+            "writeOnly": true
+          },
+          "exposeContextBeansAsAttributes": {
+            "type": "boolean",
+            "writeOnly": true
+          },
+          "exposeModelAttributes": {
+            "type": "boolean",
+            "writeOnly": true
+          },
+          "exposePathVariables": {
+            "type": "boolean"
+          },
+          "exposedContextBeanNames": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "writeOnly": true
+          },
+          "hosts": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "http10Compatible": {
+            "type": "boolean",
+            "writeOnly": true
+          },
+          "propagateQueryParams": {
+            "type": "boolean",
+            "writeOnly": true
+          },
+          "propagateQueryProperties": {
+            "type": "boolean"
+          },
+          "redirectView": {
+            "type": "boolean"
+          },
+          "requestContextAttribute": {
+            "type": "string"
+          },
+          "servletContext": {
+            "$ref": "#/components/schemas/ServletContext",
+            "writeOnly": true
+          },
+          "staticAttributes": {
+            "additionalProperties": {
+              "type": "object"
+            },
+            "type": "object"
+          },
+          "statusCode": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/DefaultHttpStatusCode"
+              },
+              {
+                "$ref": "#/components/schemas/HttpStatus"
+              }
+            ],
+            "writeOnly": true
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "RefreshRequest": {
+        "properties": {
+          "refreshToken": {
+            "maxLength": 1024,
+            "minLength": 0,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "RevokeResponse": {
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "sessionsRevoked": {
+            "format": "int32",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ServletContext": {
+        "properties": {
+          "attributeNames": {
+            "type": "object"
+          },
+          "classLoader": {
+            "properties": {
+              "defaultAssertionStatus": {
+                "type": "boolean",
+                "writeOnly": true
+              },
+              "definedPackages": {
+                "items": {
+                  "properties": {
+                    "annotations": {
+                      "items": {
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "declaredAnnotations": {
+                      "items": {
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "implementationTitle": {
+                      "type": "string"
+                    },
+                    "implementationVendor": {
+                      "type": "string"
+                    },
+                    "implementationVersion": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "sealed": {
+                      "type": "boolean"
+                    },
+                    "specificationTitle": {
+                      "type": "string"
+                    },
+                    "specificationVendor": {
+                      "type": "string"
+                    },
+                    "specificationVersion": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "name": {
+                "type": "string"
+              },
+              "registeredAsParallelCapable": {
+                "type": "boolean"
+              },
+              "unnamedModule": {
+                "properties": {
+                  "annotations": {
+                    "items": {
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "declaredAnnotations": {
+                    "items": {
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "descriptor": {
+                    "properties": {
+                      "automatic": {
+                        "type": "boolean"
+                      },
+                      "open": {
+                        "type": "boolean"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "layer": {
+                    "type": "object"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "named": {
+                    "type": "boolean"
+                  },
+                  "nativeAccessEnabled": {
+                    "type": "boolean"
+                  },
+                  "packages": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array",
+                    "uniqueItems": true
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          },
+          "contextPath": {
+            "type": "string"
+          },
+          "defaultSessionTrackingModes": {
+            "items": {
+              "enum": [
+                "COOKIE",
+                "URL",
+                "SSL"
+              ],
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": true
+          },
+          "effectiveMajorVersion": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "effectiveMinorVersion": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "effectiveSessionTrackingModes": {
+            "items": {
+              "enum": [
+                "COOKIE",
+                "URL",
+                "SSL"
+              ],
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": true
+          },
+          "filterRegistrations": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/FilterRegistration"
+            },
+            "type": "object"
+          },
+          "initParameterNames": {
+            "type": "object"
+          },
+          "jspConfigDescriptor": {
+            "$ref": "#/components/schemas/JspConfigDescriptor"
+          },
+          "majorVersion": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "minorVersion": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "requestCharacterEncoding": {
+            "type": "string"
+          },
+          "responseCharacterEncoding": {
+            "type": "string"
+          },
+          "serverInfo": {
+            "type": "string"
+          },
+          "servletContextName": {
+            "type": "string"
+          },
+          "servletRegistrations": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/ServletRegistration"
+            },
+            "type": "object"
+          },
+          "sessionCookieConfig": {
+            "$ref": "#/components/schemas/SessionCookieConfig"
+          },
+          "sessionTimeout": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "sessionTrackingModes": {
+            "items": {
+              "enum": [
+                "COOKIE",
+                "URL",
+                "SSL"
+              ],
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": true,
+            "writeOnly": true
+          },
+          "virtualServerName": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ServletRegistration": {
+        "properties": {
+          "className": {
+            "type": "string"
+          },
+          "initParameters": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "mappings": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "name": {
+            "type": "string"
+          },
+          "runAsRole": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "SessionCookieConfig": {
+        "properties": {
+          "attributes": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "comment": {
+            "deprecated": true,
+            "type": "string"
+          },
+          "domain": {
+            "type": "string"
+          },
+          "httpOnly": {
+            "type": "boolean"
+          },
+          "maxAge": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          },
+          "secure": {
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "TaglibDescriptor": {
+        "properties": {
+          "taglibLocation": {
+            "type": "string"
+          },
+          "taglibURI": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "TransactionResponse": {
+        "properties": {
+          "accountId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "amountMinorUnits": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "excludedFromAnalytics": {
+            "type": "boolean"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "merchantCategory": {
+            "type": "string"
+          },
+          "merchantName": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "occurredAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "settledAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "PENDING",
+              "SETTLED"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "User": {
+        "properties": {
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "email": {
+            "maxLength": 255,
+            "minLength": 0,
+            "type": "string"
+          },
+          "emailVerified": {
+            "type": "boolean"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "UserResponse": {
+        "properties": {
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "emailVerified": {
+            "type": "boolean"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "WindowSums": {
+        "properties": {
+          "inMinorUnits": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "outMinorUnits": {
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "description": "Personal Monzo-integrated budgeting app. All responses use the ApiResponse/ApiError envelope; authentication is a JWE session cookie obtained via the magic-link flow (dev: POST /api/dev/auth/quick-login). Unauthenticated requests to protected routes return 401 with an ApiError envelope (code MISSING_TOKEN).",
+    "title": "Budgeteer API",
+    "version": "v1"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/dev/auth/quick-login": {
+      "post": {
+        "operationId": "quickLogin",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DevLoginRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDevLoginResponse"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "dev-auth-controller"
+        ]
+      }
+    },
+    "/api/dev/auth/revoke-all": {
+      "post": {
+        "operationId": "revokeAllSessions",
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseRevokeResponse"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "dev-auth-controller"
+        ]
+      }
+    },
+    "/api/dev/auth/revoke-user": {
+      "post": {
+        "operationId": "revokeUserSessions",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "email",
+            "required": true,
+            "schema": {
+              "maxLength": 255,
+              "minLength": 0,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseRevokeResponse"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "dev-auth-controller"
+        ]
+      }
+    },
+    "/api/dev/monzo/backfill": {
+      "post": {
+        "operationId": "triggerBackfill",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "dev-monzo-controller"
+        ]
+      }
+    },
+    "/api/dev/monzo/ingest": {
+      "post": {
+        "operationId": "triggerIngest",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "dev-monzo-controller"
+        ]
+      }
+    },
+    "/api/dev/monzo/reset-backfill/{accountId}": {
+      "post": {
+        "operationId": "resetBackfill",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "accountId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "dev-monzo-controller"
+        ]
+      }
+    },
+    "/api/health": {
+      "get": {
+        "deprecated": true,
+        "operationId": "health",
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseHealthResponse"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "health-controller"
+        ]
+      }
+    },
+    "/api/health/live": {
+      "get": {
+        "deprecated": true,
+        "operationId": "liveness",
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "health-controller"
+        ]
+      }
+    },
+    "/api/health/ready": {
+      "get": {
+        "deprecated": true,
+        "operationId": "readiness",
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseReadinessResponse"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "health-controller"
+        ]
+      }
+    },
+    "/api/v1/accounts": {
+      "get": {
+        "operationId": "listAccounts",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "includeArchived",
+            "required": false,
+            "schema": {
+              "default": false,
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListAccountResponse"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "account-controller"
+        ]
+      }
+    },
+    "/api/v1/accounts/{id}/summary": {
+      "get": {
+        "operationId": "getSummary",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "zone",
+            "required": false,
+            "schema": {
+              "default": "Europe/London",
+              "example": "Europe/Paris",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseAccountSummaryResponse"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "account-controller"
+        ]
+      }
+    },
+    "/api/v1/auth/login": {
+      "post": {
+        "operationId": "login",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseAuthResponse"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "auth-controller"
+        ]
+      }
+    },
+    "/api/v1/auth/logout": {
+      "post": {
+        "operationId": "logout",
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseAuthResponse"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "auth-controller"
+        ]
+      }
+    },
+    "/api/v1/auth/me": {
+      "get": {
+        "operationId": "me",
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseUserResponse"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "auth-controller"
+        ]
+      }
+    },
+    "/api/v1/auth/refresh": {
+      "post": {
+        "operationId": "refresh",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseAuthResponse"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "auth-controller"
+        ]
+      }
+    },
+    "/api/v1/auth/verify": {
+      "get": {
+        "operationId": "verify",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "token",
+            "required": true,
+            "schema": {
+              "maxLength": 1024,
+              "minLength": 0,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseAuthResponse"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "auth-controller"
+        ]
+      }
+    },
+    "/api/v1/monzo/callback": {
+      "get": {
+        "operationId": "handleCallback",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "code",
+            "required": false,
+            "schema": {
+              "maxLength": 1024,
+              "minLength": 0,
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "state",
+            "required": true,
+            "schema": {
+              "maxLength": 64,
+              "minLength": 0,
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "error",
+            "required": false,
+            "schema": {
+              "maxLength": 256,
+              "minLength": 0,
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "error_description",
+            "required": false,
+            "schema": {
+              "maxLength": 1000,
+              "minLength": 0,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseMonzoConnectionResponse"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "monzo-controller"
+        ]
+      }
+    },
+    "/api/v1/monzo/connect": {
+      "get": {
+        "operationId": "initiateOAuth",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "user",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/User"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/RedirectView"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "monzo-controller"
+        ]
+      },
+      "post": {
+        "operationId": "initiateOAuthJson",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "user",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/User"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseMonzoConnectInitResponse"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "monzo-controller"
+        ]
+      }
+    },
+    "/api/v1/monzo/connections": {
+      "get": {
+        "operationId": "listConnections",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "user",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/User"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListMonzoConnectionResponse"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "monzo-controller"
+        ]
+      }
+    },
+    "/api/v1/monzo/connections/{id}": {
+      "delete": {
+        "operationId": "disconnectConnection",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "user",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/User"
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "monzo-controller"
+        ]
+      },
+      "get": {
+        "operationId": "getConnection",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "user",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/User"
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseMonzoConnectionResponse"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "monzo-controller"
+        ]
+      }
+    },
+    "/api/v1/monzo/status": {
+      "get": {
+        "operationId": "getStatus",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "user",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/User"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseMonzoStatusResponse"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "monzo-controller"
+        ]
+      }
+    },
+    "/api/v1/monzo/sync/progress": {
+      "get": {
+        "operationId": "getSyncProgress",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "user",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/User"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseMonzoSyncProgressResponse"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "monzo-controller"
+        ]
+      }
+    },
+    "/api/v1/transactions": {
+      "get": {
+        "operationId": "list",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "accountId",
+            "required": false,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "from",
+            "required": false,
+            "schema": {
+              "format": "date-time",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "required": false,
+            "schema": {
+              "format": "date-time",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "format": "int32",
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "size",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "format": "int32",
+              "maximum": 200,
+              "minimum": 1,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePageResponseTransactionResponse"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "transaction-controller"
+        ]
+      }
+    }
+  },
+  "servers": [
+    {
+      "description": "Generated server url",
+      "url": "http://localhost:8080"
+    }
+  ]
+}
