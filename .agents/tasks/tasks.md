@@ -24,7 +24,8 @@
 > decision + claude.ai/design pass — Alexander 2026-09-13: chrome must be derived from user
 > stories, not pattern-matched from console apps; see notes/web/03 §1a) → (#15 ∥ #16) → #17**. Webhooks and TrueLayer move to Backlog behind the frontend epics —
 > near-real-time sync and a second bank are invisible without a UI. Platform decided:
-> TypeScript React web app (Vite, react-bootstrap, TanStack Query), mobile-first,
+> TypeScript React web app (Vite, Tailwind v4 + shadcn/ui — amended from react-bootstrap
+> 2026-09-13, TanStack Query), mobile-first,
 > browser-only (Electron retired, PWA later); Cloudflare Tunnel + Access in front.
 
 | # | Task | Priority | Estimate | Plan |
@@ -41,6 +42,7 @@
 
 | Feature | Priority | Effort | Notes |
 |---------|----------|--------|-------|
+| 📖 Public API docs site (app ↔ docs split) | P3 | 1d | Alexander 2026-09-13 (inspired by Resend + Mintlify/Browserbase docs): Budgeteer as an API-first, integrable product — polished public API reference rendered FROM `docs/api/openapi.json` (the #93 pipeline is the source; enrich with `@Operation` incrementally). Tooling: Mintlify (hosted, lowest effort, the Browserbase look) vs Scalar (self-hosted static renderer, fits one-URL/self-host ethos). Routing: `docs.*` public, app stays behind Cloudflare Access; nav cross-links app ↔ docs. **Reframed 2026-09-13 (late): primary motive is PORTFOLIO/documentation showcase, not third-party integration** — a polished static rendering of the contract needs no auth work at all. PAT auth demoted to only-if-a-real-integrator-appears (YAGNI); if ever: smaller than it sounds: `JweAuthenticationFilter` already resolves `Bearer` before cookie, so PATs are a second credential TYPE through the same filter (pat table + issuance/revocation endpoints + settings UI), not an auth rework. Session tokens can't serve integrations regardless of transport: interactive-only acquisition (magic link) + single-session policy revokes them on every new login (AuthService, by design). ⚠️ Regulatory line from Session 01 holds: documenting/self-hosting is fine — *hosting other people's bank connections* ⇒ ICO/FCA. Slot: after #17 (needs domains/tunnel/Access routing). Related learning interest (Alexander): mTLS/certs — natural home is #17's edge work (Tunnel origin auth, client certs for the NUC) rather than API auth |
 | 🪝 #5 Webhooks | P3 | TBD | [plan](open/webhooks/plan.md) — second trigger into the raw→domain pipeline + near-real-time balance refresh. **Moved behind frontend epics (Session 01)**; ⚠️ Monzo's servers can't pass Cloudflare Access — needs a deliberate bypass route with its own signature verification (Session 01 dec 17) |
 | 🏺 Pots & budgeting | P2 | TBD | Virtual pots as a double-entry overlay ledger — **any spec must cite §2a of the Session 01 doc** (two-legged transfers, conservation invariant, real balances as ground truth). After money views prove daily use |
 | 🧩 Widget dashboard | P3 | TBD | Customisable pick-and-choose widget summary (Session 01 dec 18 recorded the vision; dashboard v1 ships fixed). Design in/after Session 02 |
@@ -83,7 +85,8 @@
 
 ### September 2026
 - [x] **#13 E1 Web Platform Foundation** (PR #92, merged 2026-09-13) — `budgeteer-web/`
-      scaffolded: Vite 8 + React 19 + TS (strict), react-bootstrap mobile-first, TanStack
+      scaffolded: Vite 8 + React 19 + TS (strict), react-bootstrap mobile-first (→ amended
+      to Tailwind v4 + shadcn/ui later same day, pre-#14), TanStack
       Query, React Router v7, Vitest/RTL (5 smoke tests), ESLint flat + Prettier (template's
       oxlint swapped out), Vite `/api` proxy (same-origin cookies, zero CORS), envelope-aware
       API client with central 401 handling, `Web Lint, Test & Build` CI job. Learning series

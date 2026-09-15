@@ -10,25 +10,26 @@ A React component is a plain function returning **JSX** — HTML-looking syntax 
 to function calls. Our simplest one, `pages/Home.tsx`:
 
 ```tsx
-import Container from 'react-bootstrap/Container'
-
 export default function Home() {
   return (
-    <Container className="py-4">
-      <h2>Overview</h2>
-      <p className="text-body-secondary">
+    <main className="mx-auto max-w-5xl px-4 py-8">
+      <h2 className="text-2xl font-semibold tracking-tight">Overview</h2>
+      <p className="text-muted-foreground mt-2">
         Accounts and balances land here in the money-views milestone.
       </p>
-    </Container>
+    </main>
   )
 }
 ```
 
 Things to notice:
-- `<Container>` (capitalised) is a *component* — react-bootstrap's responsive wrapper.
-  Lowercase tags (`<h2>`) are plain HTML elements. Capitalisation is how JSX tells them apart.
-- `className`, not `class` (`class` is a JS keyword). The values are Bootstrap utility
-  classes (`py-4` = vertical padding) — same Bootstrap you'd use anywhere.
+- Capitalised tags in JSX (`<Routes>`, `<Button>`) are *components*; lowercase tags
+  (`<main>`, `<h2>`) are plain HTML elements. Capitalisation is how JSX tells them apart.
+- `className`, not `class` (`class` is a JS keyword). The values are **Tailwind utility
+  classes** — each maps to one CSS declaration (`px-4` = horizontal padding, `mx-auto` =
+  centred, `max-w-5xl` = width cap). `text-muted-foreground` is one of OUR theme tokens
+  (defined in `src/index.css`) — use tokens, not raw palette classes, so dark mode and
+  future theming keep working.
 - JSX is *values*: a component returns a description of UI, and React decides when/what to
   actually draw. Think of it as returning a lightweight DTO of the desired DOM.
 
@@ -166,10 +167,13 @@ UX (finding #6) — `refetchInterval` polling and cache invalidation
 (`queryClient.invalidateQueries({ queryKey: ['accounts'] })` after an ingest completes).
 The `queryKey` is the cache key; invalidating it is how "refresh the data in the GUI" works.
 
-**react-bootstrap**: Bootstrap's components as React components (`<Navbar>`, `<Button>`,
-`<Card>`) — no jQuery, no manual class juggling, and the grid (`<Container>/<Row>/<Col>`)
-is mobile-first by default: styles target small screens, `md=`/`lg=` props add behaviour at
-larger breakpoints.
+**Tailwind v4 + shadcn/ui** (amended from react-bootstrap, 2026-09-13): Tailwind provides
+the utility classes and our theme tokens (`src/index.css` — colours, radii, the Geist font,
+dark-mode variants); shadcn/ui provides *copy-in* components — `npx shadcn add button card
+dialog …` drops accessible, Radix-based source files into `src/components/ui/` that we own
+and can edit. Mobile-first works via breakpoint prefixes: bare utilities target small
+screens, `md:`/`lg:` prefixes layer on larger-screen behaviour
+(`class="flex-col md:flex-row"`).
 
 ## 8. How the tests work
 

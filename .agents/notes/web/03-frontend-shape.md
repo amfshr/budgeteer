@@ -78,8 +78,9 @@ model.
 **Timing:** #14 needs only `PublicLayout` (design-trivial, no IA risk). Session 02 — the
 user-story grill producing the interaction model + chrome decision, with the
 claude.ai/design visual pass inside it — runs after #14, before any authenticated pages
-(#15/#16) are built. Design-tool output is translated into react-bootstrap, never pasted
-(no second CSS framework by accident).
+(#15/#16) are built. Design-tool output (Tailwind-native since the 2026-09-13 stack switch)
+can be adopted near-verbatim — but adapt it to OUR theme tokens in `src/index.css`
+(`bg-background`, `text-muted-foreground`, …), never hardcoded palette classes.
 
 ## 2. The route table as it will look after #14–#16
 
