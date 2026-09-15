@@ -1,8 +1,9 @@
 # budgeteer-web
 
-The Budgeteer frontend — a mobile-first TypeScript React app (Vite, react-bootstrap,
-TanStack Query, React Router). Platform decisions: Design Session 01
-(`.agents/notes/product/design-session-01-top-down.md`).
+The Budgeteer frontend — a mobile-first TypeScript React app (Vite, Tailwind v4 +
+shadcn/ui, TanStack Query, React Router). Platform decisions: Design Session 01
+(`.agents/notes/product/design-session-01-top-down.md`), component stack amended to
+Tailwind/shadcn 2026-09-13.
 
 ## Commands
 
