@@ -1,6 +1,11 @@
 package dev.amfshr.budgeteer.service.common;
 
 import dev.amfshr.budgeteer.config.AppProperties;
+import dev.amfshr.budgeteer.config.JweProperties;
+import dev.amfshr.budgeteer.exception.ApiException;
+import jakarta.mail.Multipart;
+import jakarta.mail.Session;
+import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -12,8 +17,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.mail.MailSendException;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+
+import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -22,7 +28,8 @@ import static org.mockito.Mockito.*;
 /**
  * Unit tests for {@link EmailService}.
  *
- * <p>Uses Mockito to mock the JavaMailSender and AppProperties dependencies.</p>
+ * <p>The mocked JavaMailSender hands out a REAL in-memory MimeMessage so the
+ * multipart/alternative content (plain + HTML parts) can be captured and parsed.</p>
  */
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.STRICT_STUBS)
@@ -38,14 +45,43 @@ class EmailServiceTest {
     @Mock
     private AppProperties.Mail mailProperties;
 
+    @Mock
+    private JweProperties jweProperties;
+
     private EmailService emailService;
 
     @BeforeEach
     void setUp() {
-        emailService = new EmailService(mailSender, appProperties);
-        // Set up mail properties mock with default from address (lenient as not all tests send emails)
+        emailService = new EmailService(mailSender, appProperties, jweProperties);
+        // Lenient: not every test sends an email
         lenient().when(mailProperties.getFrom()).thenReturn("noreply@budgeteer.amfshr.dev");
         lenient().when(appProperties.getMail()).thenReturn(mailProperties);
+        lenient().when(jweProperties.getMagicLinkExpiry()).thenReturn(Duration.ofMinutes(30));
+        lenient().when(mailSender.createMimeMessage()).thenReturn(new MimeMessage((Session) null));
+    }
+
+    /** Walks the multipart tree collecting every body part's text (plain + html). */
+    private String allContent(MimeMessage message) throws Exception {
+        StringBuilder sb = new StringBuilder();
+        collect(message.getContent(), sb);
+        return sb.toString();
+    }
+
+    private void collect(Object content, StringBuilder sb) throws Exception {
+        if (content instanceof String text) {
+            sb.append(text).append('\n');
+        } else if (content instanceof Multipart multipart) {
+            for (int i = 0; i < multipart.getCount(); i++) {
+                collect(multipart.getBodyPart(i).getContent(), sb);
+            }
+        }
+    }
+
+    private MimeMessage sendAndCapture(String email, String token) {
+        emailService.sendMagicLinkEmail(email, token);
+        ArgumentCaptor<MimeMessage> captor = ArgumentCaptor.forClass(MimeMessage.class);
+        verify(mailSender).send(captor.capture());
+        return captor.getValue();
     }
 
     @Nested
@@ -55,173 +91,122 @@ class EmailServiceTest {
         @Test
         @DisplayName("should send email when email is enabled")
         void shouldSendEmailWhenEnabled() {
-            // Given
-            String email = "test@example.com";
-            String token = "magic-token-123";
             when(appProperties.isEmailEnabled()).thenReturn(true);
             when(appProperties.getBaseUrl()).thenReturn("https://budgeteer.dev");
 
-            // When
-            emailService.sendMagicLinkEmail(email, token);
+            emailService.sendMagicLinkEmail("test@example.com", "magic-token-123");
 
-            // Then
-            verify(mailSender).send(any(SimpleMailMessage.class));
+            verify(mailSender).send(any(MimeMessage.class));
         }
 
         @Test
         @DisplayName("should not send email when email is disabled (dev mode)")
         void shouldNotSendEmailWhenDisabled() {
-            // Given
-            String email = "test@example.com";
-            String token = "magic-token-123";
             when(appProperties.isEmailEnabled()).thenReturn(false);
             when(appProperties.getBaseUrl()).thenReturn("http://localhost:8080");
 
-            // When
-            emailService.sendMagicLinkEmail(email, token);
+            emailService.sendMagicLinkEmail("test@example.com", "magic-token-123");
 
-            // Then
-            verify(mailSender, never()).send(any(SimpleMailMessage.class));
+            verify(mailSender, never()).send(any(MimeMessage.class));
         }
 
         @Test
-        @DisplayName("should build correct magic link URL")
-        void shouldBuildCorrectMagicLinkUrl() {
-            // Given
-            String email = "test@example.com";
-            String token = "my-secret-token";
+        @DisplayName("should include the magic link in both plain and HTML parts")
+        void shouldBuildCorrectMagicLinkUrl() throws Exception {
             when(appProperties.isEmailEnabled()).thenReturn(true);
             when(appProperties.getBaseUrl()).thenReturn("https://budgeteer.dev");
 
-            ArgumentCaptor<SimpleMailMessage> messageCaptor = ArgumentCaptor.forClass(SimpleMailMessage.class);
+            MimeMessage sent = sendAndCapture("test@example.com", "my-secret-token");
 
-            // When
-            emailService.sendMagicLinkEmail(email, token);
+            String link = "https://budgeteer.dev/auth/verify?token=my-secret-token";
+            String content = allContent(sent);
+            assertThat(content).contains(link);
+            // the HTML part carries it as a real anchor — the reason this email is HTML at all
+            assertThat(content).contains("href=\"" + link + "\"");
+        }
 
-            // Then
-            verify(mailSender).send(messageCaptor.capture());
-            SimpleMailMessage sentMessage = messageCaptor.getValue();
-            assertThat(sentMessage.getText())
-                    .contains("https://budgeteer.dev/api/v1/auth/verify?token=my-secret-token");
+        @Test
+        @DisplayName("should send multipart/alternative with an HTML part")
+        void shouldSendMultipartAlternative() throws Exception {
+            when(appProperties.isEmailEnabled()).thenReturn(true);
+            when(appProperties.getBaseUrl()).thenReturn("https://budgeteer.dev");
+
+            MimeMessage sent = sendAndCapture("test@example.com", "token-123");
+
+            assertThat(sent.getContent()).isInstanceOf(Multipart.class);
+            assertThat(allContent(sent)).contains("Sign in to Budgeteer");
         }
 
         @Test
         @DisplayName("should set correct recipient")
-        void shouldSetCorrectRecipient() {
-            // Given
-            String email = "recipient@example.com";
-            String token = "token-123";
+        void shouldSetCorrectRecipient() throws Exception {
             when(appProperties.isEmailEnabled()).thenReturn(true);
             when(appProperties.getBaseUrl()).thenReturn("https://budgeteer.dev");
 
-            ArgumentCaptor<SimpleMailMessage> messageCaptor = ArgumentCaptor.forClass(SimpleMailMessage.class);
+            MimeMessage sent = sendAndCapture("recipient@example.com", "token-123");
 
-            // When
-            emailService.sendMagicLinkEmail(email, token);
-
-            // Then
-            verify(mailSender).send(messageCaptor.capture());
-            SimpleMailMessage sentMessage = messageCaptor.getValue();
-            assertThat(sentMessage.getTo()).containsExactly("recipient@example.com");
+            assertThat(sent.getAllRecipients()).hasSize(1);
+            assertThat(sent.getAllRecipients()[0].toString()).isEqualTo("recipient@example.com");
         }
 
         @Test
         @DisplayName("should set correct subject")
-        void shouldSetCorrectSubject() {
-            // Given
-            String email = "test@example.com";
-            String token = "token-123";
+        void shouldSetCorrectSubject() throws Exception {
             when(appProperties.isEmailEnabled()).thenReturn(true);
             when(appProperties.getBaseUrl()).thenReturn("https://budgeteer.dev");
 
-            ArgumentCaptor<SimpleMailMessage> messageCaptor = ArgumentCaptor.forClass(SimpleMailMessage.class);
+            MimeMessage sent = sendAndCapture("test@example.com", "token-123");
 
-            // When
-            emailService.sendMagicLinkEmail(email, token);
-
-            // Then
-            verify(mailSender).send(messageCaptor.capture());
-            SimpleMailMessage sentMessage = messageCaptor.getValue();
-            assertThat(sentMessage.getSubject()).isEqualTo("Login to Budgeteer");
+            assertThat(sent.getSubject()).isEqualTo("Login to Budgeteer");
         }
 
         @Test
         @DisplayName("should set correct from address from app properties")
-        void shouldSetCorrectFromAddress() {
-            // Given
-            String email = "test@example.com";
-            String token = "token-123";
+        void shouldSetCorrectFromAddress() throws Exception {
             when(appProperties.isEmailEnabled()).thenReturn(true);
             when(appProperties.getBaseUrl()).thenReturn("https://budgeteer.dev");
 
-            ArgumentCaptor<SimpleMailMessage> messageCaptor = ArgumentCaptor.forClass(SimpleMailMessage.class);
+            MimeMessage sent = sendAndCapture("test@example.com", "token-123");
 
-            // When
-            emailService.sendMagicLinkEmail(email, token);
-
-            // Then
-            verify(mailSender).send(messageCaptor.capture());
-            SimpleMailMessage sentMessage = messageCaptor.getValue();
-            assertThat(sentMessage.getFrom()).isEqualTo("noreply@budgeteer.amfshr.dev");
+            assertThat(sent.getFrom()[0].toString()).isEqualTo("noreply@budgeteer.amfshr.dev");
         }
 
         @Test
-        @DisplayName("should include expiry information in email body")
-        void shouldIncludeExpiryInfo() {
-            // Given
-            String email = "test@example.com";
-            String token = "token-123";
+        @DisplayName("should include the configured expiry in the email body")
+        void shouldIncludeExpiryInfo() throws Exception {
             when(appProperties.isEmailEnabled()).thenReturn(true);
             when(appProperties.getBaseUrl()).thenReturn("https://budgeteer.dev");
+            when(jweProperties.getMagicLinkExpiry()).thenReturn(Duration.ofMinutes(10));
 
-            ArgumentCaptor<SimpleMailMessage> messageCaptor = ArgumentCaptor.forClass(SimpleMailMessage.class);
+            MimeMessage sent = sendAndCapture("test@example.com", "token-123");
 
-            // When
-            emailService.sendMagicLinkEmail(email, token);
-
-            // Then
-            verify(mailSender).send(messageCaptor.capture());
-            SimpleMailMessage sentMessage = messageCaptor.getValue();
-            assertThat(sentMessage.getText()).contains("15 minutes");
+            assertThat(allContent(sent)).contains("10 minutes");
         }
 
         @Test
-        @DisplayName("should throw RuntimeException when mail sending fails")
+        @DisplayName("should throw ApiException when mail sending fails")
         void shouldThrowExceptionWhenMailFails() {
-            // Given
-            String email = "test@example.com";
-            String token = "token-123";
             when(appProperties.isEmailEnabled()).thenReturn(true);
             when(appProperties.getBaseUrl()).thenReturn("https://budgeteer.dev");
             doThrow(new MailSendException("SMTP connection failed"))
-                    .when(mailSender).send(any(SimpleMailMessage.class));
+                    .when(mailSender).send(any(MimeMessage.class));
 
-            // When/Then
-            assertThatThrownBy(() -> emailService.sendMagicLinkEmail(email, token))
-                    .isInstanceOf(RuntimeException.class)
-                    .hasMessage("Failed to send email")
+            assertThatThrownBy(() -> emailService.sendMagicLinkEmail("test@example.com", "token-123"))
+                    .isInstanceOf(ApiException.class)
+                    .hasMessageContaining("couldn't send the login email")
                     .hasCauseInstanceOf(MailSendException.class);
         }
 
         @Test
         @DisplayName("should handle different base URLs correctly")
-        void shouldHandleDifferentBaseUrls() {
-            // Given - localhost for dev
-            String email = "test@example.com";
-            String token = "dev-token";
+        void shouldHandleDifferentBaseUrls() throws Exception {
             when(appProperties.isEmailEnabled()).thenReturn(true);
             when(appProperties.getBaseUrl()).thenReturn("http://localhost:8080");
 
-            ArgumentCaptor<SimpleMailMessage> messageCaptor = ArgumentCaptor.forClass(SimpleMailMessage.class);
+            MimeMessage sent = sendAndCapture("test@example.com", "dev-token");
 
-            // When
-            emailService.sendMagicLinkEmail(email, token);
-
-            // Then
-            verify(mailSender).send(messageCaptor.capture());
-            SimpleMailMessage sentMessage = messageCaptor.getValue();
-            assertThat(sentMessage.getText())
-                    .contains("http://localhost:8080/api/v1/auth/verify?token=dev-token");
+            assertThat(allContent(sent))
+                    .contains("http://localhost:8080/auth/verify?token=dev-token");
         }
     }
 }
