@@ -29,28 +29,59 @@ this ticket.
 
 ## Scope
 
-- [ ] `PublicLayout` (minimal top bar, centered content) as a layout route with `<Outlet/>`;
+- [x] `PublicLayout` (minimal top bar, centered content) as a layout route with `<Outlet/>`;
       landing folded into the entry/login page
-- [ ] `features/auth/LoginPage` — email form (validation, pending state) →
+- [x] `features/auth/LoginPage` — email form (validation, pending state) →
       `POST /auth/login` → navigate to magic-link-sent view (shows masked email, resend)
-- [ ] `features/auth/VerifyPage` — `/auth/verify` route: reads `token` param, calls verify
+- [x] `features/auth/VerifyPage` — `/auth/verify` route: reads `token` param, calls verify
       with JSON accept, success → `/app`; invalid/expired → clear error + back to login
-- [ ] `features/auth/useSession` — TanStack Query hook on `GET /auth/me`
+- [x] `features/auth/useSession` — TanStack Query hook on `GET /auth/me`
       (`queryKey: ['session']`); exposes user, isPending, signedOut state
-- [ ] `RequireAuth` layout route — wraps `/app/**`: pending → spinner, no session →
+- [x] `RequireAuth` layout route — wraps `/app/**`: pending → spinner, no session →
       redirect `/login`; wire `setUnauthorizedHandler` → router redirect + `['session']`
       cache clear (mid-session expiry)
-- [ ] Logout — `POST /auth/logout`, clear query cache, redirect to login
-- [ ] Server tweak if needed for SPA verify flow (link target/loginSuccessUrl) + OpenAPI
+- [x] Logout — `POST /auth/logout`, clear query cache, redirect to login
+- [x] Server tweak if needed for SPA verify flow (link target/loginSuccessUrl) + OpenAPI
       snapshot regen
-- [ ] Tests: LoginPage (submit → sent state), VerifyPage (success + invalid token),
+- [x] Tests: LoginPage (submit → sent state), VerifyPage (success + invalid token),
       RequireAuth (redirects), useSession/logout client behaviour
-- [ ] Manual E2E in dev: request link → copy from console → click → land in `/app` →
-      refresh (session survives) → logout
-- [ ] **Alexander:** re-create Resend account + API key (gates real email, not this ticket;
-      needed before #17 daily use)
+- [x] Manual E2E (Alexander, 2026-09-15): real email → inbox → link → `/app` → logout — PASSED
+      (via two live-found fixes: proxy Origin-header removal for the CORS 403, friendly
+      fallback for non-envelope errors)
+- [x] **Alexander:** re-create Resend account + API key — DONE 2026-09-13, live delivery
+      verified
 
 ## Non-goals
 
 - Authenticated chrome/navigation (Session 02), passkeys (post-MVP), rate-limiting UX
   beyond what the server already does
+
+
+## Found & fixed during the build (2026-09-15)
+
+- **Email failure was a raw 500** — a `MailException` bubbled as `RuntimeException` →
+  generic INTERNAL_ERROR envelope. Now `ApiException(EMAIL_SERVICE_ERROR)` (502) with an
+  actionable message the login form renders directly. (Surfaced live: `.env` still has
+  `APP_EMAIL_ENABLED=true` from the Resend test, and Resend 550s `example.com` recipients.)
+- **SPA verify flow settled**: emailed link now targets `{base-url}/auth/verify?token=`
+  (frontend route); dev `.env` `APP_BASE_URL` → `http://localhost:5173`. Semantics: base-url
+  = "the origin users see" (single public domain in prod). Backend content-negotiation kept.
+- **Observation (accepted trade-off, no change)**: after logout, the *access* JWE remains
+  cryptographically valid until expiry — logout revokes the refresh session and clears
+  cookies (so browsers are fine), but a captured access token works for ≤ its TTL. Standard
+  stateless-token revocation gap; bounded by the short access expiry.
+
+## Server-side E2E verified (curl, 2026-09-15)
+
+login → console link targets `:5173/auth/verify?token=…` → verify (JSON) sets cookies →
+`/me` returns the user → logout → refresh session revoked. Browser E2E = Alexander's manual
+pass with `npm run dev`.
+
+## Late addition (2026-09-15): HTML magic-link email
+
+Proton (and most clients) won't linkify plain-text localhost URLs — the email is now
+multipart/alternative: HTML part with a real sign-in button + printed URL, text/plain
+fallback. Expiry text now comes from `JweProperties.getMagicLinkExpiry()` (was hardcoded
+"15 minutes" — wrong in every env: dev=30m, prod=10m). EmailServiceTest reworked around a
+real in-memory MimeMessage (10 tests). Micro-nit left open: MagicLinkSentPage hardcodes
+"30 minutes" — fine for dev, wrong for prod's 10m; revisit when frontend reads config.
