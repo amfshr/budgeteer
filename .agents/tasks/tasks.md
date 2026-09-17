@@ -10,7 +10,7 @@
 
 | # | Task | Priority | Estimate | Plan |
 |---|------|----------|----------|------|
-| — | *(nothing in progress — next: #14 real login)* | | | |
+| 14 | 🔑 E2 Real login — magic-link auth end to end: PublicLayout + login/magic-link-sent/verify pages, `useSession` hook, `RequireAuth` guard, 401→login wiring, logout. Public shell only (chrome waits for Session 02). Resend re-creation = Alexander, gates real email not dev. Branch: `feature/real-login` | 🟡 P2 | 1–2d | [plan](open/real-login/plan.md) |
 
 ---
 
@@ -19,17 +19,18 @@
 > **Strategy reset (Design Session 01, 2026-09-11 — see
 > [.agents/notes/product/design-session-01-top-down.md](../notes/product/design-session-01-top-down.md)):
 > frontend-first, feature-light, demand-driven APIs.** Execution order:
-> **E0 (finish #11/PR #87 contract review) → #13 ✅ → OpenAPI ✅ → #14 (public shell
-> only) → Design Session 02 (user-story grill → interaction model + authenticated-chrome
-> decision + claude.ai/design pass — Alexander 2026-09-13: chrome must be derived from user
-> stories, not pattern-matched from console apps; see notes/web/03 §1a) → (#15 ∥ #16) → #17**. Webhooks and TrueLayer move to Backlog behind the frontend epics —
+> **#13 ✅ → OpenAPI ✅ → #14 (login, public shell) → #16 FUNCTIONAL slice (Monzo connect
+> from client + basic accounts/transactions views on the minimal shell — function before
+> form, Alexander 2026-09-15) → Design Session 02 (branding + authenticated-chrome +
+> composition, decided WITH real data on screen; user-story-derived, money-app reference
+> class, claude.ai/design pass — see notes/web/03 §1a) → visual polish + #15 → #17**. Webhooks and TrueLayer move to Backlog behind the frontend epics —
 > near-real-time sync and a second bank are invisible without a UI. Platform decided:
-> TypeScript React web app (Vite, react-bootstrap, TanStack Query), mobile-first,
+> TypeScript React web app (Vite, Tailwind v4 + shadcn/ui — amended from react-bootstrap
+> 2026-09-13, TanStack Query), mobile-first,
 > browser-only (Electron retired, PWA later); Cloudflare Tunnel + Access in front.
 
 | # | Task | Priority | Estimate | Plan |
 |---|------|----------|----------|------|
-| 14 | 🔑 E2 Real login — re-create Resend (zero code, config exists) + verify EmailService; entry/login page (landing folded in), signup, magic-link-sent + verify handoff, client session handling, logout (dec 6–8, 19) | 🟡 P2 | 1–2d | [session](../notes/product/design-session-01-top-down.md) |
 | 15 | 🛡️ E3 Settings & data rights — settings page: profile, Disconnect Monzo, Export JSON, **Delete+Purge** (instant, typed confirm, Monzo consent revoke). New server endpoints — **`/grill-me` the delete/export spec before build** (dec 9–12) | 🟡 P2 | 1–2d | [session](../notes/product/design-session-01-top-down.md) |
 | 16 | 💸 E4 Money views v1 — Monzo connect from client (incl. prod redirect-URI config), accounts view, dashboard v1 (fixed composition on existing APIs), transactions view v1. **Design Session 02 (user stories/views) before the dashboard build** (dec 18, 20–21) | 🟡 P2 | 2–3d | [session](../notes/product/design-session-01-top-down.md) |
 | 17 | 🌐 E5 Edge & deploy — Dockerfile, NUC deploy, Cloudflare Tunnel + Access identity allowlist, one URL everywhere, security headers/CSP/CORS (dec 13–15). Any time after #14; required before daily phone use | 🟡 P2 | 1–2d | [session](../notes/product/design-session-01-top-down.md) |
@@ -42,13 +43,16 @@
 
 | Feature | Priority | Effort | Notes |
 |---------|----------|--------|-------|
+| 📖 Public API docs site (app ↔ docs split) | P3 | 1d | Alexander 2026-09-13 (inspired by Resend + Mintlify/Browserbase docs): Budgeteer as an API-first, integrable product — polished public API reference rendered FROM `docs/api/openapi.json` (the #93 pipeline is the source; enrich with `@Operation` incrementally). Tooling: Mintlify (hosted, lowest effort, the Browserbase look) vs Scalar (self-hosted static renderer, fits one-URL/self-host ethos). Routing: `docs.*` public, app stays behind Cloudflare Access; nav cross-links app ↔ docs. **Reframed 2026-09-13 (late): primary motive is PORTFOLIO/documentation showcase, not third-party integration** — a polished static rendering of the contract needs no auth work at all. PAT auth demoted to only-if-a-real-integrator-appears (YAGNI); if ever: smaller than it sounds: `JweAuthenticationFilter` already resolves `Bearer` before cookie, so PATs are a second credential TYPE through the same filter (pat table + issuance/revocation endpoints + settings UI), not an auth rework. Session tokens can't serve integrations regardless of transport: interactive-only acquisition (magic link) + single-session policy revokes them on every new login (AuthService, by design). ⚠️ Regulatory line from Session 01 holds: documenting/self-hosting is fine — *hosting other people's bank connections* ⇒ ICO/FCA. Slot: after #17 (needs domains/tunnel/Access routing). Related learning interest (Alexander): mTLS/certs — natural home is #17's edge work (Tunnel origin auth, client certs for the NUC) rather than API auth |
 | 🪝 #5 Webhooks | P3 | TBD | [plan](open/webhooks/plan.md) — second trigger into the raw→domain pipeline + near-real-time balance refresh. **Moved behind frontend epics (Session 01)**; ⚠️ Monzo's servers can't pass Cloudflare Access — needs a deliberate bypass route with its own signature verification (Session 01 dec 17) |
 | 🏺 Pots & budgeting | P2 | TBD | Virtual pots as a double-entry overlay ledger — **any spec must cite §2a of the Session 01 doc** (two-legged transfers, conservation invariant, real balances as ground truth). After money views prove daily use |
 | 🧩 Widget dashboard | P3 | TBD | Customisable pick-and-choose widget summary (Session 01 dec 18 recorded the vision; dashboard v1 ships fixed). Design in/after Session 02 |
 | 📣 Event-driven post-sync hooks | P3 | 0.5d | [plan](closed/oauth-callback-events/plan.md) — `BackfillCompletedEvent` / `BackfillPausedEvent` + listeners (email, domain mapping, webhook registration). Natural fit alongside #11's `DomainMappingJob` |
 | 🏦 TrueLayer Integration (Lloyds/HSBC/Barclays) | P2 | 3–4d | [plan](open/truelayer-integration/plan.md) — add `provider-truelayer` jar as a 2nd implementation of the capability contracts (`ProviderConnectionAuth` + `AccountsCapability`/`BalanceCapability`/`TransactionsCapability`, split in PR #84; cards/standing-orders/direct-debits land as further capability interfaces), copying the `provider-monzo` template from #10. Interface already validated against TrueLayer's Data API in the #6 plan. **Aug 2026 re-check:** Data API still active (now positioned as an "add-on" product — mild vendor-risk signal); Console signup is self-serve, sandbox free, live own-account testing looks viable for a solo dev — **first action when picked up: Console signup + live smoke test (deferred until after #11)**. Token model: 90-day consent, reconfirmation-of-consent renewal, refresh token must be used within a 30-day sliding window. Transactions are date-windowed (`from`/`to`), no page cursor → impl returns null `nextCursor`. ⚠️ plan.md predates the multi-module split (BankAdapter pattern, old paths, V7 migration) — rewrite around the provider contract before build. Provider-contract rename (PR #80) + capability split (PR #84) already executed: jar lands as `provider-truelayer` implementing the capability interfaces. ⚠️ Delta sync: after #12, the fetch start is the sealed `SyncPosition` (`FromTime` \| `AfterTransaction` \| `NextPage`) on `TransactionsCapability.getTransactions` — TrueLayer's impl must switch exhaustively and **throw on `AfterTransaction`** (no id-based deltas). This task must add the time-window delta fallback (`FromTime(last synced − overlap)`, idempotent upserts) incl. the persisted last-synced timestamp (column + migration) and the routing in `TransactionSyncService`. Future payments = separate `PaymentInitiationProvider` interface; one TrueLayer class implements both. **Deprioritised 2026-09-11 (Session 01): sits behind the frontend epics #13–#17 — no second bank before a frontend, real login, and basic features exist** ⚠️ Sync-layer generalisation (Alexander, 2026-08-31): everything in `service/monzo/` that isn't OAuth-specific — `TransactionSyncJob`, `TransactionSyncService`, `TransactionSyncEventListener` + `MonzoConnectionCreatedEvent` — is Monzo-shaped and must generalise here, following the `IngestService`/`ProviderIngestor` orchestrator-plus-strategy pattern from #11 (e.g. generic `ProviderConnectionCreatedEvent(provider, connectionId)` + per-provider sync strategy; listeners out of the monzo subpackage) |
 | 🧩 Per-page backfill commits (true mid-window resume) | P3 | 0.5d | Backfill commits one `TransactionTemplate` tx per ≤350-day window; an SCA 403 mid-window rolls the whole window back, so resume re-fetches it. `backfill_progress_cursor` is written per page but rolled back with the window — it never actually resumes mid-window. Commit each page (`REQUIRES_NEW`) so partial progress in a large window survives re-auth. Only bites if a single >90-day-old window can't be pulled within one 5-min SCA budget — low urgency for personal accounts |
+| 🧹 api/v1 package reshuffle (by-layer) | P3 | 0.5d | Alexander 2026-09-15: keep the api/{dev,health,v1} top split, but within `v1` the by-resource subpackaging (account/, transaction/, auth/, monzo/ each with dto/ + mapper) is too much — reshuffle to layer packages: `v1/controller`, `v1/resources` (DTOs), `v1/mapper`, maybe `v1/exceptions`. Future backend-refactor slot, not urgent. ⚠️ Consideration for the refactor: mappers are currently package-private-final beside their controllers (E0 layering decision) — a separate mapper package forces them public; decide whether that encapsulation is worth keeping before moving. Mirror the move in test packages |
 | 🔌 REST Client Refactoring & Config Consolidation | P2 | 1.5–2d | [plan](closed/rest-client-refactoring/plan.md) — Eliminate config sprawl, create `BankRestClient` base class, organize under `config/clients/` & `config/properties/`. Foundation for TrueLayer. Phase: after transaction sync + webhooks |
+| 🚦 Rate-limit magic-link requests | P2 | 0.5d | Alexander's /auth/sent refresh+resend observation (2026-09-15) surfaced the real gap: `POST /api/v1/auth/login` is unauthenticated and unthrottled — email-bombing a victim address / burning Resend quota is free. Add per-email + per-IP throttling (e.g. 3/15min per email, sliding window; 429 + RATE_LIMITED envelope code the login form can render). The sent-page resend behaviour itself is fine (history.state surviving refresh is deliberate; the action equals typing any email on the login page). **Required before #17 internet exposure** |
 | 🔄 MonzoClient Resilience | P3 | 0.5d | Connection pooling, timeouts, retries, circuit breaker |
 | 🔐 WebAuthn/Passkey Authentication | P2 | 2d | Touch ID / biometric login for fast re-auth |
 | Monitoring Infrastructure | P3 | 0.5d | Prometheus/Grafana on NUC |
@@ -84,7 +88,8 @@
 
 ### September 2026
 - [x] **#13 E1 Web Platform Foundation** (PR #92, merged 2026-09-13) — `budgeteer-web/`
-      scaffolded: Vite 8 + React 19 + TS (strict), react-bootstrap mobile-first, TanStack
+      scaffolded: Vite 8 + React 19 + TS (strict), react-bootstrap mobile-first (→ amended
+      to Tailwind v4 + shadcn/ui later same day, pre-#14), TanStack
       Query, React Router v7, Vitest/RTL (5 smoke tests), ESLint flat + Prettier (template's
       oxlint swapped out), Vite `/api` proxy (same-origin cookies, zero CORS), envelope-aware
       API client with central 401 handling, `Web Lint, Test & Build` CI job. Learning series

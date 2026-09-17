@@ -1,21 +1,29 @@
-import { Route, Routes } from 'react-router'
-import Container from 'react-bootstrap/Container'
-import Navbar from 'react-bootstrap/Navbar'
-import Landing from './pages/Landing'
+import { Navigate, Route, Routes } from 'react-router'
+import PublicLayout from './layouts/PublicLayout'
+import AppLayout from './layouts/AppLayout'
+import LoginPage from './features/auth/LoginPage'
+import MagicLinkSentPage from './features/auth/MagicLinkSentPage'
+import VerifyPage from './features/auth/VerifyPage'
+import RequireAuth from './features/auth/RequireAuth'
 import Home from './pages/Home'
 
 export default function App() {
   return (
-    <>
-      <Navbar bg="dark" data-bs-theme="dark">
-        <Container>
-          <Navbar.Brand href="/">Budgeteer</Navbar.Brand>
-        </Container>
-      </Navbar>
-      <Routes>
-        <Route path="/" element={<Landing />} />
-        <Route path="/app" element={<Home />} />
-      </Routes>
-    </>
+    <Routes>
+      <Route element={<PublicLayout />}>
+        <Route path="/" element={<LoginPage />} />
+        <Route path="/login" element={<Navigate to="/" replace />} />
+        <Route path="/auth/sent" element={<MagicLinkSentPage />} />
+        <Route path="/auth/verify" element={<VerifyPage />} />
+      </Route>
+
+      <Route element={<RequireAuth />}>
+        <Route element={<AppLayout />}>
+          <Route path="/app" element={<Home />} />
+        </Route>
+      </Route>
+
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   )
 }

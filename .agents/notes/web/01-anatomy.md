@@ -80,7 +80,9 @@ Three sections you care about:
 - **`scripts`** — named commands, run with `npm run <name>` (≈ Maven goals). Ours:
   `dev`, `build`, `preview`, `lint`, `format`/`format:check`, `test`/`test:watch`, `coverage`.
 - **`dependencies`** — shipped to the browser: `react`, `react-dom`, `react-router`,
-  `@tanstack/react-query`, `bootstrap` + `react-bootstrap`.
+  `@tanstack/react-query`, `tailwindcss` (+ the shadcn/ui runtime bits: Radix primitives,
+  `clsx`/`tailwind-merge`, the Geist font). shadcn *components* are copy-in source under
+  `src/components/ui/`, not a dependency — we own that code.
 - **`devDependencies`** — build/test tooling only, never in the bundle: `vite`,
   `typescript`, `vitest`, testing-library, `eslint`, `prettier`, type packages (`@types/*`).
 
@@ -89,7 +91,8 @@ the exact one actually installed, so builds are reproducible anyway.
 
 ### `vite.config.ts` — dev server + build + test config
 Small but load-bearing:
-- `plugins: [react()]` — teaches Vite to compile JSX and enables fast-refresh.
+- `plugins: [react(), tailwindcss()]` — JSX compilation + fast-refresh, and Tailwind v4's
+  Vite plugin (CSS-first config: the theme lives in `src/index.css`, no tailwind.config file).
 - `server.proxy: { '/api': 'http://localhost:8080' }` — **the reason auth Just Works in
   dev.** The browser only ever talks to `:5173`; Vite forwards `/api/**` to Spring. Because
   everything is one origin, the HttpOnly session cookies flow with zero CORS or SameSite
@@ -166,4 +169,5 @@ Dev loop: backend running (IDE debug or `./scripts/dev.sh`) + `npm run dev` + br
 - React Router: https://reactrouter.com/
 - Testing Library: https://testing-library.com/docs/queries/about (the query-priority page
   explains the `getByRole` style our tests use)
-- react-bootstrap: https://react-bootstrap.github.io/
+- Tailwind CSS: https://tailwindcss.com/docs — read "Styling with utility classes" first
+- shadcn/ui: https://ui.shadcn.com/docs — what the copy-in component model means
