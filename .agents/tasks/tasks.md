@@ -10,7 +10,7 @@
 
 | # | Task | Priority | Estimate | Plan |
 |---|------|----------|----------|------|
-| 14 | 🔑 E2 Real login — magic-link auth end to end: PublicLayout + login/magic-link-sent/verify pages, `useSession` hook, `RequireAuth` guard, 401→login wiring, logout. Public shell only (chrome waits for Session 02). Resend re-creation = Alexander, gates real email not dev. Branch: `feature/real-login` | 🟡 P2 | 1–2d | [plan](open/real-login/plan.md) |
+| 16 | 💸 E4 Money views — FUNCTIONAL slice: Monzo connect from client (callback → frontend redirect), sync-progress polling (finding #6), accounts + transactions views with `<Money>` + `balance_as_of`, generated OpenAPI types (`openapi-typescript`). Minimal shell, zero visual ambition — Session 02 designs against this. Branch: `feature/money-views` | 🟡 P2 | 1.5–2d | [plan](open/money-views/plan.md) |
 
 ---
 
@@ -32,7 +32,6 @@
 | # | Task | Priority | Estimate | Plan |
 |---|------|----------|----------|------|
 | 15 | 🛡️ E3 Settings & data rights — settings page: profile, Disconnect Monzo, Export JSON, **Delete+Purge** (instant, typed confirm, Monzo consent revoke). New server endpoints — **`/grill-me` the delete/export spec before build** (dec 9–12) | 🟡 P2 | 1–2d | [session](../notes/product/design-session-01-top-down.md) |
-| 16 | 💸 E4 Money views v1 — Monzo connect from client (incl. prod redirect-URI config), accounts view, dashboard v1 (fixed composition on existing APIs), transactions view v1. **Design Session 02 (user stories/views) before the dashboard build** (dec 18, 20–21) | 🟡 P2 | 2–3d | [session](../notes/product/design-session-01-top-down.md) |
 | 17 | 🌐 E5 Edge & deploy — Dockerfile, NUC deploy, Cloudflare Tunnel + Access identity allowlist, one URL everywhere, security headers/CSP/CORS (dec 13–15). Any time after #14; required before daily phone use | 🟡 P2 | 1–2d | [session](../notes/product/design-session-01-top-down.md) |
 
 ---
@@ -87,6 +86,15 @@
 ## ✅ Done
 
 ### September 2026
+- [x] **#14 E2 Real Login** (PR #94, merged 2026-09-16) — magic-link auth end to end,
+      live-verified by Alexander against a real inbox (Resend → HTML button email → verify →
+      session → /app → logout). PublicLayout + minimal AppLayout, LoginPage/Sent/Verify,
+      RequireAuth guard, useSession/useLogout, AuthBridge (401 → declarative redirect via
+      the session cache). Carried the Tailwind v4 + shadcn/ui stack switch. Live-found
+      fixes: Vite proxy strips Origin (same-origin POST 403), email failure typed 502,
+      HTML multipart email (Proton wouldn't linkify plain text), expiry text from config.
+      CodeQL sensitive-log alert on the dev console link dismissed as by-design (config-
+      gated, prod never executes). [plan](closed/real-login/plan.md)
 - [x] **#13 E1 Web Platform Foundation** (PR #92, merged 2026-09-13) — `budgeteer-web/`
       scaffolded: Vite 8 + React 19 + TS (strict), react-bootstrap mobile-first (→ amended
       to Tailwind v4 + shadcn/ui later same day, pre-#14), TanStack
@@ -215,7 +223,6 @@
 
 ---
 
-*Last updated: 2026-09-12 — #11 merged (PR #87) after the E0 contract close-out, live debug
-session and CodeQL gate clear; board cut over to the frontend epics. #13 web platform
-foundation promoted to In Progress on `feature/web-scaffold` — **next: scaffold
-`budgeteer-web`, then #14 real login (re-create Resend first).***
+*Last updated: 2026-09-17 — #14 merged (PR #94): real login live end to end. #16 functional
+slice promoted to In Progress on `feature/money-views` — real Monzo data on the minimal
+shell, then Design Session 02 designs against it.*
