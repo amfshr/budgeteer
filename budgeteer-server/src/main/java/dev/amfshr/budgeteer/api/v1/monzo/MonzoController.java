@@ -1,6 +1,7 @@
 package dev.amfshr.budgeteer.api.v1.monzo;
 
 import dev.amfshr.budgeteer.api.common.ApiResponse;
+import dev.amfshr.budgeteer.config.AppProperties;
 import dev.amfshr.budgeteer.api.common.ErrorCode;
 import dev.amfshr.budgeteer.api.v1.monzo.dto.MonzoConnectInitResponse;
 import dev.amfshr.budgeteer.api.v1.monzo.dto.MonzoConnectionResponse;
@@ -10,6 +11,7 @@ import dev.amfshr.budgeteer.provider.model.BankTokens;
 import dev.amfshr.budgeteer.domain.monzo.MonzoConnection;
 import dev.amfshr.budgeteer.domain.user.User;
 import dev.amfshr.budgeteer.exception.ApiException;
+import jakarta.servlet.http.HttpServletRequest;
 import dev.amfshr.budgeteer.security.CurrentUser;
 import dev.amfshr.budgeteer.service.monzo.MonzoConnectionService;
 import dev.amfshr.budgeteer.service.monzo.MonzoOAuthService;
@@ -50,15 +52,18 @@ public class MonzoController {
     private final MonzoOAuthService oauthService;
     private final MonzoConnectionService connectionService;
     private final TransactionSyncService syncService;
+    private final AppProperties appProperties;
 
     public MonzoController(
             MonzoOAuthService oauthService,
             MonzoConnectionService connectionService,
-            TransactionSyncService syncService
+            TransactionSyncService syncService,
+            AppProperties appProperties
     ) {
         this.oauthService = oauthService;
         this.connectionService = connectionService;
         this.syncService = syncService;
+        this.appProperties = appProperties;
     }
 
     // ============ OAuth Endpoints ============
@@ -138,7 +143,8 @@ public class MonzoController {
             @RequestParam(value = "code", required = false) @Nullable @Size(max = 1024, message = "Code too long") String code,
             @RequestParam("state") @NotBlank(message = "State is required") @Size(max = 64, message = "State too long") String state,
             @RequestParam(value = "error", required = false) @Nullable @Size(max = 256, message = "Error too long") String error,
-            @RequestParam(value = "error_description", required = false) @Nullable @Size(max = 1000, message = "Error description too long") String errorDescription
+            @RequestParam(value = "error_description", required = false) @Nullable @Size(max = 1000, message = "Error description too long") String errorDescription,
+            HttpServletRequest request
     ) {
         log.info("Received Monzo OAuth callback");
 
@@ -153,6 +159,12 @@ public class MonzoController {
                     user.getId(),
                     LogSanitizer.sanitize(error, 50),
                     LogSanitizer.sanitize(errorDescription, 200));
+            if (!wantsJson(request)) {
+                // Browser flow: land back in the app with a friendly banner, not a JSON error
+                return ResponseEntity.status(302)
+                        .header("Location", appProperties.getBaseUrl() + "/app?monzo=denied")
+                        .build();
+            }
             throw new ApiException(
                     ErrorCode.OAUTH_ACCESS_DENIED,
                     errorDescription != null ? errorDescription : "User denied access to Monzo account"
@@ -190,7 +202,14 @@ public class MonzoController {
                 connection.getId());
         syncService.backfillAsync(connection.getId());
 
-        // Return immediately — backfill happens async with retries in background
+        // Return immediately — backfill happens async with retries in background.
+        // Browser flow (Monzo redirects the user's tab here): 302 back into the app,
+        // where sync-progress polling takes over. API clients get the JSON body.
+        if (!wantsJson(request)) {
+            return ResponseEntity.status(302)
+                    .header("Location", appProperties.getBaseUrl() + "/app?monzo=connected")
+                    .build();
+        }
         return ResponseEntity.ok(ApiResponse.of(MonzoConnectionResponse.from(connection)));
     }
 
@@ -302,5 +321,14 @@ public class MonzoController {
 
         MonzoStatusResponse status = new MonzoStatusResponse(hasConnection, connectionCount, tokenStatus, backfillStatus);
         return ResponseEntity.ok(ApiResponse.of(status));
+    }
+
+    /**
+     * True when the client explicitly asks for JSON (SPA/API); browser navigations
+     * (Monzo's redirect of the user's tab) send text/html and get a 302 instead.
+     */
+    private boolean wantsJson(HttpServletRequest request) {
+        String accept = request.getHeader("Accept");
+        return accept != null && accept.contains("application/json");
     }
 }

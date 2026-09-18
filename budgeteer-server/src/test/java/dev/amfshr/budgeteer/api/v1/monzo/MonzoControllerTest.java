@@ -3,6 +3,7 @@ package dev.amfshr.budgeteer.api.v1.monzo;
 import dev.amfshr.budgeteer.api.common.ErrorCode;
 import dev.amfshr.budgeteer.api.common.GlobalExceptionHandler;
 import dev.amfshr.budgeteer.provider.model.BankTokens;
+import dev.amfshr.budgeteer.config.AppProperties;
 import dev.amfshr.budgeteer.config.SecurityConfig;
 import dev.amfshr.budgeteer.config.WebMvcConfig;
 import dev.amfshr.budgeteer.domain.monzo.MonzoConnection;
@@ -23,6 +24,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.http.MediaType;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -58,6 +60,9 @@ class MonzoControllerTest {
 
     @MockitoBean
     private MonzoOAuthService oauthService;
+
+    @MockitoBean
+    private AppProperties appProperties;
 
     @MockitoBean
     private MonzoConnectionService connectionService;
@@ -189,7 +194,8 @@ class MonzoControllerTest {
             // When/Then
             mockMvc.perform(get("/api/v1/monzo/callback")
                             .param("code", code)
-                            .param("state", state))
+                            .param("state", state)
+                            .accept(MediaType.APPLICATION_JSON))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.success").value(true))
                     .andExpect(jsonPath("$.data.monzoUserId").value(monzoUserId))
@@ -201,6 +207,50 @@ class MonzoControllerTest {
             verify(connectionService).createConnection(
                     eq(userId), eq(monzoUserId), eq("access-token"), eq("refresh-token"), any());
             verify(syncService).backfillAsync(connection.getId());
+        }
+
+        @Test
+        @DisplayName("browser navigation (no JSON accept) redirects into the app on success")
+        void shouldRedirectBrowserToAppOnSuccess() throws Exception {
+            String state = "valid-state";
+            String code = "auth-code-123";
+            String monzoUserId = "user_123";
+            BankTokens tokens = new BankTokens(
+                    "access-token", "refresh-token", Instant.now().plusSeconds(3600));
+            MonzoConnection connection = createMockConnection(userId, monzoUserId);
+
+            when(appProperties.getBaseUrl()).thenReturn("http://localhost:5173");
+            when(oauthService.verifyStateAndGetUser(state)).thenReturn(testUser);
+            when(oauthService.exchangeCodeForTokens(code)).thenReturn(tokens);
+            when(oauthService.getMonzoUserId("access-token")).thenReturn(monzoUserId);
+            when(connectionService.createConnection(
+                    eq(userId), eq(monzoUserId), eq("access-token"), eq("refresh-token"), any()))
+                    .thenReturn(connection);
+
+            mockMvc.perform(get("/api/v1/monzo/callback")
+                            .param("code", code)
+                            .param("state", state)
+                            .accept(MediaType.TEXT_HTML))
+                    .andExpect(status().isFound())
+                    .andExpect(header().string("Location", "http://localhost:5173/app?monzo=connected"));
+
+            verify(syncService).backfillAsync(connection.getId());
+        }
+
+        @Test
+        @DisplayName("browser navigation redirects into the app when the user denies access")
+        void shouldRedirectBrowserToAppOnDenial() throws Exception {
+            when(appProperties.getBaseUrl()).thenReturn("http://localhost:5173");
+            when(oauthService.verifyStateAndGetUser("valid-state")).thenReturn(testUser);
+
+            mockMvc.perform(get("/api/v1/monzo/callback")
+                            .param("state", "valid-state")
+                            .param("error", "access_denied")
+                            .accept(MediaType.TEXT_HTML))
+                    .andExpect(status().isFound())
+                    .andExpect(header().string("Location", "http://localhost:5173/app?monzo=denied"));
+
+            verifyNoInteractions(connectionService);
         }
 
         @Test

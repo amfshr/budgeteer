@@ -225,7 +225,9 @@ public class AuthController {
 
         if (userOpt.isEmpty()) {
             log.warn("Authenticated user not found in database [userId={}]", jweAuth.getUserId());
-            throw new ApiException(ErrorCode.USER_NOT_FOUND);
+            // Valid token, vanished user (deleted account / wiped dev DB) = dead session:
+            // 401 so clients drop the session, never 404
+            throw new ApiException(ErrorCode.NOT_AUTHENTICATED);
         }
 
         log.debug("User info retrieved [userId={}]", jweAuth.getUserId());
