@@ -5,6 +5,7 @@ import LoginPage from './features/auth/LoginPage'
 import MagicLinkSentPage from './features/auth/MagicLinkSentPage'
 import VerifyPage from './features/auth/VerifyPage'
 import RequireAuth from './features/auth/RequireAuth'
+import TransactionsPage from './features/transactions/TransactionsPage'
 import Home from './pages/Home'
 
 export default function App() {
@@ -20,6 +21,7 @@ export default function App() {
       <Route element={<RequireAuth />}>
         <Route element={<AppLayout />}>
           <Route path="/app" element={<Home />} />
+          <Route path="/app/transactions" element={<TransactionsPage />} />
         </Route>
       </Route>
 

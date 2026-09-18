@@ -30,7 +30,9 @@ import java.util.UUID;
  * <p>Both annotations require the user to be authenticated with a valid JWE token.
  * If the user is not authenticated, an {@link ApiException} with {@link ErrorCode#NOT_AUTHENTICATED}
  * is thrown. If the user ID from the token doesn't exist in the database (for @CurrentUser),
- * an {@link ApiException} with {@link ErrorCode#USER_NOT_FOUND} is thrown.
+ * an {@link ApiException} with {@link ErrorCode#NOT_AUTHENTICATED} (401) is thrown —
+ * a valid token whose user no longer exists (wiped dev DB, deleted account) is a DEAD
+ * session, and 401 lets the frontend's auth machinery bounce to login automatically.
  *
  * @see CurrentUser
  * @see CurrentUserId
@@ -86,7 +88,7 @@ public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolve
             return authService.getUserById(userId)
                     .orElseThrow(() -> {
                         log.warn("User from token not found in database [userId={}]", userId);
-                        return new ApiException(ErrorCode.USER_NOT_FOUND);
+                        return new ApiException(ErrorCode.NOT_AUTHENTICATED);
                     });
         }
 

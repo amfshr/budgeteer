@@ -421,8 +421,8 @@ class AuthControllerTest {
             // When/Then
             mockMvc.perform(get("/api/v1/auth/me")
                             .with(securityContext(context)))
-                    .andExpect(status().isNotFound())
-                    .andExpect(jsonPath("$.error.code").value("USER_NOT_FOUND"));
+                    .andExpect(status().isUnauthorized())
+                    .andExpect(jsonPath("$.error.code").value("NOT_AUTHENTICATED"));
         }
     }
 
