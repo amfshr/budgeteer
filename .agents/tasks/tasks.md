@@ -10,7 +10,7 @@
 
 | # | Task | Priority | Estimate | Plan |
 |---|------|----------|----------|------|
-| 16 | 💸 E4 Money views — FUNCTIONAL slice: Monzo connect from client (callback → frontend redirect), sync-progress polling (finding #6), accounts + transactions views with `<Money>` + `balance_as_of`, generated OpenAPI types (`openapi-typescript`). Minimal shell, zero visual ambition — Session 02 designs against this. Branch: `feature/money-views` | 🟡 P2 | 1.5–2d | [plan](open/money-views/plan.md) |
+| 18 | 🎨 E6 Views polish & shell — chrome (bottom tabs / top nav), dashboard v1 four-block stack, `/app/connect` onboarding, tx polish set, account-name default; branding tokens after the claude.ai/design pass. Spec = Session 02 decisions 26–32. Branch: `feature/views-polish` | 🟡 P2 | 1.5–2d | [plan](open/views-polish/plan.md) |
 
 ---
 
@@ -19,18 +19,20 @@
 > **Strategy reset (Design Session 01, 2026-09-11 — see
 > [.agents/notes/product/design-session-01-top-down.md](../notes/product/design-session-01-top-down.md)):
 > frontend-first, feature-light, demand-driven APIs.** Execution order:
-> **#13 ✅ → OpenAPI ✅ → #14 (login, public shell) → #16 FUNCTIONAL slice (Monzo connect
-> from client + basic accounts/transactions views on the minimal shell — function before
-> form, Alexander 2026-09-15) → Design Session 02 (branding + authenticated-chrome +
-> composition, decided WITH real data on screen; user-story-derived, money-app reference
-> class, claude.ai/design pass — see notes/web/03 §1a) → visual polish + #15 → #17**. Webhooks and TrueLayer move to Backlog behind the frontend epics —
-> near-real-time sync and a second bank are invisible without a UI. Platform decided:
+> **#13 ✅ → OpenAPI ✅ → #14 ✅ → #16 (PR #95, awaiting merge) → Design Session 02 ✅
+> (2026-09-19 — [notes/product/design-session-02-user-stories.md](../notes/product/design-session-02-user-stories.md),
+> decisions 22–32: pots=tree+splits / labels=free tags; bottom-tabs chrome; dashboard v1
+> four-block stack; /app/connect onboarding; zinc+emerald calm-precision branding) →
+> #18 views polish & shell → #19 pots/targets/labels (**/grill-me first**) → #15 data
+> rights → #17 edge/deploy → auth-v2 phase 1**. Webhooks + TrueLayer stay backlog —
+> near-real-time sync and a second bank are invisible without the budgeting core. Platform:
 > TypeScript React web app (Vite, Tailwind v4 + shadcn/ui — amended from react-bootstrap
 > 2026-09-13, TanStack Query), mobile-first,
 > browser-only (Electron retired, PWA later); Cloudflare Tunnel + Access in front.
 
 | # | Task | Priority | Estimate | Plan |
 |---|------|----------|----------|------|
+| 19 | 🏺 E7 Pots, targets & labels — the dec 22/23 model: pot TREE with rollups, amount-splits, free labels, monthly targets, payday config (ST3), month-end remainder (ST5), account nicknames. **Needs `/grill-me` before build** (schema + §2a invariants + dec 22/23 constraints). Absorbs the old "Pots & budgeting" backlog row | 🟡 P2 | 3–4d | [session](../notes/product/design-session-02-user-stories.md) |
 | 15 | 🛡️ E3 Settings & data rights — settings page: profile, Disconnect Monzo, Export JSON, **Delete+Purge** (instant, typed confirm, Monzo consent revoke). New server endpoints — **`/grill-me` the delete/export spec before build** (dec 9–12) | 🟡 P2 | 1–2d | [session](../notes/product/design-session-01-top-down.md) |
 | 17 | 🌐 E5 Edge & deploy — Dockerfile, NUC deploy, Cloudflare Tunnel + Access identity allowlist, one URL everywhere, security headers/CSP/CORS (dec 13–15). Any time after #14; required before daily phone use | 🟡 P2 | 1–2d | [session](../notes/product/design-session-01-top-down.md) |
 
@@ -45,8 +47,7 @@
 | 📖 Public API docs site (app ↔ docs split) | P3 | 1d | Alexander 2026-09-13 (inspired by Resend + Mintlify/Browserbase docs): Budgeteer as an API-first, integrable product — polished public API reference rendered FROM `docs/api/openapi.json` (the #93 pipeline is the source; enrich with `@Operation` incrementally). Tooling: Mintlify (hosted, lowest effort, the Browserbase look) vs Scalar (self-hosted static renderer, fits one-URL/self-host ethos). Routing: `docs.*` public, app stays behind Cloudflare Access; nav cross-links app ↔ docs. **Reframed 2026-09-13 (late): primary motive is PORTFOLIO/documentation showcase, not third-party integration** — a polished static rendering of the contract needs no auth work at all. PAT auth demoted to only-if-a-real-integrator-appears (YAGNI); if ever: smaller than it sounds: `JweAuthenticationFilter` already resolves `Bearer` before cookie, so PATs are a second credential TYPE through the same filter (pat table + issuance/revocation endpoints + settings UI), not an auth rework. Session tokens can't serve integrations regardless of transport: interactive-only acquisition (magic link) + single-session policy revokes them on every new login (AuthService, by design). ⚠️ Regulatory line from Session 01 holds: documenting/self-hosting is fine — *hosting other people's bank connections* ⇒ ICO/FCA. Slot: after #17 (needs domains/tunnel/Access routing). Related learning interest (Alexander): mTLS/certs — natural home is #17's edge work (Tunnel origin auth, client certs for the NUC) rather than API auth |
 | 🩹 Transaction status refresh (pending-fossil fix) | P2 | 0.5d | Found live 2026-09-17 (#16 E2E): id-based hourly delta (`since=lastTransactionId`) fetches NEW transactions only — Monzo never re-sends updates, so pending→settled transitions fossilise once backfill is done (statuses visibly wrong within days). Stopgap fix: hourly job also re-fetches a small overlap window (e.g. last 7d, `FromTime`) — idempotent upsert makes it safe, cursor rules already handle it. Proper fix: webhooks #5 (`transaction.updated`). **Schedule soon — independent of the frontend track, can run parallel to Session 02** |
 | 🪝 #5 Webhooks | P3 | TBD | [plan](open/webhooks/plan.md) — second trigger into the raw→domain pipeline + near-real-time balance refresh. **Moved behind frontend epics (Session 01)**; ⚠️ Monzo's servers can't pass Cloudflare Access — needs a deliberate bypass route with its own signature verification (Session 01 dec 17) |
-| 🏺 Pots & budgeting | P2 | TBD | Virtual pots as a double-entry overlay ledger — **any spec must cite §2a of the Session 01 doc** (two-legged transfers, conservation invariant, real balances as ground truth). After money views prove daily use |
-| 🧩 Widget dashboard | P3 | TBD | Customisable pick-and-choose widget summary (Session 01 dec 18 recorded the vision; dashboard v1 ships fixed). Design in/after Session 02 |
+| 🧩 Widget dashboard | P3 | TBD | Customisable pick-and-choose widget summary (Session 01 dec 18 recorded the vision; dashboard v1 ships fixed). Session 02 dec 27: v1 blocks are built widget-shaped — configurability layers on after #19 proves them |
 | 📣 Event-driven post-sync hooks | P3 → P2 | 0.5d | [plan](closed/oauth-callback-events/plan.md) — `BackfillCompletedEvent` / `BackfillPausedEvent` + listeners (email, domain mapping, webhook registration). Natural fit alongside #11's `DomainMappingJob`. **Consumer found 2026-09-17**: sync/progress reports COMPLETED when the backfill ends but ingest lags ~25s — the frontend papered over it with tail polling; a BackfillCompleted/IngestCompleted signal (exposed via progress or push) is the proper fix |
 | 🏦 TrueLayer Integration (Lloyds/HSBC/Barclays) | P2 | 3–4d | [plan](open/truelayer-integration/plan.md) — add `provider-truelayer` jar as a 2nd implementation of the capability contracts (`ProviderConnectionAuth` + `AccountsCapability`/`BalanceCapability`/`TransactionsCapability`, split in PR #84; cards/standing-orders/direct-debits land as further capability interfaces), copying the `provider-monzo` template from #10. Interface already validated against TrueLayer's Data API in the #6 plan. **Aug 2026 re-check:** Data API still active (now positioned as an "add-on" product — mild vendor-risk signal); Console signup is self-serve, sandbox free, live own-account testing looks viable for a solo dev — **first action when picked up: Console signup + live smoke test (deferred until after #11)**. Token model: 90-day consent, reconfirmation-of-consent renewal, refresh token must be used within a 30-day sliding window. Transactions are date-windowed (`from`/`to`), no page cursor → impl returns null `nextCursor`. ⚠️ plan.md predates the multi-module split (BankAdapter pattern, old paths, V7 migration) — rewrite around the provider contract before build. Provider-contract rename (PR #80) + capability split (PR #84) already executed: jar lands as `provider-truelayer` implementing the capability interfaces. ⚠️ Delta sync: after #12, the fetch start is the sealed `SyncPosition` (`FromTime` \| `AfterTransaction` \| `NextPage`) on `TransactionsCapability.getTransactions` — TrueLayer's impl must switch exhaustively and **throw on `AfterTransaction`** (no id-based deltas). This task must add the time-window delta fallback (`FromTime(last synced − overlap)`, idempotent upserts) incl. the persisted last-synced timestamp (column + migration) and the routing in `TransactionSyncService`. Future payments = separate `PaymentInitiationProvider` interface; one TrueLayer class implements both. **Deprioritised 2026-09-11 (Session 01): sits behind the frontend epics #13–#17 — no second bank before a frontend, real login, and basic features exist** ⚠️ Sync-layer generalisation (Alexander, 2026-08-31): everything in `service/monzo/` that isn't OAuth-specific — `TransactionSyncJob`, `TransactionSyncService`, `TransactionSyncEventListener` + `MonzoConnectionCreatedEvent` — is Monzo-shaped and must generalise here, following the `IngestService`/`ProviderIngestor` orchestrator-plus-strategy pattern from #11 (e.g. generic `ProviderConnectionCreatedEvent(provider, connectionId)` + per-provider sync strategy; listeners out of the monzo subpackage) |
 | 🧩 Per-page backfill commits (true mid-window resume) | P3 | 0.5d | Backfill commits one `TransactionTemplate` tx per ≤350-day window; an SCA 403 mid-window rolls the whole window back, so resume re-fetches it. `backfill_progress_cursor` is written per page but rolled back with the window — it never actually resumes mid-window. Commit each page (`REQUIRES_NEW`) so partial progress in a large window survives re-auth. Only bites if a single >90-day-old window can't be pulled within one 5-min SCA budget — low urgency for personal accounts |
@@ -87,6 +88,12 @@
 ## ✅ Done
 
 ### September 2026
+- [x] **#16 E4 Money Views — functional slice** (PR #95, merged 2026-09-19) — Monzo connect
+      from the client (browser-aware callback), sync-progress polling with live counter,
+      accounts + transactions views, generated OpenAPI types. Live-proven ×3 against real
+      Monzo; five live-found bugs fixed en route (first-connect polling, card/banner overlap,
+      ingest-lag tail, ghost-session 401 — #15 groundwork, CORS proxy Origin strip). Findings
+      + Session-02 UX wash-up list in [plan](closed/money-views/plan.md)
 - [x] **#14 E2 Real Login** (PR #94, merged 2026-09-16) — magic-link auth end to end,
       live-verified by Alexander against a real inbox (Resend → HTML button email → verify →
       session → /app → logout). PublicLayout + minimal AppLayout, LoginPage/Sent/Verify,
