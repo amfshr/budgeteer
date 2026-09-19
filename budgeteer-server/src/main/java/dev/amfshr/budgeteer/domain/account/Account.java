@@ -154,6 +154,9 @@ public class Account {
     @Nullable
     public String getDisplayName() { return displayName; }
 
+    /** Provider-owned; refreshed on every ingest pass (Session 02 dec 30). */
+    public void setDisplayName(@Nullable String displayName) { this.displayName = displayName; }
+
     public String getCurrency() { return currency; }
 
     @Nullable

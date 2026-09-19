@@ -27,6 +27,17 @@ const transaction = {
   occurredAt: '2026-09-15T09:00:00Z',
 }
 
+const income = {
+  id: 't2',
+  accountId: 'a1',
+  amountMinorUnits: 20000,
+  currency: 'GBP',
+  status: 'SETTLED',
+  merchantName: null,
+  description: 'Monthly top-up',
+  occurredAt: '2026-09-15T08:00:00Z',
+}
+
 const page = (items: unknown[], totalPages = 1, totalElements = items.length) => ({
   items,
   page: 0,
@@ -35,81 +46,155 @@ const page = (items: unknown[], totalPages = 1, totalElements = items.length) =>
   totalPages,
 })
 
+const summary = {
+  accountId: 'a1',
+  zone: 'Europe/London',
+  today: { inMinorUnits: 0, outMinorUnits: 450 },
+  thisWeek: { inMinorUnits: 0, outMinorUnits: 2000 },
+  monthToDate: { inMinorUnits: 20000, outMinorUnits: 5000 },
+}
+
 const idleProgress = {
   accounts: [{ accountId: 'acc_1', status: 'COMPLETED', transactionCount: 1 }],
+}
+
+const baseRoutes = {
+  '/api/v1/auth/me': testUser,
+  '/api/v1/accounts/a1/summary': summary,
+  '/api/v1/accounts': [account],
+  '/api/v1/transactions': page([transaction, income]),
+  '/api/v1/monzo/sync/progress': idleProgress,
 }
 
 afterEach(() => {
   vi.unstubAllGlobals()
 })
 
-describe('overview', () => {
-  it('renders accounts with balance, as-of stamp and recent transactions', async () => {
-    mockApi({
-      '/api/v1/auth/me': testUser,
-      '/api/v1/accounts': [account],
-      '/api/v1/transactions': page([transaction]),
-      '/api/v1/monzo/sync/progress': idleProgress,
-    })
+describe('overview (dashboard v1)', () => {
+  it('renders balance, spend windows and recent transactions', async () => {
+    mockApi(baseRoutes)
     renderApp('/app')
 
-    expect(await screen.findByText('Current Account')).toBeInTheDocument()
-    expect(screen.getByText('£91.77')).toBeInTheDocument()
+    expect(await screen.findByText('£91.77')).toBeInTheDocument()
     expect(screen.getByText(/as of/)).toBeInTheDocument()
+    expect(await screen.findByText('£50.00')).toBeInTheDocument() // month out
+    expect(screen.getByText('£20.00')).toBeInTheDocument() // week out
     expect(await screen.findByText('Tesco')).toBeInTheDocument()
     expect(screen.getByText('-£4.50')).toBeInTheDocument()
   })
 
-  it('shows the connect card when no accounts exist', async () => {
+  it('marks income with an explicit plus', async () => {
+    mockApi(baseRoutes)
+    renderApp('/app')
+
+    expect(await screen.findByText('+£200.00')).toBeInTheDocument()
+  })
+
+  it('groups transactions under day headers', async () => {
+    mockApi(baseRoutes)
+    renderApp('/app')
+
+    expect(await screen.findByText('15 September 2026')).toBeInTheDocument()
+  })
+
+  it('points at the connect page when no accounts exist', async () => {
+    mockApi({ ...baseRoutes, '/api/v1/accounts': [], '/api/v1/transactions': page([]) })
+    renderApp('/app')
+
+    expect(await screen.findByRole('link', { name: 'Connect Monzo' })).toHaveAttribute(
+      'href',
+      '/app/connect',
+    )
+  })
+})
+
+describe('connect onboarding phases', () => {
+  it('explains and offers the OAuth entry when nothing is connected', async () => {
     mockApi({
-      '/api/v1/auth/me': testUser,
+      ...baseRoutes,
       '/api/v1/accounts': [],
       '/api/v1/transactions': page([]),
       '/api/v1/monzo/sync/progress': { accounts: [] },
     })
-    renderApp('/app')
+    renderApp('/app/connect')
 
-    expect(await screen.findByRole('link', { name: 'Connect Monzo' })).toHaveAttribute(
+    expect(await screen.findByText('Connect your Monzo account')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Connect Monzo' })).toHaveAttribute(
       'href',
       '/api/v1/monzo/connect',
     )
   })
 
-  it('shows the denied banner after a cancelled connect', async () => {
+  it('prompts for the push approval right after the OAuth redirect', async () => {
     mockApi({
-      '/api/v1/auth/me': testUser,
+      ...baseRoutes,
       '/api/v1/accounts': [],
       '/api/v1/transactions': page([]),
       '/api/v1/monzo/sync/progress': { accounts: [] },
     })
-    renderApp('/app?monzo=denied')
+    renderApp('/app/connect?monzo=connected')
 
-    expect(await screen.findByText('Connection cancelled')).toBeInTheDocument()
+    expect(await screen.findByText(/approve the notification/)).toBeInTheDocument()
   })
 
-  it('shows import progress while a backfill runs', async () => {
+  it('shows live progress while importing', async () => {
     mockApi({
-      '/api/v1/auth/me': testUser,
-      '/api/v1/accounts': [account],
-      '/api/v1/transactions': page([transaction]),
+      ...baseRoutes,
+      '/api/v1/accounts': [],
+      '/api/v1/transactions': page([]),
       '/api/v1/monzo/sync/progress': {
         accounts: [{ accountId: 'acc_1', status: 'IN_PROGRESS', transactionCount: 1234 }],
       },
     })
-    renderApp('/app')
+    renderApp('/app/connect?monzo=connected')
 
-    expect(await screen.findByText(/Importing transactions/)).toBeInTheDocument()
-    expect(screen.getByText(/1,234 so far/)).toBeInTheDocument()
+    expect(await screen.findByText('Importing your transactions')).toBeInTheDocument()
+    expect(screen.getByText(/1,234 imported so far/)).toBeInTheDocument()
+  })
+
+  it('celebrates completion and links to the overview', async () => {
+    mockApi(baseRoutes)
+    renderApp('/app/connect?monzo=connected')
+
+    expect(await screen.findByText('Monzo sync complete')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Go to your overview' })).toHaveAttribute(
+      'href',
+      '/app',
+    )
+  })
+
+  it('shows a generic error phase for failed callbacks (replayed state etc.)', async () => {
+    mockApi({
+      ...baseRoutes,
+      '/api/v1/accounts': [],
+      '/api/v1/transactions': page([]),
+      '/api/v1/monzo/sync/progress': { accounts: [] },
+    })
+    renderApp('/app/connect?monzo=error')
+
+    expect(await screen.findByText('Something went wrong')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Try again' })).toBeInTheDocument()
+  })
+
+  it('handles a denied consent with a retry path', async () => {
+    mockApi({
+      ...baseRoutes,
+      '/api/v1/accounts': [],
+      '/api/v1/transactions': page([]),
+      '/api/v1/monzo/sync/progress': { accounts: [] },
+    })
+    renderApp('/app/connect?monzo=denied')
+
+    expect(await screen.findByText('Connection cancelled')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Try again' })).toBeInTheDocument()
   })
 })
 
 describe('transactions page', () => {
   it('renders rows and pages forward', async () => {
     const fetchMock = mockApi({
-      '/api/v1/auth/me': testUser,
+      ...baseRoutes,
       '/api/v1/transactions': page([transaction], 2, 30),
-      '/api/v1/monzo/sync/progress': idleProgress,
-      '/api/v1/accounts': [account],
     })
     renderApp('/app/transactions')
 
@@ -120,5 +205,17 @@ describe('transactions page', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Next' }))
 
     expect(fetchMock.mock.calls.some(([url]) => String(url).includes('page=1'))).toBe(true)
+  })
+})
+
+describe('chrome', () => {
+  it('shows the three destinations in navigation', async () => {
+    mockApi(baseRoutes)
+    renderApp('/app')
+
+    const overviewLinks = await screen.findAllByRole('link', { name: /Overview/ })
+    expect(overviewLinks.length).toBeGreaterThanOrEqual(1)
+    expect(screen.getAllByRole('link', { name: /Transactions/ }).length).toBeGreaterThanOrEqual(1)
+    expect(screen.getAllByRole('link', { name: /Settings/ }).length).toBeGreaterThanOrEqual(1)
   })
 })

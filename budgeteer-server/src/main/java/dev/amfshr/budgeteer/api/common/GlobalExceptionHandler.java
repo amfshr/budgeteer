@@ -209,6 +209,18 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Static resources that do not exist (favicon.ico from browser tabs) are plain 404s —
+     * previously fell through to the generic 500 handler (finding #8).
+     */
+    @ExceptionHandler(org.springframework.web.servlet.resource.NoResourceFoundException.class)
+    public ResponseEntity<ApiError> handleNoResourceFound(
+            org.springframework.web.servlet.resource.NoResourceFoundException ex,
+            HttpServletRequest request) {
+        ApiError apiError = ApiError.of(ErrorCode.RESOURCE_NOT_FOUND, request.getRequestURI());
+        return ResponseEntity.status(ErrorCode.RESOURCE_NOT_FOUND.getHttpStatus()).body(apiError);
+    }
+
+    /**
      * Handle 404 not found (when no handler matches).
      */
     @ExceptionHandler(NoHandlerFoundException.class)

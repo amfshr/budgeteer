@@ -6,6 +6,7 @@
 import type { components } from './types.gen'
 
 export type AccountResponse = components['schemas']['AccountResponse']
+export type AccountSummaryResponse = components['schemas']['AccountSummaryResponse']
 export type TransactionResponse = components['schemas']['TransactionResponse']
 export type TransactionPage = components['schemas']['PageResponseTransactionResponse']
 export type MonzoConnectInitResponse = components['schemas']['MonzoConnectInitResponse']

@@ -232,9 +232,24 @@ class MonzoControllerTest {
                             .param("state", state)
                             .accept(MediaType.TEXT_HTML))
                     .andExpect(status().isFound())
-                    .andExpect(header().string("Location", "http://localhost:5173/app?monzo=connected"));
+                    .andExpect(header().string("Location", "http://localhost:5173/app/connect?monzo=connected"));
 
             verify(syncService).backfillAsync(connection.getId());
+        }
+
+        @Test
+        @DisplayName("browser navigation redirects to the connect page on a replayed/invalid state")
+        void shouldRedirectBrowserOnStateError() throws Exception {
+            when(appProperties.getBaseUrl()).thenReturn("http://localhost:5173");
+            when(oauthService.verifyStateAndGetUser("used-state"))
+                    .thenThrow(new ApiException(ErrorCode.OAUTH_STATE_INVALID));
+
+            mockMvc.perform(get("/api/v1/monzo/callback")
+                            .param("code", "auth-code")
+                            .param("state", "used-state")
+                            .accept(MediaType.TEXT_HTML))
+                    .andExpect(status().isFound())
+                    .andExpect(header().string("Location", "http://localhost:5173/app/connect?monzo=error"));
         }
 
         @Test
@@ -248,7 +263,7 @@ class MonzoControllerTest {
                             .param("error", "access_denied")
                             .accept(MediaType.TEXT_HTML))
                     .andExpect(status().isFound())
-                    .andExpect(header().string("Location", "http://localhost:5173/app?monzo=denied"));
+                    .andExpect(header().string("Location", "http://localhost:5173/app/connect?monzo=denied"));
 
             verifyNoInteractions(connectionService);
         }
@@ -263,7 +278,8 @@ class MonzoControllerTest {
             // When/Then
             mockMvc.perform(get("/api/v1/monzo/callback")
                             .param("code", "auth-code-123")
-                            .param("state", "invalid-state"))
+                            .param("state", "invalid-state")
+                            .accept(MediaType.APPLICATION_JSON))
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.error.code").value("OAUTH_STATE_INVALID"));
 
@@ -281,7 +297,8 @@ class MonzoControllerTest {
             // When/Then
             mockMvc.perform(get("/api/v1/monzo/callback")
                             .param("code", "auth-code-123")
-                            .param("state", "expired-state"))
+                            .param("state", "expired-state")
+                            .accept(MediaType.APPLICATION_JSON))
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.error.code").value("OAUTH_STATE_EXPIRED"));
         }
@@ -294,7 +311,8 @@ class MonzoControllerTest {
             
             // When/Then - code is missing, so controller throws OAUTH_CODE_MISSING
             mockMvc.perform(get("/api/v1/monzo/callback")
-                            .param("state", "some-state"))
+                            .param("state", "some-state")
+                            .accept(MediaType.APPLICATION_JSON))
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.error.code").value("OAUTH_CODE_MISSING"));
             
@@ -335,7 +353,8 @@ class MonzoControllerTest {
             // When/Then
             mockMvc.perform(get("/api/v1/monzo/callback")
                             .param("code", "code")
-                            .param("state", "valid-state"))
+                            .param("state", "valid-state")
+                            .accept(MediaType.APPLICATION_JSON))
                     .andExpect(status().isBadGateway())
                     .andExpect(jsonPath("$.error.code").value("PROVIDER_API_ERROR"));
         }

@@ -4,6 +4,7 @@ import dev.amfshr.budgeteer.api.common.ErrorCode;
 import dev.amfshr.budgeteer.config.AppProperties;
 import dev.amfshr.budgeteer.config.JweProperties;
 import dev.amfshr.budgeteer.exception.ApiException;
+import dev.amfshr.budgeteer.util.LogSanitizer;
 import jakarta.mail.internet.MimeMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -135,7 +136,7 @@ public class EmailService {
             helper.setText(plainBody, htmlBody);
 
             mailSender.send(message);
-            log.info("Email sent to {} from {}", to, appProperties.getMail().getFrom());
+            log.info("Email sent to {} from {}", LogSanitizer.maskEmail(to), appProperties.getMail().getFrom());
         } catch (Exception e) {
             log.error("Failed to send email to {}: {}", to, e.getMessage());
             // Typed so the API answers 502 EMAIL_SERVICE_ERROR with an actionable message
