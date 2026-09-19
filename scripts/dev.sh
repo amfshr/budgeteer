@@ -352,6 +352,7 @@ cmd_help() {
     echo "  status      Check application and database status"
     echo "  restart     Stop and start the application"
     echo "  db          Start only the database"
+    echo "  wipe-db     DELETE all dev data (asks for confirmation; restart backend after)"
     echo "  tunnel      Start ngrok tunnel (for Monzo OAuth)"
     echo "  test        Run all tests (unit + integration, requires Docker)"
     echo "  unit        Run unit tests only (no Docker required)"
@@ -377,6 +378,33 @@ cmd_help() {
     echo ""
 }
 
+# Wipe the dev database (drop + recreate schema; Flyway re-migrates on next boot)
+cmd_wipe_db() {
+    if ! docker ps | grep -q budgeteer-postgres; then
+        print_error "budgeteer-postgres is not running — start it first: ./scripts/dev.sh db"
+        exit 1
+    fi
+
+    local db_name="${DB_NAME:-budgeteer}"
+    local db_user="${DB_USER:-budgeteer}"
+
+    print_warning "This will PERMANENTLY DELETE all data in the '$db_name' database:"
+    print_warning "users, sessions, Monzo connections, raw + domain transactions — everything."
+    print_warning "You will need to log in and reconnect Monzo from scratch afterwards."
+    echo ""
+    read -r -p "Type 'wipe' to confirm (anything else aborts): " confirmation
+    if [ "$confirmation" != "wipe" ]; then
+        print_status "Aborted — nothing was deleted."
+        exit 0
+    fi
+
+    print_status "Dropping and recreating schema 'public'..."
+    docker exec -i budgeteer-postgres psql -U "$db_user" -d "$db_name" \
+        -c 'drop schema public cascade; create schema public;' > /dev/null
+    print_success "Database wiped."
+    print_status "Restart the backend now — Flyway rebuilds the schema on boot."
+}
+
 # Main
 COMMAND=${1:-start}
 
@@ -395,6 +423,9 @@ case "$COMMAND" in
         ;;
     db)
         cmd_db
+        ;;
+    wipe-db)
+        cmd_wipe_db
         ;;
     test|test-all)
         cmd_test

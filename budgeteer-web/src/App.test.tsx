@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { err, ok, renderApp, testUser } from './test/utils'
+import { err, mockApi, ok, renderApp, testUser } from './test/utils'
 
 afterEach(() => {
   vi.unstubAllGlobals()
@@ -53,18 +53,16 @@ describe('login flow', () => {
 
 describe('verify flow', () => {
   it('verifies the token, establishes the session and lands in /app', async () => {
-    vi.stubGlobal(
-      'fetch',
-      vi
-        .fn()
-        .mockResolvedValueOnce(
-          ok({ message: 'ok', email: null, accessToken: 'a', refreshToken: 'r' }),
-        )
-        .mockResolvedValueOnce(ok(testUser)),
-    )
+    mockApi({
+      '/api/v1/auth/verify': { message: 'ok', email: null, accessToken: 'a', refreshToken: 'r' },
+      '/api/v1/auth/me': testUser,
+      '/api/v1/accounts': [],
+      '/api/v1/transactions': { items: [], page: 0, size: 8, totalElements: 0, totalPages: 0 },
+      '/api/v1/monzo/sync/progress': { accounts: [] },
+    })
     renderApp('/auth/verify?token=valid-token')
 
-    expect(await screen.findByRole('heading', { name: 'Overview' })).toBeInTheDocument()
+    expect(await screen.findByText('No accounts yet')).toBeInTheDocument()
   })
 
   it('shows a clear error for an invalid or used token', async () => {
@@ -89,24 +87,27 @@ describe('RequireAuth', () => {
   })
 
   it('renders the authenticated shell with a session', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValueOnce(ok(testUser)))
+    mockApi({
+      '/api/v1/auth/me': testUser,
+      '/api/v1/accounts': [],
+      '/api/v1/transactions': { items: [], page: 0, size: 8, totalElements: 0, totalPages: 0 },
+      '/api/v1/monzo/sync/progress': { accounts: [] },
+    })
     renderApp('/app')
 
-    expect(await screen.findByRole('heading', { name: 'Overview' })).toBeInTheDocument()
-    expect(screen.getByText('alex@example.com')).toBeInTheDocument()
+    expect(await screen.findByText('No accounts yet')).toBeInTheDocument()
+    expect(screen.getAllByRole('link', { name: /Settings/ }).length).toBeGreaterThanOrEqual(1)
   })
 })
 
 describe('logout', () => {
   it('revokes the session and returns to the entry page', async () => {
-    const fetchMock = vi
-      .fn()
-      .mockResolvedValueOnce(ok(testUser))
-      .mockResolvedValueOnce(
-        ok({ message: 'bye', email: null, accessToken: null, refreshToken: null }),
-      )
-    vi.stubGlobal('fetch', fetchMock)
-    renderApp('/app')
+    const fetchMock = mockApi({
+      '/api/v1/auth/me': testUser,
+      '/api/v1/auth/logout': { message: 'bye', email: null, accessToken: null, refreshToken: null },
+      '/api/v1/monzo/sync/progress': { accounts: [] },
+    })
+    renderApp('/app/settings')
 
     await userEvent.click(await screen.findByRole('button', { name: 'Log out' }))
 

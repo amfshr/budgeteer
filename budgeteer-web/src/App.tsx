@@ -5,8 +5,10 @@ import LoginPage from './features/auth/LoginPage'
 import MagicLinkSentPage from './features/auth/MagicLinkSentPage'
 import VerifyPage from './features/auth/VerifyPage'
 import RequireAuth from './features/auth/RequireAuth'
+import ConnectPage from './features/monzo/ConnectPage'
 import TransactionsPage from './features/transactions/TransactionsPage'
 import Home from './pages/Home'
+import SettingsPage from './pages/SettingsPage'
 
 export default function App() {
   return (
@@ -22,6 +24,8 @@ export default function App() {
         <Route element={<AppLayout />}>
           <Route path="/app" element={<Home />} />
           <Route path="/app/transactions" element={<TransactionsPage />} />
+          <Route path="/app/connect" element={<ConnectPage />} />
+          <Route path="/app/settings" element={<SettingsPage />} />
         </Route>
       </Route>
 
