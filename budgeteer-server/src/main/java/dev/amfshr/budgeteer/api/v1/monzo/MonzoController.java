@@ -148,6 +148,26 @@ public class MonzoController {
     ) {
         log.info("Received Monzo OAuth callback");
 
+        // Browser navigations (Monzo redirecting the user's tab) must never see raw JSON:
+        // any failure below — invalid/replayed state, missing code, exchange error — lands
+        // back on the connect page with a generic error flag. API clients keep the JSON.
+        if (!wantsJson(request)) {
+            try {
+                return doHandleCallback(code, state, error, errorDescription, request);
+            } catch (ApiException e) {
+                log.warn("Browser OAuth callback failed [code={}] — redirecting to connect page",
+                        e.getErrorCode());
+                return ResponseEntity.status(302)
+                        .header("Location", appProperties.getBaseUrl() + "/app/connect?monzo=error")
+                        .build();
+            }
+        }
+        return doHandleCallback(code, state, error, errorDescription, request);
+    }
+
+    private ResponseEntity<ApiResponse<MonzoConnectionResponse>> doHandleCallback(
+            @Nullable String code, String state, @Nullable String error,
+            @Nullable String errorDescription, HttpServletRequest request) {
         // First verify state to get the user (even for error cases)
         User user = oauthService.verifyStateAndGetUser(state);
         log.debug("OAuth callback for user {}", user.getId());
@@ -162,7 +182,7 @@ public class MonzoController {
             if (!wantsJson(request)) {
                 // Browser flow: land back in the app with a friendly banner, not a JSON error
                 return ResponseEntity.status(302)
-                        .header("Location", appProperties.getBaseUrl() + "/app?monzo=denied")
+                        .header("Location", appProperties.getBaseUrl() + "/app/connect?monzo=denied")
                         .build();
             }
             throw new ApiException(
@@ -207,7 +227,7 @@ public class MonzoController {
         // where sync-progress polling takes over. API clients get the JSON body.
         if (!wantsJson(request)) {
             return ResponseEntity.status(302)
-                    .header("Location", appProperties.getBaseUrl() + "/app?monzo=connected")
+                    .header("Location", appProperties.getBaseUrl() + "/app/connect?monzo=connected")
                     .build();
         }
         return ResponseEntity.ok(ApiResponse.of(MonzoConnectionResponse.from(connection)));

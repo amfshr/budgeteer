@@ -67,6 +67,7 @@ public class MonzoIngestor implements ProviderIngestor {
                     accountRepository.findByProviderAndProviderAccountId(Provider.MONZO, raw.getId());
 
             Account domain;
+            String displayName = sanitiseDisplayName(raw.getDescription());
             if (existing.isEmpty()) {
                 domain = new Account(
                         raw.getUser(),
@@ -74,12 +75,13 @@ public class MonzoIngestor implements ProviderIngestor {
                         raw.getId(),
                         normalise(raw.getAccountType()),
                         INSTITUTION_NAME,
-                        raw.getDescription(),
+                        displayName,
                         raw.getCurrency()
                 );
             } else {
                 domain = existing.get();
                 domain.setAccountType(normalise(raw.getAccountType()));   // provider-owned, refresh ok
+                domain.setDisplayName(displayName);                       // provider-owned, refresh ok
             }
 
             if (raw.isClosed() || !raw.getConnection().isActive()) {
@@ -139,6 +141,20 @@ public class MonzoIngestor implements ProviderIngestor {
             log.debug("No raw rows past the cursor [account={}, cursor={}]", account.getId(), cursor);
         }
         return mapped;
+    }
+
+
+    /**
+     * Monzo's {@code description} for retail accounts is their internal user id
+     * ({@code user_...}) — meaningless as a display name (Session 02 dec 30). Null it
+     * out so consumers fall back to institution + account type; real descriptions
+     * (joint accounts, Flex) pass through.
+     */
+    private @org.jspecify.annotations.Nullable String sanitiseDisplayName(@org.jspecify.annotations.Nullable String description) {
+        if (description == null || description.isBlank() || description.matches("(user|acc)_[0-9a-zA-Z]+")) {
+            return null;
+        }
+        return description;
     }
 
     private AccountType normalise(String rawType) {
