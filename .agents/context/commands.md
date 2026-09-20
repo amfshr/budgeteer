@@ -21,14 +21,13 @@ docker compose logs db        # View DB logs
 ./scripts/dev.sh status       # Show app + DB status
 ./scripts/dev.sh db           # Start DB only
 ./scripts/dev.sh tunnel       # Start ngrok tunnel (for Monzo OAuth redirect URI)
+./scripts/dev.sh wipe-db      # Drop + recreate schema public (asks you to type 'wipe'; restart backend after)
 ```
 
 ## Testing
 
 ```bash
-# From backend/ directory:
-cd backend
-
+# From the repo root (multi-module reactor — Maven runs all modules):
 mvn test                                    # All tests (unit + integration)
 mvn test -DexcludedGroups=integration       # Unit tests only (no Docker needed)
 mvn test -Dgroups=integration               # Integration tests only (needs Docker)
@@ -45,8 +44,8 @@ mvn test -Dtest=AuthFlowIT                  # Single IT class
 ## Code Quality
 
 ```bash
-cd backend
-mvn checkstyle:check          # Verify code style
+# From the repo root:
+mvn checkstyle:check          # Verify code style (config: config/checkstyle/checkstyle.xml)
 mvn checkstyle:checkstyle     # Generate checkstyle report
 mvn compile                   # Compile only
 mvn verify                    # Compile + test + checkstyle
@@ -56,11 +55,13 @@ mvn verify                    # Compile + test + checkstyle
 
 | Endpoint | URL |
 |----------|-----|
+| Web app (Vite dev) | http://localhost:5173 |
 | Health | http://localhost:8080/actuator/health |
-| Auth — request magic link | POST http://localhost:8080/auth/login |
-| Auth — verify magic link | GET http://localhost:8080/auth/verify?token=... |
-| Monzo OAuth — initiate | GET http://localhost:8080/auth/connect |
-| Dev login (dev profile only) | POST http://localhost:8080/dev/auth/login |
+| Auth — request magic link | POST http://localhost:8080/api/v1/auth/login |
+| Auth — verify magic link | GET http://localhost:8080/api/v1/auth/verify?token=... |
+| Monzo OAuth — initiate | GET http://localhost:8080/api/v1/monzo/connect |
+| Manual sync-now | POST http://localhost:8080/api/v1/monzo/sync |
+| Dev quick-login (dev only; ⚠ revokes your browser session — single-session) | POST http://localhost:8080/api/dev/auth/quick-login |
 
 ## Useful Scripts
 
@@ -90,6 +91,8 @@ npm test               # Vitest run (npm run test:watch for watch mode)
 npm run lint           # ESLint
 npm run format         # Prettier write (format:check is the CI variant)
 npm run build          # tsc type-check + production bundle → dist/
+npm run generate:types # Regenerate src/api/types.gen.ts from docs/api/openapi.json
+                       # (then: npx prettier --write src/api/types.gen.ts — CI checks formatting)
 ```
 
 Dev flow: start the backend first (IDE debug run or `./scripts/dev.sh`), then `npm run dev` —

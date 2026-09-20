@@ -7,8 +7,14 @@
 1. User submits email → magic link token generated (SHA-256 hash stored, plain token emailed)
 2. User clicks link → token verified against hash, marked `used_at` (replay prevention), expires in 15m
 3. On verify: JWE access token (15m) + refresh token (7d) issued as **HttpOnly cookies**
-4. Single-session-per-login (multi-device supported — each login gets its own refresh token row)
-5. New login does NOT revoke existing sessions
+4. **Single-session policy**: a new login revokes ALL existing sessions
+   (`AuthService` → `revokeAllSessions`) — logging in anywhere logs you out everywhere else
+5. Ghost sessions (valid JWE, user row gone — e.g. after a dev DB wipe or future
+   delete+purge) answer **401 NOT_AUTHENTICATED**, never 404 — the SPA clears its session
+   cache on any 401 and redirects to login
+6. Logout revokes the refresh session server-side; the access JWE stays cryptographically
+   valid until its 15-min TTL. **DECIDED 2026-09-20**: per-request session validation in
+   `JweAuthenticationFilter` (before #17) makes revocation instant
 
 ## Token Types
 
@@ -35,7 +41,16 @@
 - IP addresses beyond INFO level
 - Raw request/response bodies containing auth headers
 
-`LogSanitizer` (`util/LogSanitizer.java`) handles request logging redaction. Always use it for incoming request logging.
+`LogSanitizer` (`util/LogSanitizer.java`) handles request logging redaction — its
+`sanitize` is a char-loop on purpose (primitives are CodeQL taint barriers; regex
+rewrites are not recognised). Always use it for logging user-controlled values.
+
+Hard-won rules (all found live):
+- **Any PII-carrying DTO masks its `toString`** — Spring MVC DEBUG logs deserialized DTOs
+  (`LoginRequest` leaked an email this way)
+- `EmailService` masks recipients on BOTH success and failure log paths
+- `logging.level.org.springframework.web.client=INFO` in dev — RestClient DEBUG printed
+  the Monzo `client_secret` in a token-exchange body
 
 ## Logging Patterns
 
