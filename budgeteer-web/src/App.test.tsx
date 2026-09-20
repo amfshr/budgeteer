@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { err, mockApi, ok, renderApp, testUser } from './test/utils'
+import { err, mockApi, renderApp, testUser } from './test/utils'
 
 afterEach(() => {
   vi.unstubAllGlobals()
@@ -10,27 +10,28 @@ afterEach(() => {
 describe('public shell', () => {
   it('shows the login entry page at /', () => {
     renderApp('/')
-    expect(screen.getByRole('heading', { name: 'Budgeteer' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /budgeteer/ })).toBeInTheDocument()
     expect(screen.getByLabelText('Email')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Email me a login link' })).toBeInTheDocument()
   })
 
   it('redirects unknown routes to the entry page', () => {
     renderApp('/nonsense')
-    expect(screen.getByRole('heading', { name: 'Budgeteer' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /budgeteer/ })).toBeInTheDocument()
   })
 })
 
 describe('login flow', () => {
   it('submits the email and lands on the magic-link-sent page', async () => {
-    vi.stubGlobal(
-      'fetch',
-      vi
-        .fn()
-        .mockResolvedValueOnce(
-          ok({ message: 'sent', email: 'alex@example.com', accessToken: null, refreshToken: null }),
-        ),
-    )
+    mockApi({
+      '/api/v1/auth/login': {
+        message: 'sent',
+        email: 'alex@example.com',
+        accessToken: null,
+        refreshToken: null,
+      },
+      '/api/v1/auth/me': () => err(401, 'MISSING_TOKEN'),
+    })
     renderApp('/')
 
     await userEvent.type(screen.getByLabelText('Email'), 'alex@example.com')
@@ -48,6 +49,22 @@ describe('login flow', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Email me a login link' }))
 
     expect(await screen.findByText("Couldn't send the link")).toBeInTheDocument()
+  })
+})
+
+describe('magic-link sent page', () => {
+  it('follows the session the moment another tab signs in', async () => {
+    mockApi({
+      '/api/v1/auth/me': testUser,
+      '/api/v1/accounts': [],
+      '/api/v1/transactions': { items: [], page: 0, size: 8, totalElements: 0, totalPages: 0 },
+      '/api/v1/monzo/sync/progress': { accounts: [] },
+      '/api/v1/monzo/connections': [],
+    })
+    renderApp({ pathname: '/auth/sent', state: { email: 'alex@example.com' } })
+
+    // The waiting tab discovers the browser-wide session and lands in /app.
+    expect(await screen.findByText('No accounts yet')).toBeInTheDocument()
   })
 })
 

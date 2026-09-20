@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics><meta name="design_doc_mode" content="canvas"><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet"><style>body{margin:0;background:#f0eee9;font-family:Geist,system-ui,sans-serif;color:#1a1a1a}a{color:#059669}a:hover{color:#047857}.dv-turn{padding:40px 44px 32px;border-bottom:1px solid rgba(0,0,0,.08);scroll-margin-top:16px}.dv-thd{display:flex;align-items:baseline;gap:10px;margin:0 0 20px}.dv-tid{font:600 10px ui-monospace,Menlo,monospace;padding:3px 7px;background:#1a1a1a;color:#fff;border-radius:4px;text-decoration:none}.dv-tname{font:600 13px/1.2 Geist,system-ui,sans-serif;color:#1a1a1a}.dv-opts{display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start}.dv-opt{flex:none;display:flex;flex-direction:column;gap:9px;scroll-margin-top:16px}.dv-oid{font:600 10.5px ui-monospace,Menlo,monospace;padding:3px 7px;background:rgba(0,0,0,.08);color:#1a1a1a;border-radius:5px;text-decoration:none}.dv-olabel{display:flex;align-items:baseline;gap:8px;font:400 11px/1.3 Geist,system-ui,sans-serif;color:rgba(0,0,0,.55)}.dv-card{max-width:100%;background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,.06);overflow:hidden}.dv-opt:target .dv-oid{background:#059669;color:#fff}.dv-next{margin:22px 0 0;font:12px/1.5 Geist,system-ui,sans-serif;color:rgba(0,0,0,.5)}@keyframes spin{to{transform:rotate(360deg)}}</style></helmet>
+
+<section class="dv-turn" id="t4">
+<div class="dv-thd"><a class="dv-tid" href="#t4">4</a><span class="dv-tname">Settings · Connected banks · Connection detail · destructive dialogs · Login with code — on the <a class="dv-oid" href="#3a">3a</a> baseline</span></div>
+<div style="max-width:860px;margin:0 0 28px;font:13px/1.6 Geist,system-ui,sans-serif;color:rgba(0,0,0,.65)">Settings is a plain grouped list (iOS-style sections, shadcn Card + Separator). Red appears only on the two destructive rows and their confirm buttons; status pills stay neutral except "Active" (emerald dot, not emerald fill). Both dialogs lead with the consequence in plain words, require a typed word, and keep the destructive button disabled until it matches. The code step puts the six boxes first because they work cross-device; the "tap the button" path is the quiet fallback.</div>
+<div class="dv-opts">
+
+<div class="dv-opt" id="4a"><div class="dv-olabel"><a class="dv-oid" href="#4a">4a</a>Settings — mobile</div><div class="dv-card">
+<div data-screen-label="Settings mobile" style="width:390px;height:844px;display:flex;flex-direction:column;position:relative;overflow:hidden;font-family:Geist,system-ui,sans-serif;font-variant-numeric:tabular-nums;background:var(--page);color:var(--fg);--page:#fafafa;--card:#ffffff;--muted:#f4f4f5;--border:#e4e4e7;--fg:#09090b;--mfg:#71717a;--pos:#059669;--posbg:#ecfdf5;--neg:#dc2626;--negbg:#fef2f2;--primary:#059669;--pfg:#ffffff">
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 22px 0;font-size:15px;font-weight:600"><span>9:41</span><span style="width:24px;height:11px;border:1.5px solid var(--fg);border-radius:3px;display:inline-block;position:relative;box-sizing:border-box"><span style="position:absolute;inset:2px;background:var(--fg);border-radius:1px"></span></span></div>
+  <div style="padding:18px 20px 14px"><div style="font-size:24px;font-weight:600;letter-spacing:-0.02em">Settings</div></div>
+  <div style="flex:1;overflow:hidden;padding:0 16px;display:grid;gap:20px;align-content:start">
+    <div><div style="font-size:12px;font-weight:500;color:var(--mfg);padding:0 4px 8px">Account</div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:0 16px">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid var(--border);font-size:14px"><span style="color:var(--mfg)">Email</span><span style="font-weight:500">alex@example.com</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid var(--border);font-size:14px"><span style="color:var(--mfg)">Appearance</span><span style="display:inline-flex;align-items:center;gap:6px;font-weight:500">System<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--mfg);stroke-linecap:round;stroke-linejoin:round"><path d="M6 9l6 6 6-6"></path></svg></span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;font-size:14px;font-weight:500"><span>Log out</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--mfg);stroke-linecap:round;stroke-linejoin:round"><path d="M9 6l6 6-6 6"></path></svg></div>
+      </div></div>
+    <div><div style="display:flex;justify-content:space-between;align-items:baseline;padding:0 4px 8px"><span style="font-size:12px;font-weight:500;color:var(--mfg)">Connected banks</span><span style="font-size:12px;font-weight:500">Add bank</span></div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:0 16px">
+        <div style="display:flex;align-items:center;gap:12px;padding:14px 0">
+          <span style="width:36px;height:36px;border-radius:10px;background:var(--muted);border:1px solid var(--border);display:grid;place-items:center;font-family:'Geist Mono',monospace;font-size:8px;color:var(--mfg);text-align:center;line-height:1.2;flex:none">monzo<br>mark</span>
+          <span style="flex:1;min-width:0"><span style="display:block;font-size:14px;font-weight:500">Monzo</span><span style="display:block;font-size:12px;color:var(--mfg);margin-top:2px">2 accounts · synced 12 min ago</span></span>
+          <span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;padding:3px 8px;border-radius:999px;border:1px solid var(--border)"><span style="width:6px;height:6px;border-radius:999px;background:var(--pos)"></span>Active</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--mfg);stroke-linecap:round;stroke-linejoin:round"><path d="M9 6l6 6-6 6"></path></svg>
+        </div>
+      </div></div>
+    <div><div style="font-size:12px;font-weight:500;color:var(--mfg);padding:0 4px 8px">Data &amp; privacy</div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:0 16px">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid var(--border)"><span><span style="display:block;font-size:14px;font-weight:500">Export my data</span><span style="display:block;font-size:12px;color:var(--mfg);margin-top:2px">Accounts and transactions as JSON</span></span><span style="height:32px;padding:0 12px;display:inline-flex;align-items:center;border-radius:8px;border:1px solid var(--border);font-size:13px;font-weight:500">Download</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0"><span><span style="display:block;font-size:14px;font-weight:500;color:var(--neg)">Delete my account</span><span style="display:block;font-size:12px;color:var(--mfg);margin-top:2px">Erases everything immediately</span></span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--mfg);stroke-linecap:round;stroke-linejoin:round"><path d="M9 6l6 6-6 6"></path></svg></div>
+      </div>
+      <div style="font-size:12px;color:var(--mfg);padding:10px 4px 0;line-height:1.5">Personal use only. Your data lives on your own server and is never shared.</div></div>
+  </div>
+  <div style="display:flex;border-top:1px solid var(--border);background:var(--card);padding:8px 8px 22px">
+    <span style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0;color:var(--mfg)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect></svg><span style="font-size:11px;font-weight:500">Overview</span></span>
+    <span style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0;color:var(--mfg)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" style="stroke-linecap:round"><path d="M4 7h16M4 12h16M4 17h10"></path></svg><span style="font-size:11px;font-weight:500">Transactions</span></span>
+    <span style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0;color:var(--fg)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" style="stroke-linecap:round"><path d="M4 7h16M4 17h16"></path><circle cx="9" cy="7" r="2.5" fill="var(--card)"></circle><circle cx="15" cy="17" r="2.5" fill="var(--card)"></circle></svg><span style="font-size:11px;font-weight:500">Settings</span></span>
+  </div>
+</div></div></div>
+
+<div class="dv-opt" id="4b"><div class="dv-olabel"><a class="dv-oid" href="#4b">4b</a>Connected banks — list (two states shown)</div><div class="dv-card">
+<div data-screen-label="Connected banks list" style="width:390px;height:844px;display:flex;flex-direction:column;position:relative;overflow:hidden;font-family:Geist,system-ui,sans-serif;font-variant-numeric:tabular-nums;background:var(--page);color:var(--fg);--page:#fafafa;--card:#ffffff;--muted:#f4f4f5;--border:#e4e4e7;--fg:#09090b;--mfg:#71717a;--pos:#059669;--posbg:#ecfdf5;--neg:#dc2626;--warn:#b45309;--warnbg:#fffbeb;--primary:#059669;--pfg:#ffffff">
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 22px 0;font-size:15px;font-weight:600"><span>9:41</span><span style="width:24px;height:11px;border:1.5px solid var(--fg);border-radius:3px;display:inline-block;position:relative;box-sizing:border-box"><span style="position:absolute;inset:2px;background:var(--fg);border-radius:1px"></span></span></div>
+  <div style="display:flex;align-items:center;gap:10px;padding:18px 20px 14px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--mfg);stroke-linecap:round;stroke-linejoin:round"><path d="M15 6l-6 6 6 6"></path></svg><span style="font-size:17px;font-weight:600;letter-spacing:-0.01em;flex:1">Connected banks</span><span style="height:32px;padding:0 12px;display:inline-flex;align-items:center;border-radius:8px;border:1px solid var(--border);background:var(--card);font-size:13px;font-weight:500">Add bank</span></div>
+  <div style="flex:1;overflow:hidden;padding:0 16px;display:grid;gap:12px;align-content:start">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <span style="width:40px;height:40px;border-radius:10px;background:var(--muted);border:1px solid var(--border);display:grid;place-items:center;font-family:'Geist Mono',monospace;font-size:8px;color:var(--mfg);text-align:center;line-height:1.2;flex:none">monzo<br>mark</span>
+        <span style="flex:1"><span style="display:block;font-size:15px;font-weight:600;letter-spacing:-0.01em">Monzo</span><span style="display:block;font-size:12px;color:var(--mfg);margin-top:2px">Connected since 17 Sep 2026</span></span>
+        <span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;padding:3px 8px;border-radius:999px;border:1px solid var(--border)"><span style="width:6px;height:6px;border-radius:999px;background:var(--pos)"></span>Active</span>
+      </div>
+      <div style="height:1px;background:var(--border);margin:14px 0 12px"></div>
+      <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--mfg)">Monzo Current · Monzo Savings</span><span style="color:var(--mfg)">synced 12 min ago</span></div>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <span style="width:40px;height:40px;border-radius:10px;background:var(--muted);border:1px solid var(--border);display:grid;place-items:center;font-family:'Geist Mono',monospace;font-size:8px;color:var(--mfg);text-align:center;line-height:1.2;flex:none">lloyds<br>mark</span>
+        <span style="flex:1"><span style="display:block;font-size:15px;font-weight:600;letter-spacing:-0.01em">Lloyds</span><span style="display:block;font-size:12px;color:var(--mfg);margin-top:2px">Connected since 2 Jun 2026</span></span>
+        <span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;padding:3px 8px;border-radius:999px;border:1px solid var(--border);color:var(--warn)"><span style="width:6px;height:6px;border-radius:999px;background:var(--warn)"></span>Needs re-authorisation</span>
+      </div>
+      <div style="height:1px;background:var(--border);margin:14px 0 12px"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px"><span style="color:var(--mfg)">Consent expired 18 Sep · last synced 3 days ago</span><span style="height:30px;padding:0 10px;display:inline-flex;align-items:center;border-radius:8px;background:var(--fg);color:var(--page);font-size:12px;font-weight:500">Reconnect</span></div>
+    </div>
+    <div style="font-size:12px;color:var(--mfg);padding:4px 4px 0;line-height:1.5;text-wrap:pretty">Banks ask you to re-approve access every 90 days. budgeteer keeps everything already imported while a connection is paused.</div>
+  </div>
+</div></div></div>
+
+<div class="dv-opt" id="4c"><div class="dv-olabel"><a class="dv-oid" href="#4c">4c</a>Connection detail — Monzo</div><div class="dv-card">
+<div data-screen-label="Connection detail" style="width:390px;height:844px;display:flex;flex-direction:column;position:relative;overflow:hidden;font-family:Geist,system-ui,sans-serif;font-variant-numeric:tabular-nums;background:var(--page);color:var(--fg);--page:#fafafa;--card:#ffffff;--muted:#f4f4f5;--border:#e4e4e7;--fg:#09090b;--mfg:#71717a;--pos:#059669;--posbg:#ecfdf5;--neg:#dc2626;--negbg:#fef2f2;--primary:#059669;--pfg:#ffffff">
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 22px 0;font-size:15px;font-weight:600"><span>9:41</span><span style="width:24px;height:11px;border:1.5px solid var(--fg);border-radius:3px;display:inline-block;position:relative;box-sizing:border-box"><span style="position:absolute;inset:2px;background:var(--fg);border-radius:1px"></span></span></div>
+  <div style="display:flex;align-items:center;gap:10px;padding:18px 20px 14px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--mfg);stroke-linecap:round;stroke-linejoin:round"><path d="M15 6l-6 6 6 6"></path></svg><span style="font-size:17px;font-weight:600;letter-spacing:-0.01em">Monzo</span><span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;padding:3px 8px;border-radius:999px;border:1px solid var(--border);margin-left:auto"><span style="width:6px;height:6px;border-radius:999px;background:var(--pos)"></span>Active</span></div>
+  <div style="flex:1;overflow:hidden;padding:0 16px;display:grid;gap:12px;align-content:start">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:0 16px">
+      <div style="display:flex;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--border);font-size:14px"><span style="color:var(--mfg)">Connected on</span><span style="font-weight:500">17 Sep 2026</span></div>
+      <div style="display:flex;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--border);font-size:14px"><span style="color:var(--mfg)">Last sync</span><span style="font-weight:500">Today 09:38 · 4 new</span></div>
+      <div style="display:flex;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--border);font-size:14px"><span style="color:var(--mfg)">Next sync</span><span style="font-weight:500">10:38</span></div>
+      <div style="display:flex;justify-content:space-between;padding:13px 0;font-size:14px"><span style="color:var(--mfg)">Access valid until</span><span style="font-weight:500">16 Dec 2026</span></div>
+    </div>
+    <div><div style="font-size:12px;font-weight:500;color:var(--mfg);padding:4px 4px 8px">Accounts</div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:0 16px">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:13px 0;border-bottom:1px solid var(--border);font-size:14px"><span><span style="display:block;font-weight:500">Monzo Current</span><span style="display:block;font-size:12px;color:var(--mfg);margin-top:2px">Current account · 1,102 transactions</span></span><span style="font-weight:500">£412.20</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:13px 0;font-size:14px"><span><span style="display:block;font-weight:500">Monzo Savings</span><span style="display:block;font-size:12px;color:var(--mfg);margin-top:2px">Savings pot · 870 transactions</span></span><span style="font-weight:500">£872.00</span></div>
+      </div></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <span style="height:40px;border-radius:10px;background:var(--fg);color:var(--page);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:500">Sync now</span>
+      <span style="height:40px;border-radius:10px;border:1px solid var(--border);background:var(--card);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:500">Reconnect</span>
+    </div>
+    <div style="margin-top:8px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center"><span><span style="display:block;font-size:14px;font-weight:500;color:var(--neg)">Unlink bank</span><span style="display:block;font-size:12px;color:var(--mfg);margin-top:2px;line-height:1.4">Stops syncing and revokes access. Imported data stays until you delete it.</span></span></div>
+  </div>
+</div></div></div>
+
+<div class="dv-opt" id="4d"><div class="dv-olabel"><a class="dv-oid" href="#4d">4d</a>Delete account — typed confirmation</div><div class="dv-card">
+<div data-screen-label="Delete account dialog" style="width:390px;height:844px;display:flex;flex-direction:column;justify-content:flex-end;position:relative;overflow:hidden;font-family:Geist,system-ui,sans-serif;background:#3f3f46;color:var(--fg);--card:#ffffff;--muted:#f4f4f5;--border:#e4e4e7;--fg:#09090b;--mfg:#71717a;--neg:#dc2626;--negbg:#fef2f2">
+  <div style="position:absolute;inset:0;background:#fafafa;opacity:.35"></div>
+  <div style="position:relative;background:var(--card);border-radius:20px 20px 0 0;padding:14px 20px 34px;box-shadow:0 -8px 40px rgba(0,0,0,.25)">
+    <div style="width:36px;height:4px;border-radius:999px;background:var(--border);margin:0 auto 18px"></div>
+    <div style="font-size:20px;font-weight:600;letter-spacing:-0.02em">Delete your account?</div>
+    <div style="font-size:14px;line-height:1.5;color:var(--mfg);margin-top:8px;text-wrap:pretty">This happens immediately and cannot be undone.</div>
+    <div style="display:grid;gap:10px;margin-top:16px;font-size:14px;line-height:1.45">
+      <div style="display:flex;gap:10px"><span style="width:6px;height:6px;border-radius:999px;background:var(--neg);flex:none;margin-top:7px"></span><span>Every account, transaction and pot is erased from budgeteer.</span></div>
+      <div style="display:flex;gap:10px"><span style="width:6px;height:6px;border-radius:999px;background:var(--neg);flex:none;margin-top:7px"></span><span>Monzo access is revoked — nothing more is read from your bank.</span></div>
+      <div style="display:flex;gap:10px"><span style="width:6px;height:6px;border-radius:999px;background:var(--neg);flex:none;margin-top:7px"></span><span>You're signed out on every device.</span></div>
+    </div>
+    <div style="font-size:13px;color:var(--mfg);margin-top:16px">Want a copy first? <span style="color:var(--fg);font-weight:500;text-decoration:underline;text-underline-offset:3px">Export my data</span></div>
+    <div style="display:grid;gap:8px;margin-top:20px">
+      <span style="font-size:14px;font-weight:500">Type <span style="font-family:'Geist Mono',monospace;font-weight:500;background:var(--muted);padding:1px 6px;border-radius:4px">delete</span> to confirm</span>
+      <span style="height:44px;border-radius:10px;border:1px solid var(--border);background:var(--card);display:flex;align-items:center;padding:0 14px;font-size:15px;font-family:'Geist Mono',monospace">del<span style="width:1.5px;height:18px;background:var(--fg);display:inline-block;margin-left:1px"></span></span>
+    </div>
+    <div style="display:grid;gap:10px;margin-top:16px">
+      <span style="height:44px;border-radius:10px;background:var(--neg);color:#fff;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:500;opacity:.4">Delete everything</span>
+      <span style="height:44px;border-radius:10px;border:1px solid var(--border);background:var(--card);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:500">Keep my account</span>
+    </div>
+  </div>
+</div></div></div>
+
+<div class="dv-opt" id="4e"><div class="dv-olabel"><a class="dv-oid" href="#4e">4e</a>Unlink bank — confirmation</div><div class="dv-card">
+<div data-screen-label="Unlink bank dialog" style="width:390px;height:844px;display:flex;flex-direction:column;justify-content:flex-end;position:relative;overflow:hidden;font-family:Geist,system-ui,sans-serif;background:#3f3f46;color:var(--fg);--card:#ffffff;--muted:#f4f4f5;--border:#e4e4e7;--fg:#09090b;--mfg:#71717a;--neg:#dc2626">
+  <div style="position:absolute;inset:0;background:#fafafa;opacity:.35"></div>
+  <div style="position:relative;background:var(--card);border-radius:20px 20px 0 0;padding:14px 20px 34px;box-shadow:0 -8px 40px rgba(0,0,0,.25)">
+    <div style="width:36px;height:4px;border-radius:999px;background:var(--border);margin:0 auto 18px"></div>
+    <div style="font-size:20px;font-weight:600;letter-spacing:-0.02em">Unlink Monzo?</div>
+    <div style="font-size:14px;line-height:1.5;color:var(--mfg);margin-top:8px;text-wrap:pretty">Syncing stops and budgeteer's access to Monzo is revoked. You can reconnect later.</div>
+    <div style="background:var(--muted);border-radius:10px;padding:12px 14px;margin-top:16px;font-size:13px;line-height:1.5"><span style="font-weight:500">Your imported data stays.</span> <span style="color:var(--mfg)">1,972 transactions across 2 accounts remain in budgeteer until you delete them separately from Settings → Data &amp; privacy.</span></div>
+    <div style="display:grid;gap:8px;margin-top:20px">
+      <span style="font-size:14px;font-weight:500">Type <span style="font-family:'Geist Mono',monospace;font-weight:500;background:var(--muted);padding:1px 6px;border-radius:4px">unlink</span> to confirm</span>
+      <span style="height:44px;border-radius:10px;border:1px solid var(--border);background:var(--card);display:flex;align-items:center;padding:0 14px;font-size:15px;font-family:'Geist Mono',monospace">unlink</span>
+    </div>
+    <div style="display:grid;gap:10px;margin-top:16px">
+      <span style="height:44px;border-radius:10px;background:var(--neg);color:#fff;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:500">Unlink Monzo</span>
+      <span style="height:44px;border-radius:10px;border:1px solid var(--border);background:var(--card);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:500">Cancel</span>
+    </div>
+  </div>
+</div></div></div>
+
+</div>
+
+<div class="dv-thd" style="margin-top:40px"><span class="dv-tname">Login — "check your inbox" with 6-digit code</span></div>
+<div class="dv-opts">
+
+<div class="dv-opt" id="4f"><div class="dv-olabel"><a class="dv-oid" href="#4f">4f</a>Code entry — mobile, light</div><div class="dv-card">
+<div data-screen-label="Login code mobile" style="width:390px;height:844px;display:flex;flex-direction:column;position:relative;overflow:hidden;font-family:Geist,system-ui,sans-serif;font-variant-numeric:tabular-nums;background:var(--page);color:var(--fg);--page:#fafafa;--card:#ffffff;--muted:#f4f4f5;--border:#e4e4e7;--fg:#09090b;--mfg:#71717a;--pos:#059669;--posbg:#ecfdf5;--primary:#059669;--pfg:#ffffff">
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 22px 0;font-size:15px;font-weight:600"><span>9:41</span><span style="width:24px;height:11px;border:1.5px solid var(--fg);border-radius:3px;display:inline-block;position:relative;box-sizing:border-box"><span style="position:absolute;inset:2px;background:var(--fg);border-radius:1px"></span></span></div>
+  <div style="padding:18px 20px 14px;border-bottom:1px solid var(--border)"><span style="font-size:20px;font-weight:600;letter-spacing:-0.02em;display:inline-flex;align-items:baseline;gap:2px">budgeteer<span style="width:6px;height:6px;border-radius:2px;background:var(--pos);display:inline-block"></span></span></div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 24px 80px">
+    <div style="font-size:28px;font-weight:600;letter-spacing:-0.025em;line-height:1.15">Check your inbox</div>
+    <div style="font-size:15px;line-height:1.5;color:var(--mfg);margin-top:8px">We emailed <span style="color:var(--fg);font-weight:500">a•••x@example.com</span>.</div>
+    <div style="font-size:14px;font-weight:500;margin-top:28px">Enter the code from the email</div>
+    <div style="font-size:13px;color:var(--mfg);margin-top:2px">Works on any device.</div>
+    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-top:12px">
+      <span style="height:52px;border-radius:10px;border:1px solid var(--border);background:var(--card);display:grid;place-items:center;font-size:22px;font-weight:600">4</span>
+      <span style="height:52px;border-radius:10px;border:1px solid var(--border);background:var(--card);display:grid;place-items:center;font-size:22px;font-weight:600">8</span>
+      <span style="height:52px;border-radius:10px;border:1px solid var(--border);background:var(--card);display:grid;place-items:center;font-size:22px;font-weight:600">1</span>
+      <span style="height:52px;border-radius:10px;border:2px solid var(--fg);background:var(--card);display:grid;place-items:center;font-size:22px;font-weight:600;box-sizing:border-box"><span style="width:1.5px;height:22px;background:var(--fg);display:block"></span></span>
+      <span style="height:52px;border-radius:10px;border:1px solid var(--border);background:var(--card);display:grid;place-items:center;font-size:22px;font-weight:600"></span>
+      <span style="height:52px;border-radius:10px;border:1px solid var(--border);background:var(--card);display:grid;place-items:center;font-size:22px;font-weight:600"></span>
+    </div>
+    <span style="height:44px;border-radius:10px;background:var(--primary);color:var(--pfg);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:500;margin-top:16px;opacity:.5">Continue</span>
+    <div style="font-size:13px;color:var(--mfg);margin-top:22px;line-height:1.5;text-wrap:pretty">Reading the email on this device? Just tap the <span style="color:var(--fg);font-weight:500">Sign in</span> button in it instead.</div>
+    <div style="font-size:13px;color:var(--mfg);margin-top:12px;line-height:1.5">Code expires in 14:32 · <span style="color:var(--fg);font-weight:500;text-decoration:underline;text-underline-offset:3px">Resend</span> · <span style="color:var(--fg);font-weight:500;text-decoration:underline;text-underline-offset:3px">Different email</span></div>
+  </div>
+</div></div></div>
+
+<div class="dv-opt" id="4g"><div class="dv-olabel"><a class="dv-oid" href="#4g">4g</a>Code entry — error state, mobile dark</div><div class="dv-card">
+<div data-screen-label="Login code error dark" style="width:390px;height:844px;display:flex;flex-direction:column;position:relative;overflow:hidden;font-family:Geist,system-ui,sans-serif;font-variant-numeric:tabular-nums;background:var(--page);color:var(--fg);--page:#09090b;--card:#131316;--muted:#27272a;--border:#27272a;--fg:#fafafa;--mfg:#a1a1aa;--pos:#34d399;--neg:#f87171;--primary:#10b981;--pfg:#052e16">
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 22px 0;font-size:15px;font-weight:600"><span>9:41</span><span style="width:24px;height:11px;border:1.5px solid var(--fg);border-radius:3px;display:inline-block;position:relative;box-sizing:border-box"><span style="position:absolute;inset:2px;background:var(--fg);border-radius:1px"></span></span></div>
+  <div style="padding:18px 20px 14px;border-bottom:1px solid var(--border)"><span style="font-size:20px;font-weight:600;letter-spacing:-0.02em;display:inline-flex;align-items:baseline;gap:2px">budgeteer<span style="width:6px;height:6px;border-radius:2px;background:var(--pos);display:inline-block"></span></span></div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 24px 80px">
+    <div style="font-size:28px;font-weight:600;letter-spacing:-0.025em;line-height:1.15">Check your inbox</div>
+    <div style="font-size:15px;line-height:1.5;color:var(--mfg);margin-top:8px">We emailed <span style="color:var(--fg);font-weight:500">a•••x@example.com</span>.</div>
+    <div style="font-size:14px;font-weight:500;margin-top:28px">Enter the code from the email</div>
+    <div style="font-size:13px;color:var(--mfg);margin-top:2px">Works on any device.</div>
+    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-top:12px">
+      <span style="height:52px;border-radius:10px;border:1px solid var(--neg);background:var(--card);display:grid;place-items:center;font-size:22px;font-weight:600">4</span>
+      <span style="height:52px;border-radius:10px;border:1px solid var(--neg);background:var(--card);display:grid;place-items:center;font-size:22px;font-weight:600">8</span>
+      <span style="height:52px;border-radius:10px;border:1px solid var(--neg);background:var(--card);display:grid;place-items:center;font-size:22px;font-weight:600">1</span>
+      <span style="height:52px;border-radius:10px;border:1px solid var(--neg);background:var(--card);display:grid;place-items:center;font-size:22px;font-weight:600">9</span>
+      <span style="height:52px;border-radius:10px;border:1px solid var(--neg);background:var(--card);display:grid;place-items:center;font-size:22px;font-weight:600">0</span>
+      <span style="height:52px;border-radius:10px;border:1px solid var(--neg);background:var(--card);display:grid;place-items:center;font-size:22px;font-weight:600">2</span>
+    </div>
+    <div style="display:flex;gap:8px;align-items:flex-start;margin-top:10px;font-size:13px;line-height:1.45;color:var(--neg)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" style="flex:none;margin-top:2px;stroke-linecap:round"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v5M12 16v.5"></path></svg><span>That code isn't right or has expired. Check the newest email, or resend.</span></div>
+    <span style="height:44px;border-radius:10px;background:var(--primary);color:var(--pfg);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600;margin-top:16px">Try again</span>
+    <div style="font-size:13px;color:var(--mfg);margin-top:22px;line-height:1.5;text-wrap:pretty">Reading the email on this device? Just tap the <span style="color:var(--fg);font-weight:500">Sign in</span> button in it instead.</div>
+    <div style="font-size:13px;color:var(--mfg);margin-top:12px;line-height:1.5">Code expired · <span style="color:var(--fg);font-weight:500;text-decoration:underline;text-underline-offset:3px">Send a new code</span> · <span style="color:var(--fg);font-weight:500;text-decoration:underline;text-underline-offset:3px">Different email</span></div>
+  </div>
+</div></div></div>
+
+<div class="dv-opt" id="4h"><div class="dv-olabel"><a class="dv-oid" href="#4h">4h</a>Code entry — desktop, light</div><div class="dv-card">
+<div data-screen-label="Login code desktop" style="width:1280px;height:720px;display:flex;flex-direction:column;overflow:hidden;font-family:Geist,system-ui,sans-serif;font-variant-numeric:tabular-nums;background:var(--page);color:var(--fg);--page:#fafafa;--card:#ffffff;--muted:#f4f4f5;--border:#e4e4e7;--fg:#09090b;--mfg:#71717a;--pos:#059669;--primary:#059669;--pfg:#ffffff">
+  <div style="border-bottom:1px solid var(--border);background:var(--card)"><div style="max-width:72rem;margin:0 auto;padding:0 24px;height:56px;display:flex;align-items:center"><span style="font-size:18px;font-weight:600;letter-spacing:-0.02em;display:inline-flex;align-items:baseline;gap:2px">budgeteer<span style="width:5px;height:5px;border-radius:1.5px;background:var(--pos);display:inline-block"></span></span></div></div>
+  <div style="flex:1;display:grid;place-items:center;padding:24px">
+    <div style="width:420px;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:32px;box-shadow:0 1px 3px rgba(0,0,0,.04)">
+      <div style="font-size:24px;font-weight:600;letter-spacing:-0.02em;line-height:1.15">Check your inbox</div>
+      <div style="font-size:14px;line-height:1.5;color:var(--mfg);margin-top:6px">We emailed <span style="color:var(--fg);font-weight:500">a•••x@example.com</span>.</div>
+      <div style="font-size:14px;font-weight:500;margin-top:24px">Enter the code from the email</div>
+      <div style="font-size:13px;color:var(--mfg);margin-top:2px">Works on any device — including this one.</div>
+      <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-top:12px">
+        <span style="height:52px;border-radius:10px;border:1px solid var(--border);display:grid;place-items:center;font-size:22px;font-weight:600">4</span>
+        <span style="height:52px;border-radius:10px;border:1px solid var(--border);display:grid;place-items:center;font-size:22px;font-weight:600">8</span>
+        <span style="height:52px;border-radius:10px;border:1px solid var(--border);display:grid;place-items:center;font-size:22px;font-weight:600">1</span>
+        <span style="height:52px;border-radius:10px;border:2px solid var(--fg);display:grid;place-items:center;font-size:22px;font-weight:600;box-sizing:border-box"><span style="width:1.5px;height:22px;background:var(--fg);display:block"></span></span>
+        <span style="height:52px;border-radius:10px;border:1px solid var(--border);display:grid;place-items:center;font-size:22px;font-weight:600"></span>
+        <span style="height:52px;border-radius:10px;border:1px solid var(--border);display:grid;place-items:center;font-size:22px;font-weight:600"></span>
+      </div>
+      <span style="height:40px;border-radius:10px;background:var(--primary);color:var(--pfg);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:500;margin-top:16px;opacity:.5">Continue</span>
+      <div style="height:1px;background:var(--border);margin:22px 0 16px"></div>
+      <div style="font-size:13px;color:var(--mfg);line-height:1.5;text-wrap:pretty">Reading the email here? Tapping its <span style="color:var(--fg);font-weight:500">Sign in</span> button signs you in without the code.</div>
+      <div style="font-size:13px;color:var(--mfg);margin-top:10px">Expires in 14:32 · <span style="color:var(--fg);font-weight:500;text-decoration:underline;text-underline-offset:3px">Resend</span> · <span style="color:var(--fg);font-weight:500;text-decoration:underline;text-underline-offset:3px">Different email</span></div>
+    </div>
+  </div>
+</div></div></div>
+
+</div>
+<p class="dv-next">Try next: "desktop versions of <a class="dv-oid" href="#4a">4a</a>–<a class="dv-oid" href="#4c">4c</a>" · "make <a class="dv-oid" href="#4d">4d</a> a centred dialog instead of a sheet" · "show <a class="dv-oid" href="#4f">4f</a> after paste — all six filled, auto-submitting"</p>
+</section>
+
+<section class="dv-turn" id="t3">
+<div class="dv-thd"><a class="dv-tid" href="#t3">3</a><span class="dv-tname">Colour-scheme variants — same Overview excerpt, light + dark, accent discipline held</span></div>
+<div style="max-width:860px;margin:0 0 28px;font:13px/1.6 Geist,system-ui,sans-serif;color:rgba(0,0,0,.65)">Every variant keeps the rule: accent on positive money, on-track state, primary action, wordmark dot — nothing else. Red is red-600/400 throughout. <a class="dv-oid" href="#3a">3a</a> is decision 32 as written; the rest move one dial each: accent hue (<a class="dv-oid" href="#3b">3b</a>, <a class="dv-oid" href="#3c">3c</a>), neutral temperature (<a class="dv-oid" href="#3d">3d</a>), or how much the accent is allowed to do (<a class="dv-oid" href="#3e">3e</a>).</div>
+<div class="dv-opts">
+
+<div class="dv-opt" id="3a"><div class="dv-olabel"><a class="dv-oid" href="#3a">3a</a>Zinc + Emerald — decision 32 baseline (emerald-600 / 400)</div><div class="dv-card" style="width:760px">
+<div data-screen-label="Scheme zinc emerald" style="display:flex;font-family:Geist,system-ui,sans-serif;font-variant-numeric:tabular-nums">
+  <div style="flex:1;padding:18px;background:var(--page);color:var(--fg);--page:#fafafa;--card:#ffffff;--muted:#f4f4f5;--border:#e4e4e7;--fg:#09090b;--mfg:#71717a;--pos:#059669;--neg:#dc2626;--primary:#059669;--pfg:#ffffff">
+    <div style="display:flex;gap:4px;margin-bottom:14px"><span style="width:18px;height:18px;border-radius:4px;background:#fafafa;border:1px solid #e4e4e7"></span><span style="width:18px;height:18px;border-radius:4px;background:#f4f4f5"></span><span style="width:18px;height:18px;border-radius:4px;background:#e4e4e7"></span><span style="width:18px;height:18px;border-radius:4px;background:#71717a"></span><span style="width:18px;height:18px;border-radius:4px;background:#09090b"></span><span style="width:18px;height:18px;border-radius:4px;background:#059669;margin-left:8px"></span><span style="width:18px;height:18px;border-radius:4px;background:#dc2626"></span><span style="margin-left:auto;font:500 11px 'Geist Mono',monospace;color:var(--mfg)">zinc · emerald-600</span></div>
+    <div style="font-size:16px;font-weight:600;letter-spacing:-0.02em;display:inline-flex;align-items:baseline;gap:2px">budgeteer<span style="width:5px;height:5px;border-radius:1.5px;background:var(--pos);display:inline-block"></span></div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:12px"><div style="font-size:12px;font-weight:500;color:var(--mfg)">Total balance</div><div style="font-size:28px;font-weight:600;letter-spacing:-0.03em;margin-top:4px">£1,284<span style="color:var(--mfg);font-weight:500">.20</span></div><div style="margin-top:10px;font-size:11px;color:var(--mfg);display:flex;align-items:center;gap:6px"><span style="width:5px;height:5px;border-radius:999px;background:var(--pos)"></span>as of 09:38 today · synced hourly</div></div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:10px"><div style="display:flex;justify-content:space-between;font-size:12px;color:var(--mfg)"><span style="font-weight:500">This month</span><span>day 20 of 30</span></div><div style="display:flex;align-items:baseline;gap:5px;margin-top:6px"><span style="font-size:20px;font-weight:600;letter-spacing:-0.02em">£312.40</span><span style="font-size:12px;color:var(--mfg)">of £500</span></div><div style="position:relative;height:5px;border-radius:999px;background:var(--muted);margin-top:10px"><div style="width:62%;height:100%;border-radius:999px;background:var(--pos)"></div><div style="position:absolute;top:-2px;left:67%;width:2px;height:9px;background:var(--fg);opacity:.35"></div></div><div style="display:flex;justify-content:space-between;margin-top:8px;font-size:12px"><span style="color:var(--pos);font-weight:500">On track</span><span style="color:var(--mfg)">£187.60 left</span></div></div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:2px 14px;margin-top:10px"><div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px"><span><span style="font-weight:500">Transfer from Lloyds</span><span style="display:block;font-size:11px;color:var(--mfg)">Monzo Current · 09:00</span></span><span style="font-weight:500;color:var(--pos)">+£350.00</span></div><div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px"><span><span style="font-weight:500">Tesco</span><span style="display:block;font-size:11px;color:var(--mfg)">Monzo Current · 18:05</span></span><span style="font-weight:500">−£23.40</span></div><div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;font-size:13px"><span><span style="font-weight:500">Fun</span><span style="display:block;font-size:11px;color:var(--mfg)">£240 / £200</span></span><span style="font-weight:500;color:var(--neg)">£40 over</span></div></div>
+    <div style="display:flex;gap:8px;margin-top:12px"><span style="flex:1;height:36px;border-radius:8px;background:var(--primary);color:var(--pfg);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500">Connect Monzo</span><span style="flex:1;height:36px;border-radius:8px;border:1px solid var(--border);background:var(--card);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500">Sign out</span></div>
+  </div>
+  <div style="flex:1;padding:18px;background:var(--page);color:var(--fg);--page:#09090b;--card:#131316;--muted:#27272a;--border:#27272a;--fg:#fafafa;--mfg:#a1a1aa;--pos:#34d399;--neg:#f87171;--primary:#10b981;--pfg:#052e16">
+    <div style="display:flex;gap:4px;margin-bottom:14px"><span style="width:18px;height:18px;border-radius:4px;background:#09090b;border:1px solid #27272a"></span><span style="width:18px;height:18px;border-radius:4px;background:#131316;border:1px solid #27272a"></span><span style="width:18px;height:18px;border-radius:4px;background:#27272a"></span><span style="width:18px;height:18px;border-radius:4px;background:#a1a1aa"></span><span style="width:18px;height:18px;border-radius:4px;background:#fafafa"></span><span style="width:18px;height:18px;border-radius:4px;background:#34d399;margin-left:8px"></span><span style="width:18px;height:18px;border-radius:4px;background:#f87171"></span><span style="margin-left:auto;font:500 11px 'Geist Mono',monospace;color:var(--mfg)">zinc · emerald-400</span></div>
+    <div style="font-size:16px;font-weight:600;letter-spacing:-0.02em;display:inline-flex;align-items:baseline;gap:2px">budgeteer<span style="width:5px;height:5px;border-radius:1.5px;background:var(--pos);display:inline-block"></span></div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:12px"><div style="font-size:12px;font-weight:500;color:var(--mfg)">Total balance</div><div style="font-size:28px;font-weight:600;letter-spacing:-0.03em;margin-top:4px">£1,284<span style="color:var(--mfg);font-weight:500">.20</span></div><div style="margin-top:10px;font-size:11px;color:var(--mfg);display:flex;align-items:center;gap:6px"><span style="width:5px;height:5px;border-radius:999px;background:var(--pos)"></span>as of 09:38 today · synced hourly</div></div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:10px"><div style="display:flex;justify-content:space-between;font-size:12px;color:var(--mfg)"><span style="font-weight:500">This month</span><span>day 20 of 30</span></div><div style="display:flex;align-items:baseline;gap:5px;margin-top:6px"><span style="font-size:20px;font-weight:600;letter-spacing:-0.02em">£312.40</span><span style="font-size:12px;color:var(--mfg)">of £500</span></div><div style="position:relative;height:5px;border-radius:999px;background:var(--muted);margin-top:10px"><div style="width:62%;height:100%;border-radius:999px;background:var(--pos)"></div><div style="position:absolute;top:-2px;left:67%;width:2px;height:9px;background:var(--fg);opacity:.35"></div></div><div style="display:flex;justify-content:space-between;margin-top:8px;font-size:12px"><span style="color:var(--pos);font-weight:500">On track</span><span style="color:var(--mfg)">£187.60 left</span></div></div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:2px 14px;margin-top:10px"><div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px"><span><span style="font-weight:500">Transfer from Lloyds</span><span style="display:block;font-size:11px;color:var(--mfg)">Monzo Current · 09:00</span></span><span style="font-weight:500;color:var(--pos)">+£350.00</span></div><div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px"><span><span style="font-weight:500">Tesco</span><span style="display:block;font-size:11px;color:var(--mfg)">Monzo Current · 18:05</span></span><span style="font-weight:500">−£23.40</span></div><div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;font-size:13px"><span><span style="font-weight:500">Fun</span><span style="display:block;font-size:11px;color:var(--mfg)">£240 / £200</span></span><span style="font-weight:500;color:var(--neg)">£40 over</span></div></div>
+    <div style="display:flex;gap:8px;margin-top:12px"><span style="flex:1;height:36px;border-radius:8px;background:var(--primary);color:var(--pfg);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600">Connect Monzo</span><span style="flex:1;height:36px;border-radius:8px;border:1px solid var(--border);background:var(--card);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500">Sign out</span></div>
+  </div>
+</div></div></div>
+
+<div class="dv-opt" id="3b"><div class="dv-olabel"><a class="dv-oid" href="#3b">3b</a>Zinc + Green — warmer, yellow-leaning (green-600 / 400): friendlier, less "fintech"</div><div class="dv-card" style="width:760px">
+<div data-screen-label="Scheme zinc green" style="display:flex;font-family:Geist,system-ui,sans-serif;font-variant-numeric:tabular-nums">
+  <div style="flex:1;padding:18px;background:var(--page);color:var(--fg);--page:#fafafa;--card:#ffffff;--muted:#f4f4f5;--border:#e4e4e7;--fg:#09090b;--mfg:#71717a;--pos:#16a34a;--neg:#dc2626;--primary:#16a34a;--pfg:#ffffff">
+    <div style="display:flex;gap:4px;margin-bottom:14px"><span style="width:18px;height:18px;border-radius:4px;background:#fafafa;border:1px solid #e4e4e7"></span><span style="width:18px;height:18px;border-radius:4px;background:#f4f4f5"></span><span style="width:18px;height:18px;border-radius:4px;background:#e4e4e7"></span><span style="width:18px;height:18px;border-radius:4px;background:#71717a"></span><span style="width:18px;height:18px;border-radius:4px;background:#09090b"></span><span style="width:18px;height:18px;border-radius:4px;background:#16a34a;margin-left:8px"></span><span style="width:18px;height:18px;border-radius:4px;background:#dc2626"></span><span style="margin-left:auto;font:500 11px 'Geist Mono',monospace;color:var(--mfg)">zinc · green-600</span></div>
+    <div style="font-size:16px;font-weight:600;letter-spacing:-0.02em;display:inline-flex;align-items:baseline;gap:2px">budgeteer<span style="width:5px;height:5px;border-radius:1.5px;background:var(--pos);display:inline-block"></span></div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:12px"><div style="font-size:12px;font-weight:500;color:var(--mfg)">Total balance</div><div style="font-size:28px;font-weight:600;letter-spacing:-0.03em;margin-top:4px">£1,284<span style="color:var(--mfg);font-weight:500">.20</span></div><div style="margin-top:10px;font-size:11px;color:var(--mfg);display:flex;align-items:center;gap:6px"><span style="width:5px;height:5px;border-radius:999px;background:var(--pos)"></span>as of 09:38 today · synced hourly</div></div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:10px"><div style="display:flex;justify-content:space-between;font-size:12px;color:var(--mfg)"><span style="font-weight:500">This month</span><span>day 20 of 30</span></div><div style="display:flex;align-items:baseline;gap:5px;margin-top:6px"><span style="font-size:20px;font-weight:600;letter-spacing:-0.02em">£312.40</span><span style="font-size:12px;color:var(--mfg)">of £500</span></div><div style="position:relative;height:5px;border-radius:999px;background:var(--muted);margin-top:10px"><div style="width:62%;height:100%;border-radius:999px;background:var(--pos)"></div><div style="position:absolute;top:-2px;left:67%;width:2px;height:9px;background:var(--fg);opacity:.35"></div></div><div style="display:flex;justify-content:space-between;margin-top:8px;font-size:12px"><span style="color:var(--pos);font-weight:500">On track</span><span style="color:var(--mfg)">£187.60 left</span></div></div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:2px 14px;margin-top:10px"><div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px"><span><span style="font-weight:500">Transfer from Lloyds</span><span style="display:block;font-size:11px;color:var(--mfg)">Monzo Current · 09:00</span></span><span style="font-weight:500;color:var(--pos)">+£350.00</span></div><div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px"><span><span style="font-weight:500">Tesco</span><span style="display:block;font-size:11px;color:var(--mfg)">Monzo Current · 18:05</span></span><span style="font-weight:500">−£23.40</span></div><div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;font-size:13px"><span><span style="font-weight:500">Fun</span><span style="display:block;font-size:11px;color:var(--mfg)">£240 / £200</span></span><span style="font-weight:500;color:var(--neg)">£40 over</span></div></div>
+    <div style="display:flex;gap:8px;margin-top:12px"><span style="flex:1;height:36px;border-radius:8px;background:var(--primary);color:var(--pfg);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500">Connect Monzo</span><span style="flex:1;height:36px;border-radius:8px;border:1px solid var(--border);background:var(--card);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500">Sign out</span></div>
+  </div>
+  <div style="flex:1;padding:18px;background:var(--page);color:var(--fg);--page:#09090b;--card:#131316;--muted:#27272a;--border:#27272a;--fg:#fafafa;--mfg:#a1a1aa;--pos:#4ade80;--neg:#f87171;--primary:#22c55e;--pfg:#052e16">
+    <div style="display:flex;gap:4px;margin-bottom:14px"><span style="width:18px;height:18px;border-radius:4px;background:#09090b;border:1px solid #27272a"></span><span style="width:18px;height:18px;border-radius:4px;background:#131316;border:1px solid #27272a"></span><span style="width:18px;height:18px;border-radius:4px;background:#27272a"></span><span style="width:18px;height:18px;border-radius:4px;background:#a1a1aa"></span><span style="width:18px;height:18px;border-radius:4px;background:#fafafa"></span><span style="width:18px;height:18px;border-radius:4px;background:#4ade80;margin-left:8px"></span><span style="width:18px;height:18px;border-radius:4px;background:#f87171"></span><span style="margin-left:auto;font:500 11px 'Geist Mono',monospace;color:var(--mfg)">zinc · green-400</span></div>
+    <div style="font-size:16px;font-weight:600;letter-spacing:-0.02em;display:inline-flex;align-items:baseline;gap:2px">budgeteer<span style="width:5px;height:5px;border-radius:1.5px;background:var(--pos);display:inline-block"></span></div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:12px"><div style="font-size:12px;font-weight:500;color:var(--mfg)">Total balance</div><div style="font-size:28px;font-weight:600;letter-spacing:-0.03em;margin-top:4px">£1,284<span style="color:var(--mfg);font-weight:500">.20</span></div><div style="margin-top:10px;font-size:11px;color:var(--mfg);display:flex;align-items:center;gap:6px"><span style="width:5px;height:5px;border-radius:999px;background:var(--pos)"></span>as of 09:38 today · synced hourly</div></div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:10px"><div style="display:flex;justify-content:space-between;font-size:12px;color:var(--mfg)"><span style="font-weight:500">This month</span><span>day 20 of 30</span></div><div style="display:flex;align-items:baseline;gap:5px;margin-top:6px"><span style="font-size:20px;font-weight:600;letter-spacing:-0.02em">£312.40</span><span style="font-size:12px;color:var(--mfg)">of £500</span></div><div style="position:relative;height:5px;border-radius:999px;background:var(--muted);margin-top:10px"><div style="width:62%;height:100%;border-radius:999px;background:var(--pos)"></div><div style="position:absolute;top:-2px;left:67%;width:2px;height:9px;background:var(--fg);opacity:.35"></div></div><div style="display:flex;justify-content:space-between;margin-top:8px;font-size:12px"><span style="color:var(--pos);font-weight:500">On track</span><span style="color:var(--mfg)">£187.60 left</span></div></div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:2px 14px;margin-top:10px"><div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px"><span><span style="font-weight:500">Transfer from Lloyds</span><span style="display:block;font-size:11px;color:var(--mfg)">Monzo Current · 09:00</span></span><span style="font-weight:500;color:var(--pos)">+£350.00</span></div><div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px"><span><span style="font-weight:500">Tesco</span><span style="display:block;font-size:11px;color:var(--mfg)">Monzo Current · 18:05</span></span><span style="font-weight:500">−£23.40</span></div><div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;font-size:13px"><span><span style="font-weight:500">Fun</span><span style="display:block;font-size:11px;color:var(--mfg)">£240 / £200</span></span><span style="font-weight:500;color:var(--neg)">£40 over</span></div></div>
+    <div style="display:flex;gap:8px;margin-top:12px"><span style="flex:1;height:36px;border-radius:8px;background:var(--primary);color:var(--pfg);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600">Connect Monzo</span><span style="flex:1;height:36px;border-radius:8px;border:1px solid var(--border);background:var(--card);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500">Sign out</span></div>
+  </div>
+</div></div></div>
+
+<div class="dv-opt" id="3c"><div class="dv-olabel"><a class="dv-oid" href="#3c">3c</a>Zinc + Teal — cooler, blue-leaning (teal-600 / 400): more Linear, less "money green"</div><div class="dv-card" style="width:760px">
+<div data-screen-label="Scheme zinc teal" style="display:flex;font-family:Geist,system-ui,sans-serif;font-variant-numeric:tabular-nums">
+  <div style="flex:1;padding:18px;background:var(--page);color:var(--fg);--page:#fafafa;--card:#ffffff;--muted:#f4f4f5;--border:#e4e4e7;--fg:#09090b;--mfg:#71717a;--pos:#0d9488;--neg:#dc2626;--primary:#0d9488;--pfg:#ffffff">
+    <div style="display:flex;gap:4px;margin-bottom:14px"><span style="width:18px;height:18px;border-radius:4px;background:#fafafa;border:1px solid #e4e4e7"></span><span style="width:18px;height:18px;border-radius:4px;background:#f4f4f5"></span><span style="width:18px;height:18px;border-radius:4px;background:#e4e4e7"></span><span style="width:18px;height:18px;border-radius:4px;background:#71717a"></span><span style="width:18px;height:18px;border-radius:4px;background:#09090b"></span><span style="width:18px;height:18px;border-radius:4px;background:#0d9488;margin-left:8px"></span><span style="width:18px;height:18px;border-radius:4px;background:#dc2626"></span><span style="margin-left:auto;font:500 11px 'Geist Mono',monospace;color:var(--mfg)">zinc · teal-600</span></div>
+    <div style="font-size:16px;font-weight:600;letter-spacing:-0.02em;display:inline-flex;align-items:baseline;gap:2px">budgeteer<span style="width:5px;height:5px;border-radius:1.5px;background:var(--pos);display:inline-block"></span></div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:12px"><div style="font-size:12px;font-weight:500;color:var(--mfg)">Total balance</div><div style="font-size:28px;font-weight:600;letter-spacing:-0.03em;margin-top:4px">£1,284<span style="color:var(--mfg);font-weight:500">.20</span></div><div style="margin-top:10px;font-size:11px;color:var(--mfg);display:flex;align-items:center;gap:6px"><span style="width:5px;height:5px;border-radius:999px;background:var(--pos)"></span>as of 09:38 today · synced hourly</div></div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:10px"><div style="display:flex;justify-content:space-between;font-size:12px;color:var(--mfg)"><span style="font-weight:500">This month</span><span>day 20 of 30</span></div><div style="display:flex;align-items:baseline;gap:5px;margin-top:6px"><span style="font-size:20px;font-weight:600;letter-spacing:-0.02em">£312.40</span><span style="font-size:12px;color:var(--mfg)">of £500</span></div><div style="position:relative;height:5px;border-radius:999px;background:var(--muted);margin-top:10px"><div style="width:62%;height:100%;border-radius:999px;background:var(--pos)"></div><div style="position:absolute;top:-2px;left:67%;width:2px;height:9px;background:var(--fg);opacity:.35"></div></div><div style="display:flex;justify-content:space-between;margin-top:8px;font-size:12px"><span style="color:var(--pos);font-weight:500">On track</span><span style="color:var(--mfg)">£187.60 left</span></div></div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:2px 14px;margin-top:10px"><div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px"><span><span style="font-weight:500">Transfer from Lloyds</span><span style="display:block;font-size:11px;color:var(--mfg)">Monzo Current · 09:00</span></span><span style="font-weight:500;color:var(--pos)">+£350.00</span></div><div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px"><span><span style="font-weight:500">Tesco</span><span style="display:block;font-size:11px;color:var(--mfg)">Monzo Current · 18:05</span></span><span style="font-weight:500">−£23.40</span></div><div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;font-size:13px"><span><span style="font-weight:500">Fun</span><span style="display:block;font-size:11px;color:var(--mfg)">£240 / £200</span></span><span style="font-weight:500;color:var(--neg)">£40 over</span></div></div>
+    <div style="display:flex;gap:8px;margin-top:12px"><span style="flex:1;height:36px;border-radius:8px;background:var(--primary);color:var(--pfg);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500">Connect Monzo</span><span style="flex:1;height:36px;border-radius:8px;border:1px solid var(--border);background:var(--card);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500">Sign out</span></div>
+  </div>
+  <div style="flex:1;padding:18px;background:var(--page);color:var(--fg);--page:#09090b;--card:#131316;--muted:#27272a;--border:#27272a;--fg:#fafafa;--mfg:#a1a1aa;--pos:#2dd4bf;--neg:#f87171;--primary:#14b8a6;--pfg:#042f2e">
+    <div style="display:flex;gap:4px;margin-bottom:14px"><span style="width:18px;height:18px;border-radius:4px;background:#09090b;border:1px solid #27272a"></span><span style="width:18px;height:18px;border-radius:4px;background:#131316;border:1px solid #27272a"></span><span style="width:18px;height:18px;border-radius:4px;background:#27272a"></span><span style="width:18px;height:18px;border-radius:4px;background:#a1a1aa"></span><span style="width:18px;height:18px;border-radius:4px;background:#fafafa"></span><span style="width:18px;height:18px;border-radius:4px;background:#2dd4bf;margin-left:8px"></span><span style="width:18px;height:18px;border-radius:4px;background:#f87171"></span><span style="margin-left:auto;font:500 11px 'Geist Mono',monospace;color:var(--mfg)">zinc · teal-400</span></div>
+    <div style="font-size:16px;font-weight:600;letter-spacing:-0.02em;display:inline-flex;align-items:baseline;gap:2px">budgeteer<span style="width:5px;height:5px;border-radius:1.5px;background:var(--pos);display:inline-block"></span></div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:12px"><div style="font-size:12px;font-weight:500;color:var(--mfg)">Total balance</div><div style="font-size:28px;font-weight:600;letter-spacing:-0.03em;margin-top:4px">£1,284<span style="color:var(--mfg);font-weight:500">.20</span></div><div style="margin-top:10px;font-size:11px;color:var(--mfg);display:flex;align-items:center;gap:6px"><span style="width:5px;height:5px;border-radius:999px;background:var(--pos)"></span>as of 09:38 today · synced hourly</div></div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:10px"><div style="display:flex;justify-content:space-between;font-size:12px;color:var(--mfg)"><span style="font-weight:500">This month</span><span>day 20 of 30</span></div><div style="display:flex;align-items:baseline;gap:5px;margin-top:6px"><span style="font-size:20px;font-weight:600;letter-spacing:-0.02em">£312.40</span><span style="font-size:12px;color:var(--mfg)">of £500</span></div><div style="position:relative;height:5px;border-radius:999px;background:var(--muted);margin-top:10px"><div style="width:62%;height:100%;border-radius:999px;background:var(--pos)"></div><div style="position:absolute;top:-2px;left:67%;width:2px;height:9px;background:var(--fg);opacity:.35"></div></div><div style="display:flex;justify-content:space-between;margin-top:8px;font-size:12px"><span style="color:var(--pos);font-weight:500">On track</span><span style="color:var(--mfg)">£187.60 left</span></div></div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:2px 14px;margin-top:10px"><div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px"><span><span style="font-weight:500">Transfer from Lloyds</span><span style="display:block;font-size:11px;color:var(--mfg)">Monzo Current · 09:00</span></span><span style="font-weight:500;color:var(--pos)">+£350.00</span></div><div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px"><span><span style="font-weight:500">Tesco</span><span style="display:block;font-size:11px;color:var(--mfg)">Monzo Current · 18:05</span></span><span style="font-weight:500">−£23.40</span></div><div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;font-size:13px"><span><span style="font-weight:500">Fun</span><span style="display:block;font-size:11px;color:var(--mfg)">£240 / £200</span></span><span style="font-weight:500;color:var(--neg)">£40 over</span></div></div>
+    <div style="display:flex;gap:8px;margin-top:12px"><span style="flex:1;height:36px;border-radius:8px;background:var(--primary);color:var(--pfg);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600">Connect Monzo</span><span style="flex:1;height:36px;border-radius:8px;border:1px solid var(--border);background:var(--card);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500">Sign out</span></div>
+  </div>
+</div></div></div>
+
+<div class="dv-opt" id="3d"><div class="dv-olabel"><a class="dv-oid" href="#3d">3d</a>Stone + Emerald — warm neutrals instead of zinc: softer paper feel, emerald reads greener against it</div><div class="dv-card" style="width:760px">
+<div data-screen-label="Scheme stone emerald" style="display:flex;font-family:Geist,system-ui,sans-serif;font-variant-numeric:tabular-nums">
+  <div style="flex:1;padding:18px;background:var(--page);color:var(--fg);--page:#fafaf9;--card:#ffffff;--muted:#f5f5f4;--border:#e7e5e4;--fg:#0c0a09;--mfg:#78716c;--pos:#059669;--neg:#dc2626;--primary:#059669;--pfg:#ffffff">
+    <div style="display:flex;gap:4px;margin-bottom:14px"><span style="width:18px;height:18px;border-radius:4px;background:#fafaf9;border:1px solid #e7e5e4"></span><span style="width:18px;height:18px;border-radius:4px;background:#f5f5f4"></span><span style="width:18px;height:18px;border-radius:4px;background:#e7e5e4"></span><span style="width:18px;height:18px;border-radius:4px;background:#78716c"></span><span style="width:18px;height:18px;border-radius:4px;background:#0c0a09"></span><span style="width:18px;height:18px;border-radius:4px;background:#059669;margin-left:8px"></span><span style="width:18px;height:18px;border-radius:4px;background:#dc2626"></span><span style="margin-left:auto;font:500 11px 'Geist Mono',monospace;color:var(--mfg)">stone · emerald-600</span></div>
+    <div style="font-size:16px;font-weight:600;letter-spacing:-0.02em;display:inline-flex;align-items:baseline;gap:2px">budgeteer<span style="width:5px;height:5px;border-radius:1.5px;background:var(--pos);display:inline-block"></span></div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:12px"><div style="font-size:12px;font-weight:500;color:var(--mfg)">Total balance</div><div style="font-size:28px;font-weight:600;letter-spacing:-0.03em;margin-top:4px">£1,284<span style="color:var(--mfg);font-weight:500">.20</span></div><div style="margin-top:10px;font-size:11px;color:var(--mfg);display:flex;align-items:center;gap:6px"><span style="width:5px;height:5px;border-radius:999px;background:var(--pos)"></span>as of 09:38 today · synced hourly</div></div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:10px"><div style="display:flex;justify-content:space-between;font-size:12px;color:var(--mfg)"><span style="font-weight:500">This month</span><span>day 20 of 30</span></div><div style="display:flex;align-items:baseline;gap:5px;margin-top:6px"><span style="font-size:20px;font-weight:600;letter-spacing:-0.02em">£312.40</span><span style="font-size:12px;color:var(--mfg)">of £500</span></div><div style="position:relative;height:5px;border-radius:999px;background:var(--muted);margin-top:10px"><div style="width:62%;height:100%;border-radius:999px;background:var(--pos)"></div><div style="position:absolute;top:-2px;left:67%;width:2px;height:9px;background:var(--fg);opacity:.35"></div></div><div style="display:flex;justify-content:space-between;margin-top:8px;font-size:12px"><span style="color:var(--pos);font-weight:500">On track</span><span style="color:var(--mfg)">£187.60 left</span></div></div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:2px 14px;margin-top:10px"><div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px"><span><span style="font-weight:500">Transfer from Lloyds</span><span style="display:block;font-size:11px;color:var(--mfg)">Monzo Current · 09:00</span></span><span style="font-weight:500;color:var(--pos)">+£350.00</span></div><div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px"><span><span style="font-weight:500">Tesco</span><span style="display:block;font-size:11px;color:var(--mfg)">Monzo Current · 18:05</span></span><span style="font-weight:500">−£23.40</span></div><div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;font-size:13px"><span><span style="font-weight:500">Fun</span><span style="display:block;font-size:11px;color:var(--mfg)">£240 / £200</span></span><span style="font-weight:500;color:var(--neg)">£40 over</span></div></div>
+    <div style="display:flex;gap:8px;margin-top:12px"><span style="flex:1;height:36px;border-radius:8px;background:var(--primary);color:var(--pfg);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500">Connect Monzo</span><span style="flex:1;height:36px;border-radius:8px;border:1px solid var(--border);background:var(--card);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500">Sign out</span></div>
+  </div>
+  <div style="flex:1;padding:18px;background:var(--page);color:var(--fg);--page:#0c0a09;--card:#171412;--muted:#292524;--border:#292524;--fg:#fafaf9;--mfg:#a8a29e;--pos:#34d399;--neg:#f87171;--primary:#10b981;--pfg:#052e16">
+    <div style="display:flex;gap:4px;margin-bottom:14px"><span style="width:18px;height:18px;border-radius:4px;background:#0c0a09;border:1px solid #292524"></span><span style="width:18px;height:18px;border-radius:4px;background:#171412;border:1px solid #292524"></span><span style="width:18px;height:18px;border-radius:4px;background:#292524"></span><span style="width:18px;height:18px;border-radius:4px;background:#a8a29e"></span><span style="width:18px;height:18px;border-radius:4px;background:#fafaf9"></span><span style="width:18px;height:18px;border-radius:4px;background:#34d399;margin-left:8px"></span><span style="width:18px;height:18px;border-radius:4px;background:#f87171"></span><span style="margin-left:auto;font:500 11px 'Geist Mono',monospace;color:var(--mfg)">stone · emerald-400</span></div>
+    <div style="font-size:16px;font-weight:600;letter-spacing:-0.02em;display:inline-flex;align-items:baseline;gap:2px">budgeteer<span style="width:5px;height:5px;border-radius:1.5px;background:var(--pos);display:inline-block"></span></div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:12px"><div style="font-size:12px;font-weight:500;color:var(--mfg)">Total balance</div><div style="font-size:28px;font-weight:600;letter-spacing:-0.03em;margin-top:4px">£1,284<span style="color:var(--mfg);font-weight:500">.20</span></div><div style="margin-top:10px;font-size:11px;color:var(--mfg);display:flex;align-items:center;gap:6px"><span style="width:5px;height:5px;border-radius:999px;background:var(--pos)"></span>as of 09:38 today · synced hourly</div></div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:10px"><div style="display:flex;justify-content:space-between;font-size:12px;color:var(--mfg)"><span style="font-weight:500">This month</span><span>day 20 of 30</span></div><div style="display:flex;align-items:baseline;gap:5px;margin-top:6px"><span style="font-size:20px;font-weight:600;letter-spacing:-0.02em">£312.40</span><span style="font-size:12px;color:var(--mfg)">of £500</span></div><div style="position:relative;height:5px;border-radius:999px;background:var(--muted);margin-top:10px"><div style="width:62%;height:100%;border-radius:999px;background:var(--pos)"></div><div style="position:absolute;top:-2px;left:67%;width:2px;height:9px;background:var(--fg);opacity:.35"></div></div><div style="display:flex;justify-content:space-between;margin-top:8px;font-size:12px"><span style="color:var(--pos);font-weight:500">On track</span><span style="color:var(--mfg)">£187.60 left</span></div></div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:2px 14px;margin-top:10px"><div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px"><span><span style="font-weight:500">Transfer from Lloyds</span><span style="display:block;font-size:11px;color:var(--mfg)">Monzo Current · 09:00</span></span><span style="font-weight:500;color:var(--pos)">+£350.00</span></div><div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px"><span><span style="font-weight:500">Tesco</span><span style="display:block;font-size:11px;color:var(--mfg)">Monzo Current · 18:05</span></span><span style="font-weight:500">−£23.40</span></div><div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;font-size:13px"><span><span style="font-weight:500">Fun</span><span style="display:block;font-size:11px;color:var(--mfg)">£240 / £200</span></span><span style="font-weight:500;color:var(--neg)">£40 over</span></div></div>
+    <div style="display:flex;gap:8px;margin-top:12px"><span style="flex:1;height:36px;border-radius:8px;background:var(--primary);color:var(--pfg);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600">Connect Monzo</span><span style="flex:1;height:36px;border-radius:8px;border:1px solid var(--border);background:var(--card);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500">Sign out</span></div>
+  </div>
+</div></div></div>
+
+<div class="dv-opt" id="3e"><div class="dv-olabel"><a class="dv-oid" href="#3e">3e</a>Zinc + Emerald, ink-first — primary buttons are foreground ink; emerald is purely semantic (money + on-track only)</div><div class="dv-card" style="width:760px">
+<div data-screen-label="Scheme ink first" style="display:flex;font-family:Geist,system-ui,sans-serif;font-variant-numeric:tabular-nums">
+  <div style="flex:1;padding:18px;background:var(--page);color:var(--fg);--page:#fafafa;--card:#ffffff;--muted:#f4f4f5;--border:#e4e4e7;--fg:#09090b;--mfg:#71717a;--pos:#059669;--neg:#dc2626;--primary:#18181b;--pfg:#fafafa">
+    <div style="display:flex;gap:4px;margin-bottom:14px"><span style="width:18px;height:18px;border-radius:4px;background:#fafafa;border:1px solid #e4e4e7"></span><span style="width:18px;height:18px;border-radius:4px;background:#f4f4f5"></span><span style="width:18px;height:18px;border-radius:4px;background:#e4e4e7"></span><span style="width:18px;height:18px;border-radius:4px;background:#71717a"></span><span style="width:18px;height:18px;border-radius:4px;background:#18181b"></span><span style="width:18px;height:18px;border-radius:4px;background:#059669;margin-left:8px"></span><span style="width:18px;height:18px;border-radius:4px;background:#dc2626"></span><span style="margin-left:auto;font:500 11px 'Geist Mono',monospace;color:var(--mfg)">primary = zinc-900</span></div>
+    <div style="font-size:16px;font-weight:600;letter-spacing:-0.02em;display:inline-flex;align-items:baseline;gap:2px">budgeteer<span style="width:5px;height:5px;border-radius:1.5px;background:var(--fg);display:inline-block"></span></div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:12px"><div style="font-size:12px;font-weight:500;color:var(--mfg)">Total balance</div><div style="font-size:28px;font-weight:600;letter-spacing:-0.03em;margin-top:4px">£1,284<span style="color:var(--mfg);font-weight:500">.20</span></div><div style="margin-top:10px;font-size:11px;color:var(--mfg)">as of 09:38 today · synced hourly</div></div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:10px"><div style="display:flex;justify-content:space-between;font-size:12px;color:var(--mfg)"><span style="font-weight:500">This month</span><span>day 20 of 30</span></div><div style="display:flex;align-items:baseline;gap:5px;margin-top:6px"><span style="font-size:20px;font-weight:600;letter-spacing:-0.02em">£312.40</span><span style="font-size:12px;color:var(--mfg)">of £500</span></div><div style="position:relative;height:5px;border-radius:999px;background:var(--muted);margin-top:10px"><div style="width:62%;height:100%;border-radius:999px;background:var(--pos)"></div><div style="position:absolute;top:-2px;left:67%;width:2px;height:9px;background:var(--fg);opacity:.35"></div></div><div style="display:flex;justify-content:space-between;margin-top:8px;font-size:12px"><span style="color:var(--pos);font-weight:500">On track</span><span style="color:var(--mfg)">£187.60 left</span></div></div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:2px 14px;margin-top:10px"><div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px"><span><span style="font-weight:500">Transfer from Lloyds</span><span style="display:block;font-size:11px;color:var(--mfg)">Monzo Current · 09:00</span></span><span style="font-weight:500;color:var(--pos)">+£350.00</span></div><div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px"><span><span style="font-weight:500">Tesco</span><span style="display:block;font-size:11px;color:var(--mfg)">Monzo Current · 18:05</span></span><span style="font-weight:500">−£23.40</span></div><div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;font-size:13px"><span><span style="font-weight:500">Fun</span><span style="display:block;font-size:11px;color:var(--mfg)">£240 / £200</span></span><span style="font-weight:500;color:var(--neg)">£40 over</span></div></div>
+    <div style="display:flex;gap:8px;margin-top:12px"><span style="flex:1;height:36px;border-radius:8px;background:var(--primary);color:var(--pfg);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500">Connect Monzo</span><span style="flex:1;height:36px;border-radius:8px;border:1px solid var(--border);background:var(--card);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500">Sign out</span></div>
+  </div>
+  <div style="flex:1;padding:18px;background:var(--page);color:var(--fg);--page:#09090b;--card:#131316;--muted:#27272a;--border:#27272a;--fg:#fafafa;--mfg:#a1a1aa;--pos:#34d399;--neg:#f87171;--primary:#fafafa;--pfg:#09090b">
+    <div style="display:flex;gap:4px;margin-bottom:14px"><span style="width:18px;height:18px;border-radius:4px;background:#09090b;border:1px solid #27272a"></span><span style="width:18px;height:18px;border-radius:4px;background:#131316;border:1px solid #27272a"></span><span style="width:18px;height:18px;border-radius:4px;background:#27272a"></span><span style="width:18px;height:18px;border-radius:4px;background:#a1a1aa"></span><span style="width:18px;height:18px;border-radius:4px;background:#fafafa"></span><span style="width:18px;height:18px;border-radius:4px;background:#34d399;margin-left:8px"></span><span style="width:18px;height:18px;border-radius:4px;background:#f87171"></span><span style="margin-left:auto;font:500 11px 'Geist Mono',monospace;color:var(--mfg)">primary = zinc-50</span></div>
+    <div style="font-size:16px;font-weight:600;letter-spacing:-0.02em;display:inline-flex;align-items:baseline;gap:2px">budgeteer<span style="width:5px;height:5px;border-radius:1.5px;background:var(--fg);display:inline-block"></span></div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:12px"><div style="font-size:12px;font-weight:500;color:var(--mfg)">Total balance</div><div style="font-size:28px;font-weight:600;letter-spacing:-0.03em;margin-top:4px">£1,284<span style="color:var(--mfg);font-weight:500">.20</span></div><div style="margin-top:10px;font-size:11px;color:var(--mfg)">as of 09:38 today · synced hourly</div></div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:10px"><div style="display:flex;justify-content:space-between;font-size:12px;color:var(--mfg)"><span style="font-weight:500">This month</span><span>day 20 of 30</span></div><div style="display:flex;align-items:baseline;gap:5px;margin-top:6px"><span style="font-size:20px;font-weight:600;letter-spacing:-0.02em">£312.40</span><span style="font-size:12px;color:var(--mfg)">of £500</span></div><div style="position:relative;height:5px;border-radius:999px;background:var(--muted);margin-top:10px"><div style="width:62%;height:100%;border-radius:999px;background:var(--pos)"></div><div style="position:absolute;top:-2px;left:67%;width:2px;height:9px;background:var(--fg);opacity:.35"></div></div><div style="display:flex;justify-content:space-between;margin-top:8px;font-size:12px"><span style="color:var(--pos);font-weight:500">On track</span><span style="color:var(--mfg)">£187.60 left</span></div></div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:2px 14px;margin-top:10px"><div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px"><span><span style="font-weight:500">Transfer from Lloyds</span><span style="display:block;font-size:11px;color:var(--mfg)">Monzo Current · 09:00</span></span><span style="font-weight:500;color:var(--pos)">+£350.00</span></div><div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px"><span><span style="font-weight:500">Tesco</span><span style="display:block;font-size:11px;color:var(--mfg)">Monzo Current · 18:05</span></span><span style="font-weight:500">−£23.40</span></div><div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;font-size:13px"><span><span style="font-weight:500">Fun</span><span style="display:block;font-size:11px;color:var(--mfg)">£240 / £200</span></span><span style="font-weight:500;color:var(--neg)">£40 over</span></div></div>
+    <div style="display:flex;gap:8px;margin-top:12px"><span style="flex:1;height:36px;border-radius:8px;background:var(--primary);color:var(--pfg);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600">Connect Monzo</span><span style="flex:1;height:36px;border-radius:8px;border:1px solid var(--border);background:var(--card);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500">Sign out</span></div>
+  </div>
+</div></div></div>
+
+</div>
+<p class="dv-next">Try next: "apply <a class="dv-oid" href="#3d">3d</a> to all of turn 1" · "<a class="dv-oid" href="#3e">3e</a> but keep the emerald wordmark dot" · "show <a class="dv-oid" href="#3a">3a</a> vs <a class="dv-oid" href="#3c">3c</a> on the full Pots screen <a class="dv-oid" href="#2b">2b</a>"</p>
+</section>
+
+<section class="dv-turn" id="t2">
+<div class="dv-thd"><a class="dv-tid" href="#t2">2</a><span class="dv-tname">Targets, Pots tree, month-end — extends <a class="dv-oid" href="#1a">1a</a></span></div>
+<div style="max-width:860px;margin:0 0 28px;font:13px/1.6 Geist,system-ui,sans-serif;color:rgba(0,0,0,.65)">Reasoning: the target bar carries a small tick at "today's pace" (day 20 of 30) so on-track reads as <em>bar behind tick</em>, not just "under 100%". Red appears only once the bar is full. Pots obey §2a — parents are computed sums (labelled), and the header totals reconcile to real cash. Month-end never moves money: the CTA records an allocation; the footnote points to Monzo for the real transfer.</div>
+<div class="dv-opts">
+
+<div class="dv-opt" id="2a"><div class="dv-olabel"><a class="dv-oid" href="#2a">2a</a>This month vs target — on track · over · no target</div><div class="dv-card" style="padding:16px;background:#fafafa">
+<div data-screen-label="Target card variants" style="display:flex;gap:16px;font-family:Geist,system-ui,sans-serif;font-variant-numeric:tabular-nums;color:var(--fg);--card:#ffffff;--muted:#f4f4f5;--border:#e4e4e7;--fg:#09090b;--mfg:#71717a;--pos:#059669;--posbg:#ecfdf5;--neg:#dc2626;--negbg:#fef2f2">
+  <div style="width:326px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px">
+    <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:13px;font-weight:500;color:var(--mfg)">This month</span><span style="font-size:11px;color:var(--mfg)">day 20 of 30</span></div>
+    <div style="display:flex;align-items:baseline;gap:6px;margin-top:10px"><span style="font-size:28px;font-weight:600;letter-spacing:-0.025em;line-height:1">£312.40</span><span style="font-size:14px;color:var(--mfg)">of £500</span></div>
+    <div style="position:relative;height:6px;border-radius:999px;background:var(--muted);margin-top:16px"><div style="width:62%;height:100%;border-radius:999px;background:var(--pos)"></div><div style="position:absolute;top:-3px;left:67%;width:2px;height:12px;border-radius:1px;background:var(--fg);opacity:.35"></div></div>
+    <div style="display:flex;justify-content:space-between;margin-top:10px;font-size:13px"><span style="display:inline-flex;align-items:center;gap:6px;color:var(--pos);font-weight:500"><span style="width:6px;height:6px;border-radius:999px;background:var(--pos)"></span>On track</span><span style="color:var(--mfg)">£187.60 left · £18.76/day</span></div>
+  </div>
+  <div style="width:326px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px">
+    <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:13px;font-weight:500;color:var(--mfg)">This month</span><span style="font-size:11px;color:var(--mfg)">day 20 of 30</span></div>
+    <div style="display:flex;align-items:baseline;gap:6px;margin-top:10px"><span style="font-size:28px;font-weight:600;letter-spacing:-0.025em;line-height:1">£541.20</span><span style="font-size:14px;color:var(--mfg)">of £500</span></div>
+    <div style="position:relative;height:6px;border-radius:999px;background:var(--muted);margin-top:16px"><div style="width:100%;height:100%;border-radius:999px;background:var(--neg)"></div><div style="position:absolute;top:-3px;left:67%;width:2px;height:12px;border-radius:1px;background:#fff;opacity:.9"></div></div>
+    <div style="display:flex;justify-content:space-between;margin-top:10px;font-size:13px"><span style="display:inline-flex;align-items:center;gap:6px;color:var(--neg);font-weight:500"><span style="width:6px;height:6px;border-radius:999px;background:var(--neg)"></span>£41.20 over</span><span style="color:var(--mfg)">10 days to go</span></div>
+  </div>
+  <div style="width:326px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px">
+    <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:13px;font-weight:500;color:var(--mfg)">This month</span><span style="font-size:11px;color:var(--mfg)">1–20 Sep</span></div>
+    <div style="display:flex;align-items:baseline;gap:6px;margin-top:10px"><span style="font-size:28px;font-weight:600;letter-spacing:-0.025em;line-height:1">£312.40</span><span style="font-size:14px;color:var(--mfg)">out</span></div>
+    <div style="height:6px;border-radius:999px;background:var(--muted);margin-top:16px;border:1px dashed var(--border);box-sizing:border-box;background:transparent"></div>
+    <div style="display:flex;justify-content:space-between;margin-top:10px;font-size:13px"><span style="color:var(--mfg)">No target yet</span><span style="color:var(--fg);font-weight:500">Set a target →</span></div>
+  </div>
+</div></div></div>
+
+<div class="dv-opt" id="2b"><div class="dv-olabel"><a class="dv-oid" href="#2b">2b</a>Pots — tree with rollups, mobile</div><div class="dv-card">
+<div data-screen-label="Pots mobile" style="width:390px;height:844px;display:flex;flex-direction:column;position:relative;overflow:hidden;font-family:Geist,system-ui,sans-serif;font-variant-numeric:tabular-nums;background:var(--page);color:var(--fg);--page:#fafafa;--card:#ffffff;--muted:#f4f4f5;--border:#e4e4e7;--fg:#09090b;--mfg:#71717a;--pos:#059669;--posbg:#ecfdf5;--neg:#dc2626;--primary:#059669;--pfg:#ffffff">
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 22px 0;font-size:15px;font-weight:600"><span>9:41</span><span style="width:24px;height:11px;border:1.5px solid var(--fg);border-radius:3px;display:inline-block;position:relative;box-sizing:border-box"><span style="position:absolute;inset:2px;background:var(--fg);border-radius:1px"></span></span></div>
+  <div style="display:flex;justify-content:space-between;align-items:flex-end;padding:18px 20px 12px">
+    <div><div style="font-size:24px;font-weight:600;letter-spacing:-0.02em">Pots</div><div style="font-size:13px;color:var(--mfg);margin-top:2px">September targets</div></div>
+    <span style="height:32px;padding:0 12px;display:inline-flex;align-items:center;gap:6px;border-radius:8px;border:1px solid var(--border);background:var(--card);font-size:13px;font-weight:500;box-shadow:0 1px 2px rgba(0,0,0,.04)">+ New pot</span>
+  </div>
+  <div style="flex:1;overflow:hidden;padding:0 16px;display:grid;gap:12px;align-content:start">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 18px;display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:8px;font-size:12px;color:var(--mfg)">
+      <span><span style="display:block;font-size:16px;font-weight:600;color:var(--fg);letter-spacing:-0.01em">£1,140.00</span>in pots</span><span style="font-size:14px">+</span>
+      <span><span style="display:block;font-size:16px;font-weight:600;color:var(--fg);letter-spacing:-0.01em">£144.20</span>unallocated</span><span style="font-size:14px">=</span>
+      <span><span style="display:block;font-size:16px;font-weight:600;color:var(--fg);letter-spacing:-0.01em">£1,284.20</span>real balance</span>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:4px 18px">
+      <div style="padding:14px 0 12px;border-bottom:1px solid var(--border)">
+        <div style="display:flex;align-items:center;gap:8px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" style="color:var(--mfg);stroke-linecap:round;stroke-linejoin:round"><path d="M6 9l6 6 6-6"></path></svg><span style="flex:1;font-size:15px;font-weight:600;letter-spacing:-0.01em">Essentials</span><span style="font-size:15px;font-weight:600">£320.00</span><span style="font-size:13px;color:var(--mfg)">/ £360</span></div>
+        <div style="position:relative;height:5px;border-radius:999px;background:var(--muted);margin:10px 0 0 22px"><div style="width:89%;height:100%;border-radius:999px;background:var(--pos)"></div></div>
+        <div style="margin:6px 0 0 22px;font-size:12px;color:var(--mfg)">Sum of 2 pots · £40.00 headroom</div>
+      </div>
+      <div style="position:relative;padding-left:22px">
+        <div style="position:absolute;left:6px;top:0;bottom:16px;width:1px;background:var(--border)"></div>
+        <div style="padding:12px 0;border-bottom:1px solid var(--border);position:relative">
+          <div style="position:absolute;left:-16px;top:22px;width:12px;height:1px;background:var(--border)"></div>
+          <div style="display:flex;align-items:center;gap:8px"><span style="flex:1;font-size:14px;font-weight:500">Gas</span><span style="font-size:14px;font-weight:500">£180.00</span><span style="font-size:13px;color:var(--mfg)">/ £200</span></div>
+          <div style="height:4px;border-radius:999px;background:var(--muted);margin-top:8px"><div style="width:90%;height:100%;border-radius:999px;background:var(--pos)"></div></div>
+        </div>
+        <div style="padding:12px 0 14px;position:relative">
+          <div style="position:absolute;left:-16px;top:22px;width:12px;height:1px;background:var(--border)"></div>
+          <div style="display:flex;align-items:center;gap:8px"><span style="flex:1;font-size:14px;font-weight:500">Electric</span><span style="font-size:14px;font-weight:500">£140.00</span><span style="font-size:13px;color:var(--mfg)">/ £160</span></div>
+          <div style="height:4px;border-radius:999px;background:var(--muted);margin-top:8px"><div style="width:87%;height:100%;border-radius:999px;background:var(--pos)"></div></div>
+        </div>
+      </div>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 18px">
+      <div style="display:flex;align-items:center;gap:8px"><span style="flex:1;font-size:15px;font-weight:600;letter-spacing:-0.01em">Fun</span><span style="font-size:15px;font-weight:600;color:var(--neg)">£240.00</span><span style="font-size:13px;color:var(--mfg)">/ £200</span></div>
+      <div style="height:5px;border-radius:999px;background:var(--muted);margin-top:10px"><div style="width:100%;height:100%;border-radius:999px;background:var(--neg)"></div></div>
+      <div style="margin-top:6px;font-size:12px;color:var(--neg);font-weight:500">£40.00 over target</div>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 18px">
+      <div style="display:flex;align-items:center;gap:8px"><span style="flex:1;font-size:15px;font-weight:600;letter-spacing:-0.01em">Rainy day</span><span style="font-size:15px;font-weight:600">£580.00</span><span style="font-size:13px;color:var(--mfg)">/ £1,000</span></div>
+      <div style="height:5px;border-radius:999px;background:var(--muted);margin-top:10px"><div style="width:58%;height:100%;border-radius:999px;background:var(--pos)"></div></div>
+      <div style="margin-top:6px;font-size:12px;color:var(--mfg)">Saving goal · £420.00 to go</div>
+    </div>
+  </div>
+  <div style="display:flex;border-top:1px solid var(--border);background:var(--card);padding:8px 8px 22px">
+    <span style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0;color:var(--mfg)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect></svg><span style="font-size:11px;font-weight:500">Overview</span></span>
+    <span style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0;color:var(--mfg)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" style="stroke-linecap:round"><path d="M4 7h16M4 12h16M4 17h10"></path></svg><span style="font-size:11px;font-weight:500">Transactions</span></span>
+    <span style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0;color:var(--fg)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" style="stroke-linecap:round"><rect x="3" y="6" width="18" height="14" rx="2.5"></rect><path d="M3 11h18M15 15h2"></path></svg><span style="font-size:11px;font-weight:500">Pots</span></span>
+    <span style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0;color:var(--mfg)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" style="stroke-linecap:round"><path d="M4 7h16M4 17h16"></path><circle cx="9" cy="7" r="2.5" fill="var(--card)"></circle><circle cx="15" cy="17" r="2.5" fill="var(--card)"></circle></svg><span style="font-size:11px;font-weight:500">Settings</span></span>
+  </div>
+</div></div></div>
+
+<div class="dv-opt" id="2c"><div class="dv-olabel"><a class="dv-oid" href="#2c">2c</a>Month-end — remainder → savings, mobile</div><div class="dv-card">
+<div data-screen-label="Month end mobile" style="width:390px;height:844px;display:flex;flex-direction:column;position:relative;overflow:hidden;font-family:Geist,system-ui,sans-serif;font-variant-numeric:tabular-nums;background:var(--page);color:var(--fg);--page:#fafafa;--card:#ffffff;--muted:#f4f4f5;--border:#e4e4e7;--fg:#09090b;--mfg:#71717a;--pos:#059669;--posbg:#ecfdf5;--neg:#dc2626;--primary:#059669;--pfg:#ffffff">
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 22px 0;font-size:15px;font-weight:600"><span>9:41</span><span style="width:24px;height:11px;border:1.5px solid var(--fg);border-radius:3px;display:inline-block;position:relative;box-sizing:border-box"><span style="position:absolute;inset:2px;background:var(--fg);border-radius:1px"></span></span></div>
+  <div style="display:flex;align-items:center;gap:10px;padding:18px 20px 12px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--mfg);stroke-linecap:round;stroke-linejoin:round"><path d="M15 6l-6 6 6 6"></path></svg><span style="font-size:17px;font-weight:600;letter-spacing:-0.01em">September in review</span></div>
+  <div style="flex:1;overflow:hidden;padding:0 16px;display:grid;gap:12px;align-content:start">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px 18px 18px;text-align:center">
+      <div style="font-size:13px;font-weight:500;color:var(--mfg)">Left over this month</div>
+      <div style="font-size:44px;font-weight:600;letter-spacing:-0.03em;line-height:1.05;margin-top:8px;color:var(--pos)">£143.60</div>
+      <div style="display:inline-flex;align-items:center;gap:6px;margin-top:12px;font-size:12px;font-weight:500;color:var(--pos);background:var(--posbg);padding:4px 10px;border-radius:999px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="stroke-linecap:round;stroke-linejoin:round"><path d="M5 12l5 5L20 7"></path></svg>Under target · 3rd month running</div>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:6px 18px">
+      <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);font-size:14px"><span style="color:var(--mfg)">Into Monzo, 1 Sep</span><span style="font-weight:500;color:var(--pos)">+£500.00</span></div>
+      <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);font-size:14px"><span style="color:var(--mfg)">Spent, 1–30 Sep</span><span style="font-weight:500">−£356.40</span></div>
+      <div style="display:flex;justify-content:space-between;padding:12px 0;font-size:14px"><span style="font-weight:500">Remainder</span><span style="font-weight:600">£143.60</span></div>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:6px 18px">
+      <div style="font-size:12px;font-weight:500;color:var(--mfg);padding:10px 0 4px">Against targets</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:14px"><span>Essentials</span><span style="display:flex;gap:10px;align-items:baseline"><span style="color:var(--mfg);font-size:13px">£320 / £360</span><span style="font-weight:500;color:var(--pos);min-width:64px;text-align:right">£40 under</span></span></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:14px"><span>Fun</span><span style="display:flex;gap:10px;align-items:baseline"><span style="color:var(--mfg);font-size:13px">£240 / £200</span><span style="font-weight:500;color:var(--neg);min-width:64px;text-align:right">£40 over</span></span></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;font-size:14px"><span>Unallocated</span><span style="display:flex;gap:10px;align-items:baseline"><span style="color:var(--mfg);font-size:13px">£143.60</span><span style="font-weight:500;color:var(--mfg);min-width:64px;text-align:right">→ pot</span></span></div>
+    </div>
+  </div>
+  <div style="padding:12px 20px 34px;display:grid;gap:12px;border-top:1px solid var(--border);background:var(--card)">
+    <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px"><span style="color:var(--mfg)">Send remainder to</span><span style="display:inline-flex;align-items:center;gap:6px;font-weight:500">Rainy day<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--mfg);stroke-linecap:round;stroke-linejoin:round"><path d="M6 9l6 6 6-6"></path></svg></span></div>
+    <span style="height:44px;border-radius:10px;background:var(--primary);color:var(--pfg);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:500">Allocate £143.60 to Rainy day</span>
+    <span style="text-align:center;font-size:12px;color:var(--mfg);line-height:1.5">Records the allocation here. Move the money in Monzo when you're ready — budgeteer never moves it for you.</span>
+  </div>
+</div></div></div>
+
+</div>
+<p class="dv-next">Try next: "put the on-track card from <a class="dv-oid" href="#2a">2a</a> into <a class="dv-oid" href="#1a">1a</a> and <a class="dv-oid" href="#1l">1l</a>" · "desktop version of <a class="dv-oid" href="#2b">2b</a> with pots as a two-column tree" · "celebratory state for <a class="dv-oid" href="#2c">2c</a> after allocating"</p>
+</section>
+
+<section class="dv-turn" id="t1">
+<div class="dv-thd"><a class="dv-tid" href="#t1">1</a><span class="dv-tname">budgeteer — Overview · Transactions · Connect · Login, mobile-first, light + dark, desktop</span></div>
+<div style="max-width:860px;margin:0 0 28px;font:13px/1.6 Geist,system-ui,sans-serif;color:rgba(0,0,0,.65);display:grid;gap:8px">
+<div><strong style="color:#1a1a1a">Reading of the brief.</strong> Screens map 1:1 to Session-02 decisions 26–32. Tokens used: <code style="font:12px 'Geist Mono',monospace">background · card · muted · border · foreground · muted-foreground · primary (emerald) · money-positive (emerald-600 light / emerald-400 dark)</code>. Class names below are shadcn-flavoured; colours are shown as literal values only so the mock renders — swap to your <code style="font:12px 'Geist Mono',monospace">index.css</code> tokens on adoption.</div>
+<div><strong style="color:#1a1a1a">Assumptions.</strong> Monzo-only v1 (two accounts: Current + Savings pot as chips). Summary card shows in/out only — a target row is left visually "reserved" for the pots epic. Accent is rationed: emerald appears only on income amounts, the primary CTA, the on-track/success states and the wordmark's terminal dot. Active nav is foreground zinc, not emerald. Tabular figures everywhere numbers stack.</div>
+<div><strong style="color:#1a1a1a">Tweaks</strong> (panel): tab labels on/off · date grouping on/off · income sign style.</div>
+</div>
+
+<div class="dv-opts">
+
+<div class="dv-opt" id="1a"><div class="dv-olabel"><a class="dv-oid" href="#1a">1a</a>Overview — mobile, light</div><div class="dv-card">
+<div data-screen-label="Overview mobile light" style="width:390px;height:844px;display:flex;flex-direction:column;position:relative;overflow:hidden;font-family:Geist,system-ui,sans-serif;font-variant-numeric:tabular-nums;background:var(--page);color:var(--fg);--page:#fafafa;--card:#ffffff;--muted:#f4f4f5;--border:#e4e4e7;--fg:#09090b;--mfg:#71717a;--pos:#059669;--posbg:#ecfdf5;--primary:#059669;--pfg:#ffffff">
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 22px 0;font-size:15px;font-weight:600"><span>9:41</span><span style="width:24px;height:11px;border:1.5px solid var(--fg);border-radius:3px;display:inline-block;position:relative;box-sizing:border-box"><span style="position:absolute;inset:2px;background:var(--fg);border-radius:1px"></span></span></div>
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 20px 12px"><span style="font-size:20px;font-weight:600;letter-spacing:-0.02em;display:inline-flex;align-items:baseline;gap:2px">budgeteer<span style="width:6px;height:6px;border-radius:2px;background:var(--pos);display:inline-block"></span></span><span style="width:32px;height:32px;border-radius:999px;background:var(--muted);border:1px solid var(--border);display:grid;place-items:center;font-size:12px;font-weight:600;color:var(--mfg)">A</span></div>
+  <div style="flex:1;overflow:hidden;padding:0 16px;display:grid;gap:12px;align-content:start">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 18px 16px">
+      <div style="font-size:13px;font-weight:500;color:var(--mfg)">Total balance</div>
+      <div style="font-size:38px;font-weight:600;letter-spacing:-0.03em;line-height:1.1;margin-top:6px">£1,284<span style="color:var(--mfg);font-weight:500">.20</span></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">
+        <span style="display:inline-flex;gap:6px;align-items:center;font-size:13px;padding:6px 10px;border-radius:999px;background:var(--muted);border:1px solid var(--border)"><span style="color:var(--mfg)">Monzo Current</span><span style="font-weight:500">£412.20</span></span>
+        <span style="display:inline-flex;gap:6px;align-items:center;font-size:13px;padding:6px 10px;border-radius:999px;background:var(--muted);border:1px solid var(--border)"><span style="color:var(--mfg)">Monzo Savings</span><span style="font-weight:500">£872.00</span></span>
+      </div>
+      <div style="margin-top:14px;font-size:12px;color:var(--mfg);display:flex;align-items:center;gap:6px"><span style="width:6px;height:6px;border-radius:999px;background:var(--pos)"></span>as of 09:38 today · synced hourly</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:13px;font-weight:500;color:var(--mfg)">This month</span><span style="font-size:11px;color:var(--mfg)">1–20 Sep</span></div>
+        <div style="font-size:24px;font-weight:600;letter-spacing:-0.02em;margin-top:10px">£312.40</div>
+        <div style="font-size:12px;color:var(--mfg);margin-top:2px">out</div>
+        <div style="height:1px;background:var(--border);margin:12px 0 10px"></div>
+        <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--mfg)">in</span><span style="color:var(--pos);font-weight:500">+£350.00</span></div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:13px;font-weight:500;color:var(--mfg)">This week</span><span style="font-size:11px;color:var(--mfg)">Mon–Sun</span></div>
+        <div style="font-size:24px;font-weight:600;letter-spacing:-0.02em;margin-top:10px">£84.10</div>
+        <div style="font-size:12px;color:var(--mfg);margin-top:2px">out</div>
+        <div style="height:1px;background:var(--border);margin:12px 0 10px"></div>
+        <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--mfg)">in</span><span style="font-weight:500">£0.00</span></div>
+      </div>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:6px 18px 4px">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0 4px"><span style="font-size:15px;font-weight:600;letter-spacing:-0.01em">Recent</span><span style="font-size:13px;font-weight:500;color:var(--mfg)">See all →</span></div>
+      <sc-for list="{{ recent }}" as="g" hint-placeholder-count="2">
+        <div>
+          <sc-if value="{{ g.label }}" hint-placeholder-val="{{ true }}"><div style="font-size:12px;font-weight:500;color:var(--mfg);padding:12px 0 2px;letter-spacing:0.01em">{{ g.label }}</div></sc-if>
+          <sc-for list="{{ g.rows }}" as="r" hint-placeholder-count="2">
+            <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)">
+              <span style="width:36px;height:36px;border-radius:999px;background:var(--muted);display:grid;place-items:center;font-size:13px;font-weight:600;color:var(--mfg);flex:none">{{ r.initial }}</span>
+              <span style="flex:1;min-width:0"><span style="display:block;font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.name }}</span><span style="display:block;font-size:12px;color:var(--mfg);margin-top:2px">{{ r.sub }}</span></span>
+              <span style="text-align:right"><span style="display:block;font-size:14px;font-weight:500;color:{{ r.color }}">{{ r.amount }}</span><sc-if value="{{ r.pending }}" hint-placeholder-val="{{ false }}"><span style="display:inline-block;margin-top:3px;font-size:10px;font-weight:500;padding:1px 6px;border-radius:999px;border:1px solid var(--border);color:var(--mfg)">Pending</span></sc-if></span>
+            </div>
+          </sc-for>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+  <div style="display:flex;border-top:1px solid var(--border);background:var(--card);padding:8px 8px 22px">
+    <span style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0;color:var(--fg)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect></svg><sc-if value="{{ showTabLabels }}" hint-placeholder-val="{{ true }}"><span style="font-size:11px;font-weight:500">Overview</span></sc-if></span>
+    <span style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0;color:var(--mfg)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" style="stroke-linecap:round"><path d="M4 7h16M4 12h16M4 17h10"></path></svg><sc-if value="{{ showTabLabels }}" hint-placeholder-val="{{ true }}"><span style="font-size:11px;font-weight:500">Transactions</span></sc-if></span>
+    <span style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0;color:var(--mfg)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" style="stroke-linecap:round"><path d="M4 7h16M4 17h16"></path><circle cx="9" cy="7" r="2.5" fill="var(--card)"></circle><circle cx="15" cy="17" r="2.5" fill="var(--card)"></circle></svg><sc-if value="{{ showTabLabels }}" hint-placeholder-val="{{ true }}"><span style="font-size:11px;font-weight:500">Settings</span></sc-if></span>
+  </div>
+</div></div></div>
+
+<div class="dv-opt" id="1b"><div class="dv-olabel"><a class="dv-oid" href="#1b">1b</a>Transactions — mobile, light</div><div class="dv-card">
+<div data-screen-label="Transactions mobile light" style="width:390px;height:844px;display:flex;flex-direction:column;position:relative;overflow:hidden;font-family:Geist,system-ui,sans-serif;font-variant-numeric:tabular-nums;background:var(--page);color:var(--fg);--page:#fafafa;--card:#ffffff;--muted:#f4f4f5;--border:#e4e4e7;--fg:#09090b;--mfg:#71717a;--pos:#059669;--posbg:#ecfdf5;--primary:#059669;--pfg:#ffffff">
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 22px 0;font-size:15px;font-weight:600"><span>9:41</span><span style="width:24px;height:11px;border:1.5px solid var(--fg);border-radius:3px;display:inline-block;position:relative;box-sizing:border-box"><span style="position:absolute;inset:2px;background:var(--fg);border-radius:1px"></span></span></div>
+  <div style="padding:18px 20px 10px"><div style="font-size:24px;font-weight:600;letter-spacing:-0.02em">Transactions</div><div style="font-size:13px;color:var(--mfg);margin-top:2px">412 across 2 accounts</div></div>
+  <div style="display:flex;gap:8px;padding:4px 16px 12px">
+    <span style="display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 12px;border-radius:8px;border:1px solid var(--border);background:var(--card);font-size:13px;font-weight:500;box-shadow:0 1px 2px rgba(0,0,0,.04)">All accounts<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--mfg);stroke-linecap:round;stroke-linejoin:round"><path d="M6 9l6 6 6-6"></path></svg></span>
+    <span style="display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 12px;border-radius:8px;border:1px solid var(--border);background:var(--card);font-size:13px;font-weight:500;box-shadow:0 1px 2px rgba(0,0,0,.04)">Sep 2026<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--mfg);stroke-linecap:round;stroke-linejoin:round"><path d="M6 9l6 6 6-6"></path></svg></span>
+  </div>
+  <div style="flex:1;overflow:hidden;padding:0 16px">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:0 18px 4px">
+      <sc-for list="{{ txGroups }}" as="g" hint-placeholder-count="3">
+        <div>
+          <sc-if value="{{ g.label }}" hint-placeholder-val="{{ true }}"><div style="font-size:12px;font-weight:500;color:var(--mfg);padding:14px 0 2px">{{ g.label }}</div></sc-if>
+          <sc-for list="{{ g.rows }}" as="r" hint-placeholder-count="2">
+            <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)">
+              <span style="width:36px;height:36px;border-radius:999px;background:var(--muted);display:grid;place-items:center;font-size:13px;font-weight:600;color:var(--mfg);flex:none">{{ r.initial }}</span>
+              <span style="flex:1;min-width:0"><span style="display:block;font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.name }}</span><span style="display:block;font-size:12px;color:var(--mfg);margin-top:2px">{{ r.sub }}</span></span>
+              <span style="text-align:right"><span style="display:block;font-size:14px;font-weight:500;color:{{ r.color }}">{{ r.amount }}</span><sc-if value="{{ r.pending }}" hint-placeholder-val="{{ false }}"><span style="display:inline-block;margin-top:3px;font-size:10px;font-weight:500;padding:1px 6px;border-radius:999px;border:1px solid var(--border);color:var(--mfg)">Pending</span></sc-if></span>
+            </div>
+          </sc-for>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 16px 12px;font-size:13px;color:var(--mfg)">
+    <span>1–25 of 412</span>
+    <span style="display:flex;gap:6px"><span style="height:32px;padding:0 12px;display:inline-flex;align-items:center;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--mfg);font-weight:500;opacity:.5">Previous</span><span style="height:32px;padding:0 12px;display:inline-flex;align-items:center;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--fg);font-weight:500">Next</span></span>
+  </div>
+  <div style="display:flex;border-top:1px solid var(--border);background:var(--card);padding:8px 8px 22px">
+    <span style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0;color:var(--mfg)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect></svg><sc-if value="{{ showTabLabels }}" hint-placeholder-val="{{ true }}"><span style="font-size:11px;font-weight:500">Overview</span></sc-if></span>
+    <span style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0;color:var(--fg)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" style="stroke-linecap:round"><path d="M4 7h16M4 12h16M4 17h10"></path></svg><sc-if value="{{ showTabLabels }}" hint-placeholder-val="{{ true }}"><span style="font-size:11px;font-weight:500">Transactions</span></sc-if></span>
+    <span style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0;color:var(--mfg)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" style="stroke-linecap:round"><path d="M4 7h16M4 17h16"></path><circle cx="9" cy="7" r="2.5" fill="var(--card)"></circle><circle cx="15" cy="17" r="2.5" fill="var(--card)"></circle></svg><sc-if value="{{ showTabLabels }}" hint-placeholder-val="{{ true }}"><span style="font-size:11px;font-weight:500">Settings</span></sc-if></span>
+  </div>
+</div></div></div>
+
+<div class="dv-opt" id="1c"><div class="dv-olabel"><a class="dv-oid" href="#1c">1c</a>Connect — phase 1, explainer</div><div class="dv-card">
+<div data-screen-label="Connect phase 1" style="width:390px;height:844px;display:flex;flex-direction:column;position:relative;overflow:hidden;font-family:Geist,system-ui,sans-serif;background:var(--page);color:var(--fg);--page:#fafafa;--card:#ffffff;--muted:#f4f4f5;--border:#e4e4e7;--fg:#09090b;--mfg:#71717a;--pos:#059669;--posbg:#ecfdf5;--primary:#059669;--pfg:#ffffff">
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 22px 0;font-size:15px;font-weight:600"><span>9:41</span><span style="width:24px;height:11px;border:1.5px solid var(--fg);border-radius:3px;display:inline-block;position:relative;box-sizing:border-box"><span style="position:absolute;inset:2px;background:var(--fg);border-radius:1px"></span></span></div>
+  <div style="padding:18px 20px 0"><span style="font-size:20px;font-weight:600;letter-spacing:-0.02em;display:inline-flex;align-items:baseline;gap:2px">budgeteer<span style="width:6px;height:6px;border-radius:2px;background:var(--pos);display:inline-block"></span></span></div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 24px 40px">
+    <div style="width:56px;height:56px;border-radius:14px;background:var(--muted);border:1px solid var(--border);display:grid;place-items:center;font-family:'Geist Mono',monospace;font-size:10px;color:var(--mfg);text-align:center;line-height:1.2">monzo<br>mark</div>
+    <div style="font-size:28px;font-weight:600;letter-spacing:-0.025em;line-height:1.15;margin-top:22px;text-wrap:pretty">Connect your Monzo account</div>
+    <div style="font-size:15px;line-height:1.5;color:var(--mfg);margin-top:10px;text-wrap:pretty">budgeteer reads balances and transactions so you can see the month clearly. It never moves money.</div>
+    <div style="display:grid;gap:14px;margin-top:28px">
+      <div style="display:flex;gap:12px;align-items:flex-start"><span style="width:20px;height:20px;border-radius:999px;background:var(--posbg);color:var(--pos);display:grid;place-items:center;flex:none;margin-top:1px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="stroke-linecap:round;stroke-linejoin:round"><path d="M5 12l5 5L20 7"></path></svg></span><span style="font-size:14px;line-height:1.45"><span style="font-weight:500">Read-only access</span><span style="color:var(--mfg)"> — no payments, no transfers, ever.</span></span></div>
+      <div style="display:flex;gap:12px;align-items:flex-start"><span style="width:20px;height:20px;border-radius:999px;background:var(--posbg);color:var(--pos);display:grid;place-items:center;flex:none;margin-top:1px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="stroke-linecap:round;stroke-linejoin:round"><path d="M5 12l5 5L20 7"></path></svg></span><span style="font-size:14px;line-height:1.45"><span style="font-weight:500">Full history imported</span><span style="color:var(--mfg)">, then kept in sync every hour.</span></span></div>
+      <div style="display:flex;gap:12px;align-items:flex-start"><span style="width:20px;height:20px;border-radius:999px;background:var(--posbg);color:var(--pos);display:grid;place-items:center;flex:none;margin-top:1px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="stroke-linecap:round;stroke-linejoin:round"><path d="M5 12l5 5L20 7"></path></svg></span><span style="font-size:14px;line-height:1.45"><span style="font-weight:500">Disconnect any time</span><span style="color:var(--mfg)"> from Settings. Your data is deleted with it.</span></span></div>
+    </div>
+  </div>
+  <div style="padding:0 20px 34px;display:grid;gap:12px">
+    <span style="height:44px;border-radius:10px;background:var(--primary);color:var(--pfg);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:500">Connect Monzo</span>
+    <span style="text-align:center;font-size:12px;color:var(--mfg)">You'll be sent to Monzo to approve, then brought back here.</span>
+  </div>
+</div></div></div>
+
+<div class="dv-opt" id="1d"><div class="dv-olabel"><a class="dv-oid" href="#1d">1d</a>Connect — phase 2, approve the push</div><div class="dv-card">
+<div data-screen-label="Connect phase 2" style="width:390px;height:844px;display:flex;flex-direction:column;position:relative;overflow:hidden;font-family:Geist,system-ui,sans-serif;background:var(--page);color:var(--fg);--page:#fafafa;--card:#ffffff;--muted:#f4f4f5;--border:#e4e4e7;--fg:#09090b;--mfg:#71717a;--pos:#059669;--posbg:#ecfdf5;--primary:#059669;--pfg:#ffffff">
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 22px 0;font-size:15px;font-weight:600"><span>9:41</span><span style="width:24px;height:11px;border:1.5px solid var(--fg);border-radius:3px;display:inline-block;position:relative;box-sizing:border-box"><span style="position:absolute;inset:2px;background:var(--fg);border-radius:1px"></span></span></div>
+  <div style="padding:18px 20px 0"><span style="font-size:20px;font-weight:600;letter-spacing:-0.02em;display:inline-flex;align-items:baseline;gap:2px">budgeteer<span style="width:6px;height:6px;border-radius:2px;background:var(--pos);display:inline-block"></span></span></div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 24px 40px">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 16px;display:flex;gap:12px;align-items:center;box-shadow:0 8px 24px -12px rgba(0,0,0,.18)">
+      <span style="width:40px;height:40px;border-radius:10px;background:var(--muted);border:1px solid var(--border);display:grid;place-items:center;font-family:'Geist Mono',monospace;font-size:9px;color:var(--mfg);text-align:center;line-height:1.2;flex:none">monzo<br>mark</span>
+      <span style="flex:1;min-width:0"><span style="display:flex;justify-content:space-between;font-size:12px;color:var(--mfg)"><span style="font-weight:500;color:var(--fg)">Monzo</span><span>now</span></span><span style="display:block;font-size:13px;line-height:1.4;margin-top:2px">Allow budgeteer to view your account? Tap to approve.</span></span>
+    </div>
+    <div style="font-size:28px;font-weight:600;letter-spacing:-0.025em;line-height:1.15;margin-top:32px;text-wrap:pretty">Approve in your Monzo app</div>
+    <div style="font-size:15px;line-height:1.5;color:var(--mfg);margin-top:10px;text-wrap:pretty">Monzo has sent a notification to your phone. Open it, tap <span style="color:var(--fg);font-weight:500">Approve</span>, and come back — we'll carry on automatically.</div>
+    <div style="display:flex;align-items:center;gap:10px;margin-top:28px;font-size:14px;color:var(--mfg)">{{ spinner }}Waiting for approval…</div>
+  </div>
+  <div style="padding:0 20px 34px;display:grid;gap:12px">
+    <span style="height:44px;border-radius:10px;border:1px solid var(--border);background:var(--card);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:500">Didn't get a notification?</span>
+    <span style="text-align:center;font-size:12px;color:var(--mfg)">Approvals usually arrive within a few seconds.</span>
+  </div>
+</div></div></div>
+
+<div class="dv-opt" id="1e"><div class="dv-olabel"><a class="dv-oid" href="#1e">1e</a>Connect — phase 3, importing</div><div class="dv-card">
+<div data-screen-label="Connect phase 3" style="width:390px;height:844px;display:flex;flex-direction:column;position:relative;overflow:hidden;font-family:Geist,system-ui,sans-serif;font-variant-numeric:tabular-nums;background:var(--page);color:var(--fg);--page:#fafafa;--card:#ffffff;--muted:#f4f4f5;--border:#e4e4e7;--fg:#09090b;--mfg:#71717a;--pos:#059669;--posbg:#ecfdf5;--primary:#059669;--pfg:#ffffff">
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 22px 0;font-size:15px;font-weight:600"><span>9:41</span><span style="width:24px;height:11px;border:1.5px solid var(--fg);border-radius:3px;display:inline-block;position:relative;box-sizing:border-box"><span style="position:absolute;inset:2px;background:var(--fg);border-radius:1px"></span></span></div>
+  <div style="padding:18px 20px 0"><span style="font-size:20px;font-weight:600;letter-spacing:-0.02em;display:inline-flex;align-items:baseline;gap:2px">budgeteer<span style="width:6px;height:6px;border-radius:2px;background:var(--pos);display:inline-block"></span></span></div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 24px 40px">
+    <div style="display:flex;align-items:center;gap:10px;font-size:13px;font-weight:500;color:var(--pos)"><span style="width:8px;height:8px;border-radius:999px;background:var(--pos)"></span>Connected to Monzo</div>
+    <div style="font-size:28px;font-weight:600;letter-spacing:-0.025em;line-height:1.15;margin-top:14px">Importing your history</div>
+    <div style="font-size:15px;line-height:1.5;color:var(--mfg);margin-top:10px;text-wrap:pretty">This runs once. Larger histories can take a minute or two — you can leave this page.</div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-top:28px">
+      <div style="font-size:44px;font-weight:600;letter-spacing:-0.03em;line-height:1">1,284</div>
+      <div style="font-size:13px;color:var(--mfg);margin-top:6px">transactions imported · since Mar 2021</div>
+      <div style="height:4px;border-radius:999px;background:var(--muted);margin-top:18px;overflow:hidden"><div style="width:62%;height:100%;border-radius:999px;background:var(--pos)"></div></div>
+      <div style="display:grid;gap:10px;margin-top:18px;font-size:14px">
+        <div style="display:flex;justify-content:space-between;align-items:center"><span>Monzo Current</span><span style="display:inline-flex;align-items:center;gap:6px;color:var(--pos);font-size:13px;font-weight:500"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="stroke-linecap:round;stroke-linejoin:round"><path d="M5 12l5 5L20 7"></path></svg>1,102</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center"><span>Monzo Savings</span><span style="display:inline-flex;align-items:center;gap:8px;color:var(--mfg);font-size:13px">{{ spinnerSm }}182</span></div>
+      </div>
+    </div>
+  </div>
+  <div style="padding:0 20px 34px;display:grid;gap:12px">
+    <span style="height:44px;border-radius:10px;border:1px solid var(--border);background:var(--card);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:500;color:var(--mfg)">Continue to overview</span>
+    <span style="text-align:center;font-size:12px;color:var(--mfg)">Numbers fill in as the import finishes.</span>
+  </div>
+</div></div></div>
+
+<div class="dv-opt" id="1f"><div class="dv-olabel"><a class="dv-oid" href="#1f">1f</a>Connect — phase 4, complete</div><div class="dv-card">
+<div data-screen-label="Connect phase 4" style="width:390px;height:844px;display:flex;flex-direction:column;position:relative;overflow:hidden;font-family:Geist,system-ui,sans-serif;font-variant-numeric:tabular-nums;background:var(--page);color:var(--fg);--page:#fafafa;--card:#ffffff;--muted:#f4f4f5;--border:#e4e4e7;--fg:#09090b;--mfg:#71717a;--pos:#059669;--posbg:#ecfdf5;--primary:#059669;--pfg:#ffffff">
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 22px 0;font-size:15px;font-weight:600"><span>9:41</span><span style="width:24px;height:11px;border:1.5px solid var(--fg);border-radius:3px;display:inline-block;position:relative;box-sizing:border-box"><span style="position:absolute;inset:2px;background:var(--fg);border-radius:1px"></span></span></div>
+  <div style="padding:18px 20px 0"><span style="font-size:20px;font-weight:600;letter-spacing:-0.02em;display:inline-flex;align-items:baseline;gap:2px">budgeteer<span style="width:6px;height:6px;border-radius:2px;background:var(--pos);display:inline-block"></span></span></div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:0 24px 40px">
+    <span style="width:72px;height:72px;border-radius:999px;background:var(--pos);color:#fff;display:grid;place-items:center;box-shadow:0 0 0 10px var(--posbg)"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" style="stroke-linecap:round;stroke-linejoin:round"><path d="M5 12l5 5L20 7"></path></svg></span>
+    <div style="font-size:28px;font-weight:600;letter-spacing:-0.025em;line-height:1.15;margin-top:28px">Sync complete</div>
+    <div style="font-size:15px;line-height:1.5;color:var(--mfg);margin-top:10px;text-wrap:pretty;max-width:280px">1,972 transactions across 2 accounts, back to Mar 2021. New activity syncs every hour.</div>
+    <div style="display:flex;gap:8px;margin-top:22px">
+      <span style="display:inline-flex;gap:6px;align-items:center;font-size:13px;padding:6px 10px;border-radius:999px;background:var(--card);border:1px solid var(--border)"><span style="color:var(--mfg)">Monzo Current</span><span style="font-weight:500">£412.20</span></span>
+      <span style="display:inline-flex;gap:6px;align-items:center;font-size:13px;padding:6px 10px;border-radius:999px;background:var(--card);border:1px solid var(--border)"><span style="color:var(--mfg)">Monzo Savings</span><span style="font-weight:500">£872.00</span></span>
+    </div>
+  </div>
+  <div style="padding:0 20px 34px;display:grid;gap:12px">
+    <span style="height:44px;border-radius:10px;background:var(--primary);color:var(--pfg);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:500">Go to overview</span>
+  </div>
+</div></div></div>
+
+<div class="dv-opt" id="1g"><div class="dv-olabel"><a class="dv-oid" href="#1g">1g</a>Login — email</div><div class="dv-card">
+<div data-screen-label="Login email" style="width:390px;height:844px;display:flex;flex-direction:column;position:relative;overflow:hidden;font-family:Geist,system-ui,sans-serif;background:var(--page);color:var(--fg);--page:#fafafa;--card:#ffffff;--muted:#f4f4f5;--border:#e4e4e7;--fg:#09090b;--mfg:#71717a;--pos:#059669;--posbg:#ecfdf5;--primary:#059669;--pfg:#ffffff">
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 22px 0;font-size:15px;font-weight:600"><span>9:41</span><span style="width:24px;height:11px;border:1.5px solid var(--fg);border-radius:3px;display:inline-block;position:relative;box-sizing:border-box"><span style="position:absolute;inset:2px;background:var(--fg);border-radius:1px"></span></span></div>
+  <div style="padding:18px 20px 0;border-bottom:1px solid var(--border);padding-bottom:14px"><span style="font-size:20px;font-weight:600;letter-spacing:-0.02em;display:inline-flex;align-items:baseline;gap:2px">budgeteer<span style="width:6px;height:6px;border-radius:2px;background:var(--pos);display:inline-block"></span></span></div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 24px 80px">
+    <div style="font-size:28px;font-weight:600;letter-spacing:-0.025em;line-height:1.15">Sign in</div>
+    <div style="font-size:15px;line-height:1.5;color:var(--mfg);margin-top:8px;text-wrap:pretty">Enter your email and we'll send you a link. No password to remember.</div>
+    <div style="display:grid;gap:8px;margin-top:28px">
+      <span style="font-size:14px;font-weight:500">Email</span>
+      <span style="height:44px;border-radius:10px;border:1px solid var(--border);background:var(--card);display:flex;align-items:center;padding:0 14px;font-size:15px;color:var(--mfg);box-shadow:0 1px 2px rgba(0,0,0,.04)">you@example.com</span>
+    </div>
+    <span style="height:44px;border-radius:10px;background:var(--primary);color:var(--pfg);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:500;margin-top:16px">Send magic link</span>
+    <div style="font-size:13px;color:var(--mfg);margin-top:18px;line-height:1.5;text-wrap:pretty">New here? Signing in creates your account — nothing else to fill in.</div>
+  </div>
+</div></div></div>
+
+<div class="dv-opt" id="1h"><div class="dv-olabel"><a class="dv-oid" href="#1h">1h</a>Login — magic link sent</div><div class="dv-card">
+<div data-screen-label="Login sent" style="width:390px;height:844px;display:flex;flex-direction:column;position:relative;overflow:hidden;font-family:Geist,system-ui,sans-serif;background:var(--page);color:var(--fg);--page:#fafafa;--card:#ffffff;--muted:#f4f4f5;--border:#e4e4e7;--fg:#09090b;--mfg:#71717a;--pos:#059669;--posbg:#ecfdf5;--primary:#059669;--pfg:#ffffff">
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 22px 0;font-size:15px;font-weight:600"><span>9:41</span><span style="width:24px;height:11px;border:1.5px solid var(--fg);border-radius:3px;display:inline-block;position:relative;box-sizing:border-box"><span style="position:absolute;inset:2px;background:var(--fg);border-radius:1px"></span></span></div>
+  <div style="padding:18px 20px 0;border-bottom:1px solid var(--border);padding-bottom:14px"><span style="font-size:20px;font-weight:600;letter-spacing:-0.02em;display:inline-flex;align-items:baseline;gap:2px">budgeteer<span style="width:6px;height:6px;border-radius:2px;background:var(--pos);display:inline-block"></span></span></div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 24px 80px">
+    <span style="width:44px;height:44px;border-radius:12px;background:var(--posbg);color:var(--pos);display:grid;place-items:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="stroke-linecap:round;stroke-linejoin:round"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="M3 7l9 6 9-6"></path></svg></span>
+    <div style="font-size:28px;font-weight:600;letter-spacing:-0.025em;line-height:1.15;margin-top:20px">Check your inbox</div>
+    <div style="font-size:15px;line-height:1.5;color:var(--mfg);margin-top:8px;text-wrap:pretty">We sent a sign-in link to <span style="color:var(--fg);font-weight:500">alex@example.com</span>. It works once and expires in 15 minutes.</div>
+    <span style="height:44px;border-radius:10px;border:1px solid var(--border);background:var(--card);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:500;margin-top:28px">Use a different email</span>
+    <div style="font-size:13px;color:var(--mfg);margin-top:18px;line-height:1.5">Nothing after a minute? Check spam, or <span style="color:var(--fg);font-weight:500;text-decoration:underline;text-underline-offset:3px">resend the link</span>.</div>
+  </div>
+</div></div></div>
+
+</div>
+
+<div class="dv-thd" style="margin-top:40px"><span class="dv-tname">Dark mode — same screens, tokens flipped</span></div>
+<div class="dv-opts">
+
+<div class="dv-opt" id="1i"><div class="dv-olabel"><a class="dv-oid" href="#1i">1i</a>Overview — mobile, dark</div><div class="dv-card">
+<div data-screen-label="Overview mobile dark" style="width:390px;height:844px;display:flex;flex-direction:column;position:relative;overflow:hidden;font-family:Geist,system-ui,sans-serif;font-variant-numeric:tabular-nums;background:var(--page);color:var(--fg);--page:#09090b;--card:#131316;--muted:#27272a;--border:#27272a;--fg:#fafafa;--mfg:#a1a1aa;--pos:#34d399;--posbg:rgba(52,211,153,.12);--primary:#10b981;--pfg:#052e16">
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 22px 0;font-size:15px;font-weight:600"><span>9:41</span><span style="width:24px;height:11px;border:1.5px solid var(--fg);border-radius:3px;display:inline-block;position:relative;box-sizing:border-box"><span style="position:absolute;inset:2px;background:var(--fg);border-radius:1px"></span></span></div>
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 20px 12px"><span style="font-size:20px;font-weight:600;letter-spacing:-0.02em;display:inline-flex;align-items:baseline;gap:2px">budgeteer<span style="width:6px;height:6px;border-radius:2px;background:var(--pos);display:inline-block"></span></span><span style="width:32px;height:32px;border-radius:999px;background:var(--muted);border:1px solid var(--border);display:grid;place-items:center;font-size:12px;font-weight:600;color:var(--mfg)">A</span></div>
+  <div style="flex:1;overflow:hidden;padding:0 16px;display:grid;gap:12px;align-content:start">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 18px 16px">
+      <div style="font-size:13px;font-weight:500;color:var(--mfg)">Total balance</div>
+      <div style="font-size:38px;font-weight:600;letter-spacing:-0.03em;line-height:1.1;margin-top:6px">£1,284<span style="color:var(--mfg);font-weight:500">.20</span></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">
+        <span style="display:inline-flex;gap:6px;align-items:center;font-size:13px;padding:6px 10px;border-radius:999px;background:var(--muted);border:1px solid var(--border)"><span style="color:var(--mfg)">Monzo Current</span><span style="font-weight:500">£412.20</span></span>
+        <span style="display:inline-flex;gap:6px;align-items:center;font-size:13px;padding:6px 10px;border-radius:999px;background:var(--muted);border:1px solid var(--border)"><span style="color:var(--mfg)">Monzo Savings</span><span style="font-weight:500">£872.00</span></span>
+      </div>
+      <div style="margin-top:14px;font-size:12px;color:var(--mfg);display:flex;align-items:center;gap:6px"><span style="width:6px;height:6px;border-radius:999px;background:var(--pos)"></span>as of 09:38 today · synced hourly</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:13px;font-weight:500;color:var(--mfg)">This month</span><span style="font-size:11px;color:var(--mfg)">1–20 Sep</span></div>
+        <div style="font-size:24px;font-weight:600;letter-spacing:-0.02em;margin-top:10px">£312.40</div>
+        <div style="font-size:12px;color:var(--mfg);margin-top:2px">out</div>
+        <div style="height:1px;background:var(--border);margin:12px 0 10px"></div>
+        <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--mfg)">in</span><span style="color:var(--pos);font-weight:500">+£350.00</span></div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:13px;font-weight:500;color:var(--mfg)">This week</span><span style="font-size:11px;color:var(--mfg)">Mon–Sun</span></div>
+        <div style="font-size:24px;font-weight:600;letter-spacing:-0.02em;margin-top:10px">£84.10</div>
+        <div style="font-size:12px;color:var(--mfg);margin-top:2px">out</div>
+        <div style="height:1px;background:var(--border);margin:12px 0 10px"></div>
+        <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--mfg)">in</span><span style="font-weight:500">£0.00</span></div>
+      </div>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:6px 18px 4px">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0 4px"><span style="font-size:15px;font-weight:600;letter-spacing:-0.01em">Recent</span><span style="font-size:13px;font-weight:500;color:var(--mfg)">See all →</span></div>
+      <sc-for list="{{ recent }}" as="g" hint-placeholder-count="2">
+        <div>
+          <sc-if value="{{ g.label }}" hint-placeholder-val="{{ true }}"><div style="font-size:12px;font-weight:500;color:var(--mfg);padding:12px 0 2px">{{ g.label }}</div></sc-if>
+          <sc-for list="{{ g.rows }}" as="r" hint-placeholder-count="2">
+            <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)">
+              <span style="width:36px;height:36px;border-radius:999px;background:var(--muted);display:grid;place-items:center;font-size:13px;font-weight:600;color:var(--mfg);flex:none">{{ r.initial }}</span>
+              <span style="flex:1;min-width:0"><span style="display:block;font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.name }}</span><span style="display:block;font-size:12px;color:var(--mfg);margin-top:2px">{{ r.sub }}</span></span>
+              <span style="text-align:right"><span style="display:block;font-size:14px;font-weight:500;color:{{ r.color }}">{{ r.amount }}</span><sc-if value="{{ r.pending }}" hint-placeholder-val="{{ false }}"><span style="display:inline-block;margin-top:3px;font-size:10px;font-weight:500;padding:1px 6px;border-radius:999px;border:1px solid var(--border);color:var(--mfg)">Pending</span></sc-if></span>
+            </div>
+          </sc-for>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+  <div style="display:flex;border-top:1px solid var(--border);background:var(--card);padding:8px 8px 22px">
+    <span style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0;color:var(--fg)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect></svg><sc-if value="{{ showTabLabels }}" hint-placeholder-val="{{ true }}"><span style="font-size:11px;font-weight:500">Overview</span></sc-if></span>
+    <span style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0;color:var(--mfg)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" style="stroke-linecap:round"><path d="M4 7h16M4 12h16M4 17h10"></path></svg><sc-if value="{{ showTabLabels }}" hint-placeholder-val="{{ true }}"><span style="font-size:11px;font-weight:500">Transactions</span></sc-if></span>
+    <span style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0;color:var(--mfg)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" style="stroke-linecap:round"><path d="M4 7h16M4 17h16"></path><circle cx="9" cy="7" r="2.5" fill="var(--card)"></circle><circle cx="15" cy="17" r="2.5" fill="var(--card)"></circle></svg><sc-if value="{{ showTabLabels }}" hint-placeholder-val="{{ true }}"><span style="font-size:11px;font-weight:500">Settings</span></sc-if></span>
+  </div>
+</div></div></div>
+
+<div class="dv-opt" id="1j"><div class="dv-olabel"><a class="dv-oid" href="#1j">1j</a>Connect — importing, dark</div><div class="dv-card">
+<div data-screen-label="Connect phase 3 dark" style="width:390px;height:844px;display:flex;flex-direction:column;position:relative;overflow:hidden;font-family:Geist,system-ui,sans-serif;font-variant-numeric:tabular-nums;background:var(--page);color:var(--fg);--page:#09090b;--card:#131316;--muted:#27272a;--border:#27272a;--fg:#fafafa;--mfg:#a1a1aa;--pos:#34d399;--posbg:rgba(52,211,153,.12);--primary:#10b981;--pfg:#052e16">
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 22px 0;font-size:15px;font-weight:600"><span>9:41</span><span style="width:24px;height:11px;border:1.5px solid var(--fg);border-radius:3px;display:inline-block;position:relative;box-sizing:border-box"><span style="position:absolute;inset:2px;background:var(--fg);border-radius:1px"></span></span></div>
+  <div style="padding:18px 20px 0"><span style="font-size:20px;font-weight:600;letter-spacing:-0.02em;display:inline-flex;align-items:baseline;gap:2px">budgeteer<span style="width:6px;height:6px;border-radius:2px;background:var(--pos);display:inline-block"></span></span></div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 24px 40px">
+    <div style="display:flex;align-items:center;gap:10px;font-size:13px;font-weight:500;color:var(--pos)"><span style="width:8px;height:8px;border-radius:999px;background:var(--pos)"></span>Connected to Monzo</div>
+    <div style="font-size:28px;font-weight:600;letter-spacing:-0.025em;line-height:1.15;margin-top:14px">Importing your history</div>
+    <div style="font-size:15px;line-height:1.5;color:var(--mfg);margin-top:10px;text-wrap:pretty">This runs once. Larger histories can take a minute or two — you can leave this page.</div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-top:28px">
+      <div style="font-size:44px;font-weight:600;letter-spacing:-0.03em;line-height:1">1,284</div>
+      <div style="font-size:13px;color:var(--mfg);margin-top:6px">transactions imported · since Mar 2021</div>
+      <div style="height:4px;border-radius:999px;background:var(--muted);margin-top:18px;overflow:hidden"><div style="width:62%;height:100%;border-radius:999px;background:var(--pos)"></div></div>
+      <div style="display:grid;gap:10px;margin-top:18px;font-size:14px">
+        <div style="display:flex;justify-content:space-between;align-items:center"><span>Monzo Current</span><span style="display:inline-flex;align-items:center;gap:6px;color:var(--pos);font-size:13px;font-weight:500"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="stroke-linecap:round;stroke-linejoin:round"><path d="M5 12l5 5L20 7"></path></svg>1,102</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center"><span>Monzo Savings</span><span style="display:inline-flex;align-items:center;gap:8px;color:var(--mfg);font-size:13px">{{ spinnerSm }}182</span></div>
+      </div>
+    </div>
+  </div>
+  <div style="padding:0 20px 34px;display:grid;gap:12px">
+    <span style="height:44px;border-radius:10px;border:1px solid var(--border);background:var(--card);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:500;color:var(--mfg)">Continue to overview</span>
+    <span style="text-align:center;font-size:12px;color:var(--mfg)">Numbers fill in as the import finishes.</span>
+  </div>
+</div></div></div>
+
+<div class="dv-opt" id="1k"><div class="dv-olabel"><a class="dv-oid" href="#1k">1k</a>Login — dark</div><div class="dv-card">
+<div data-screen-label="Login dark" style="width:390px;height:844px;display:flex;flex-direction:column;position:relative;overflow:hidden;font-family:Geist,system-ui,sans-serif;background:var(--page);color:var(--fg);--page:#09090b;--card:#131316;--muted:#27272a;--border:#27272a;--fg:#fafafa;--mfg:#a1a1aa;--pos:#34d399;--posbg:rgba(52,211,153,.12);--primary:#10b981;--pfg:#052e16">
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 22px 0;font-size:15px;font-weight:600"><span>9:41</span><span style="width:24px;height:11px;border:1.5px solid var(--fg);border-radius:3px;display:inline-block;position:relative;box-sizing:border-box"><span style="position:absolute;inset:2px;background:var(--fg);border-radius:1px"></span></span></div>
+  <div style="padding:18px 20px 0;border-bottom:1px solid var(--border);padding-bottom:14px"><span style="font-size:20px;font-weight:600;letter-spacing:-0.02em;display:inline-flex;align-items:baseline;gap:2px">budgeteer<span style="width:6px;height:6px;border-radius:2px;background:var(--pos);display:inline-block"></span></span></div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 24px 80px">
+    <div style="font-size:28px;font-weight:600;letter-spacing:-0.025em;line-height:1.15">Sign in</div>
+    <div style="font-size:15px;line-height:1.5;color:var(--mfg);margin-top:8px;text-wrap:pretty">Enter your email and we'll send you a link. No password to remember.</div>
+    <div style="display:grid;gap:8px;margin-top:28px">
+      <span style="font-size:14px;font-weight:500">Email</span>
+      <span style="height:44px;border-radius:10px;border:1px solid var(--border);background:rgba(255,255,255,.03);display:flex;align-items:center;padding:0 14px;font-size:15px;color:var(--mfg)">you@example.com</span>
+    </div>
+    <span style="height:44px;border-radius:10px;background:var(--primary);color:var(--pfg);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600;margin-top:16px">Send magic link</span>
+    <div style="font-size:13px;color:var(--mfg);margin-top:18px;line-height:1.5;text-wrap:pretty">New here? Signing in creates your account — nothing else to fill in.</div>
+  </div>
+</div></div></div>
+
+</div>
+
+<div class="dv-thd" style="margin-top:40px"><span class="dv-tname">Desktop — slim top nav, content max-width 72rem</span></div>
+<div class="dv-opts">
+
+<div class="dv-opt" id="1l"><div class="dv-olabel"><a class="dv-oid" href="#1l">1l</a>Overview — desktop, light</div><div class="dv-card">
+<div data-screen-label="Overview desktop" style="width:1280px;height:820px;display:flex;flex-direction:column;overflow:hidden;font-family:Geist,system-ui,sans-serif;font-variant-numeric:tabular-nums;background:var(--page);color:var(--fg);--page:#fafafa;--card:#ffffff;--muted:#f4f4f5;--border:#e4e4e7;--fg:#09090b;--mfg:#71717a;--pos:#059669;--posbg:#ecfdf5;--primary:#059669;--pfg:#ffffff">
+  <div style="border-bottom:1px solid var(--border);background:var(--card)"><div style="max-width:72rem;margin:0 auto;padding:0 24px;height:56px;display:flex;align-items:center;gap:32px">
+    <span style="font-size:18px;font-weight:600;letter-spacing:-0.02em;display:inline-flex;align-items:baseline;gap:2px">budgeteer<span style="width:5px;height:5px;border-radius:1.5px;background:var(--pos);display:inline-block"></span></span>
+    <span style="display:flex;gap:4px;font-size:14px;font-weight:500"><span style="padding:6px 10px;border-radius:6px;background:var(--muted);color:var(--fg)">Overview</span><span style="padding:6px 10px;border-radius:6px;color:var(--mfg)">Transactions</span><span style="padding:6px 10px;border-radius:6px;color:var(--mfg)">Settings</span></span>
+    <span style="margin-left:auto;display:flex;align-items:center;gap:14px;font-size:13px;color:var(--mfg)"><span>alex@example.com</span><span style="height:32px;padding:0 12px;display:inline-flex;align-items:center;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--fg);font-weight:500;box-shadow:0 1px 2px rgba(0,0,0,.04)">Sign out</span></span>
+  </div></div>
+  <div style="max-width:72rem;margin:0 auto;padding:32px 24px;width:100%;box-sizing:border-box;display:grid;gap:16px;grid-template-columns:1.35fr 1fr 1fr;align-content:start">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px 24px">
+      <div style="font-size:13px;font-weight:500;color:var(--mfg)">Total balance</div>
+      <div style="font-size:44px;font-weight:600;letter-spacing:-0.03em;line-height:1.1;margin-top:8px">£1,284<span style="color:var(--mfg);font-weight:500">.20</span></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px">
+        <span style="display:inline-flex;gap:6px;align-items:center;font-size:13px;padding:6px 10px;border-radius:999px;background:var(--muted);border:1px solid var(--border)"><span style="color:var(--mfg)">Monzo Current</span><span style="font-weight:500">£412.20</span></span>
+        <span style="display:inline-flex;gap:6px;align-items:center;font-size:13px;padding:6px 10px;border-radius:999px;background:var(--muted);border:1px solid var(--border)"><span style="color:var(--mfg)">Monzo Savings</span><span style="font-weight:500">£872.00</span></span>
+      </div>
+      <div style="margin-top:18px;font-size:12px;color:var(--mfg);display:flex;align-items:center;gap:6px"><span style="width:6px;height:6px;border-radius:999px;background:var(--pos)"></span>as of 09:38 today · synced hourly</div>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px 24px;display:flex;flex-direction:column">
+      <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:13px;font-weight:500;color:var(--mfg)">This month</span><span style="font-size:12px;color:var(--mfg)">1–20 Sep</span></div>
+      <div style="font-size:32px;font-weight:600;letter-spacing:-0.025em;margin-top:12px">£312.40</div>
+      <div style="font-size:12px;color:var(--mfg);margin-top:2px">out</div>
+      <div style="height:1px;background:var(--border);margin:auto 0 12px"></div>
+      <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--mfg)">in</span><span style="color:var(--pos);font-weight:500">+£350.00</span></div>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px 24px;display:flex;flex-direction:column">
+      <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:13px;font-weight:500;color:var(--mfg)">This week</span><span style="font-size:12px;color:var(--mfg)">Mon 14 – Sun 20</span></div>
+      <div style="font-size:32px;font-weight:600;letter-spacing:-0.025em;margin-top:12px">£84.10</div>
+      <div style="font-size:12px;color:var(--mfg);margin-top:2px">out</div>
+      <div style="height:1px;background:var(--border);margin:auto 0 12px"></div>
+      <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--mfg)">in</span><span style="font-weight:500">£0.00</span></div>
+    </div>
+    <div style="grid-column:1 / -1;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:8px 24px 6px">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0 6px"><span style="font-size:15px;font-weight:600;letter-spacing:-0.01em">Recent transactions</span><span style="font-size:13px;font-weight:500;color:var(--mfg)">See all →</span></div>
+      <sc-for list="{{ recent }}" as="g" hint-placeholder-count="2">
+        <div>
+          <sc-if value="{{ g.label }}" hint-placeholder-val="{{ true }}"><div style="font-size:12px;font-weight:500;color:var(--mfg);padding:12px 0 2px">{{ g.label }}</div></sc-if>
+          <sc-for list="{{ g.rows }}" as="r" hint-placeholder-count="2">
+            <div style="display:grid;grid-template-columns:36px 1fr 200px 160px;align-items:center;gap:16px;padding:9px 0;border-bottom:1px solid var(--border)">
+              <span style="width:36px;height:36px;border-radius:999px;background:var(--muted);display:grid;place-items:center;font-size:13px;font-weight:600;color:var(--mfg)">{{ r.initial }}</span>
+              <span style="font-size:14px;font-weight:500">{{ r.name }}<sc-if value="{{ r.pending }}" hint-placeholder-val="{{ false }}"><span style="display:inline-block;margin-left:8px;font-size:10px;font-weight:500;padding:1px 6px;border-radius:999px;border:1px solid var(--border);color:var(--mfg);vertical-align:middle">Pending</span></sc-if></span>
+              <span style="font-size:13px;color:var(--mfg)">{{ r.sub }}</span>
+              <span style="text-align:right;font-size:14px;font-weight:500;color:{{ r.color }}">{{ r.amount }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</div></div></div>
+
+<div class="dv-opt" id="1m"><div class="dv-olabel"><a class="dv-oid" href="#1m">1m</a>Transactions — desktop, dark</div><div class="dv-card">
+<div data-screen-label="Transactions desktop dark" style="width:1280px;height:820px;display:flex;flex-direction:column;overflow:hidden;font-family:Geist,system-ui,sans-serif;font-variant-numeric:tabular-nums;background:var(--page);color:var(--fg);--page:#09090b;--card:#131316;--muted:#27272a;--border:#27272a;--fg:#fafafa;--mfg:#a1a1aa;--pos:#34d399;--posbg:rgba(52,211,153,.12);--primary:#10b981;--pfg:#052e16">
+  <div style="border-bottom:1px solid var(--border);background:var(--card)"><div style="max-width:72rem;margin:0 auto;padding:0 24px;height:56px;display:flex;align-items:center;gap:32px">
+    <span style="font-size:18px;font-weight:600;letter-spacing:-0.02em;display:inline-flex;align-items:baseline;gap:2px">budgeteer<span style="width:5px;height:5px;border-radius:1.5px;background:var(--pos);display:inline-block"></span></span>
+    <span style="display:flex;gap:4px;font-size:14px;font-weight:500"><span style="padding:6px 10px;border-radius:6px;color:var(--mfg)">Overview</span><span style="padding:6px 10px;border-radius:6px;background:var(--muted);color:var(--fg)">Transactions</span><span style="padding:6px 10px;border-radius:6px;color:var(--mfg)">Settings</span></span>
+    <span style="margin-left:auto;display:flex;align-items:center;gap:14px;font-size:13px;color:var(--mfg)"><span>alex@example.com</span><span style="height:32px;padding:0 12px;display:inline-flex;align-items:center;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--fg);font-weight:500">Sign out</span></span>
+  </div></div>
+  <div style="max-width:72rem;margin:0 auto;padding:32px 24px;width:100%;box-sizing:border-box;display:flex;flex-direction:column;gap:16px;flex:1;min-height:0">
+    <div style="display:flex;align-items:flex-end;justify-content:space-between">
+      <div><div style="font-size:26px;font-weight:600;letter-spacing:-0.025em">Transactions</div><div style="font-size:13px;color:var(--mfg);margin-top:2px">412 across 2 accounts</div></div>
+      <div style="display:flex;gap:8px">
+        <span style="display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 12px;border-radius:8px;border:1px solid var(--border);background:var(--card);font-size:13px;font-weight:500">All accounts<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--mfg);stroke-linecap:round;stroke-linejoin:round"><path d="M6 9l6 6 6-6"></path></svg></span>
+        <span style="display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 12px;border-radius:8px;border:1px solid var(--border);background:var(--card);font-size:13px;font-weight:500">1 Sep – 20 Sep 2026<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--mfg);stroke-linecap:round;stroke-linejoin:round"><path d="M6 9l6 6 6-6"></path></svg></span>
+      </div>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:0 24px;flex:1;min-height:0;overflow:hidden">
+      <sc-for list="{{ txGroups }}" as="g" hint-placeholder-count="3">
+        <div>
+          <sc-if value="{{ g.label }}" hint-placeholder-val="{{ true }}"><div style="font-size:12px;font-weight:500;color:var(--mfg);padding:14px 0 2px">{{ g.label }}</div></sc-if>
+          <sc-for list="{{ g.rows }}" as="r" hint-placeholder-count="2">
+            <div style="display:grid;grid-template-columns:36px 1fr 200px 120px 160px;align-items:center;gap:16px;padding:9px 0;border-bottom:1px solid var(--border)">
+              <span style="width:36px;height:36px;border-radius:999px;background:var(--muted);display:grid;place-items:center;font-size:13px;font-weight:600;color:var(--mfg)">{{ r.initial }}</span>
+              <span style="font-size:14px;font-weight:500">{{ r.name }}</span>
+              <span style="font-size:13px;color:var(--mfg)">{{ r.sub }}</span>
+              <span><sc-if value="{{ r.pending }}" hint-placeholder-val="{{ false }}"><span style="display:inline-block;font-size:10px;font-weight:500;padding:1px 6px;border-radius:999px;border:1px solid var(--border);color:var(--mfg)">Pending</span></sc-if></span>
+              <span style="text-align:right;font-size:14px;font-weight:500;color:{{ r.color }}">{{ r.amount }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </sc-for>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--mfg)">
+      <span>Showing 1–25 of 412</span>
+      <span style="display:flex;gap:6px"><span style="height:32px;padding:0 12px;display:inline-flex;align-items:center;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--mfg);font-weight:500;opacity:.5">Previous</span><span style="height:32px;padding:0 12px;display:inline-flex;align-items:center;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--fg);font-weight:500">Next</span></span>
+    </div>
+  </div>
+</div></div></div>
+
+</div>
+<p class="dv-next">Try next: "give <a class="dv-oid" href="#1a">1a</a> a reserved target row under This month" · "make the connect screens (<a class="dv-oid" href="#1c">1c</a>–<a class="dv-oid" href="#1f">1f</a>) a single stepper" · "explore a denser transactions row for <a class="dv-oid" href="#1m">1m</a>"</p>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showTabLabels&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Navigation&quot;},&quot;groupByDate&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Transactions&quot;},&quot;incomeSign&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;plus&quot;,&quot;options&quot;:[&quot;plus&quot;,&quot;none&quot;],&quot;tsType&quot;:&quot;'plus' | 'none'&quot;,&quot;section&quot;:&quot;Transactions&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const p = this.props;
+    const showTabLabels = p.showTabLabels ?? true;
+    const groupByDate = p.groupByDate ?? true;
+    const plus = (p.incomeSign ?? 'plus') === 'plus';
+    const fmt = (pence) => {
+      const s = (Math.abs(pence) / 100).toLocaleString('en-GB', { minimumFractionDigits: 2 });
+      return pence < 0 ? '−£' + s : (plus ? '+£' : '£') + s;
+    };
+    const mk = (name, sub, pence, pending) => ({ name, sub, pending: !!pending, amount: fmt(pence), color: pence > 0 ? 'var(--pos)' : 'var(--fg)', initial: name[0] });
+    const groups = [
+      { label: 'Today', rows: [mk('Pret a Manger', 'Monzo Current · 08:12', -465, true), mk('TfL', 'Monzo Current · 07:40', -280, true)] },
+      { label: 'Yesterday', rows: [mk('Tesco', 'Monzo Current · 18:05', -2340), mk('Transfer from Lloyds', 'Monzo Current · 09:00', 35000), mk('Spotify', 'Monzo Current · 06:00', -1099)] },
+      { label: 'Thu 18 Sep', rows: [mk('Boots', 'Monzo Current · 13:22', -812), mk('Greggs', 'Monzo Current · 08:31', -245)] },
+      { label: 'Wed 17 Sep', rows: [mk('Round-up to Savings', 'Monzo Savings · 21:00', 120), mk('Sainsbury\u2019s', 'Monzo Current · 19:14', -1786)] },
+    ];
+    const recent = groupByDate ? groups.slice(0, 2) : [{ label: null, rows: groups.slice(0, 2).flatMap(g => g.rows) }];
+    const txGroups = groupByDate ? groups : [{ label: null, rows: groups.flatMap(g => g.rows) }];
+    const spin = (size) => React.createElement('span', { style: { width: size, height: size, borderRadius: 999, border: '2px solid var(--border)', borderTopColor: 'var(--fg)', display: 'inline-block', flex: 'none', animation: 'spin .9s linear infinite' } });
+    return { showTabLabels, recent, txGroups, spinner: spin(16), spinnerSm: spin(12) };
+  }
+}
+</script>
+</body>
+</html>

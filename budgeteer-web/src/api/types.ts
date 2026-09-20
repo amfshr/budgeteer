@@ -13,3 +13,4 @@ export type MonzoConnectInitResponse = components['schemas']['MonzoConnectInitRe
 export type MonzoSyncProgressResponse = components['schemas']['MonzoSyncProgressResponse']
 export type AccountProgress = components['schemas']['AccountProgress']
 export type MonzoStatusResponse = components['schemas']['MonzoStatusResponse']
+export type MonzoConnectionResponse = components['schemas']['MonzoConnectionResponse']

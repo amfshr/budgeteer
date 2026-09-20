@@ -1,12 +1,22 @@
-import { Badge } from '@/components/ui/badge'
 import Money from '@/components/Money'
 import { groupByDay } from '@/lib/dates'
 import { cn } from '@/lib/utils'
 import type { TransactionResponse } from '@/api/types'
 
+function initialOf(tx: TransactionResponse): string {
+  const name = tx.merchantName ?? tx.description ?? '?'
+  return name.trim().charAt(0).toUpperCase() || '?'
+}
+
+function timeOf(iso: string | undefined): string {
+  if (!iso) return ''
+  return new Date(iso).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
+}
+
 /**
- * Shared row list with day group headers (dec 31). Income renders in the
- * money-positive token with an explicit +; spend stays default foreground.
+ * Shared row list, design-pass treatment (option 1a): day group headers,
+ * merchant-initial avatars, time sub-line, income in money-positive with
+ * explicit +, pending as a quiet outline pill under the amount.
  */
 export default function TransactionList({ transactions }: { transactions: TransactionResponse[] }) {
   if (transactions.length === 0) {
@@ -16,38 +26,44 @@ export default function TransactionList({ transactions }: { transactions: Transa
   const groups = groupByDay(transactions, (tx) => tx.occurredAt)
 
   return (
-    <div className="space-y-4">
+    <div>
       {groups.map((group) => (
         <section key={group.label}>
-          <h4 className="text-muted-foreground pb-1 text-xs font-medium tracking-wide uppercase">
-            {group.label}
-          </h4>
-          <ul className="divide-border divide-y">
+          <h4 className="text-muted-foreground pt-3 pb-0.5 text-xs font-medium">{group.label}</h4>
+          <ul>
             {group.items.map((tx) => {
               const income = (tx.amountMinorUnits ?? 0) > 0
               return (
-                <li key={tx.id} className="flex items-center justify-between gap-4 py-2.5">
-                  <div className="flex min-w-0 items-center gap-2">
-                    <p className="truncate text-sm font-medium">
+                <li key={tx.id} className="flex items-center gap-3 border-b py-2.5 last:border-b-0">
+                  <span
+                    aria-hidden
+                    className="bg-muted text-muted-foreground grid size-9 flex-none place-items-center rounded-full text-[13px] font-semibold"
+                  >
+                    {initialOf(tx)}
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-sm font-medium">
                       {tx.merchantName ?? tx.description ?? 'Transaction'}
-                    </p>
-                    {tx.status === 'PENDING' && (
-                      <Badge variant="secondary" className="shrink-0">
-                        pending
-                      </Badge>
+                    </span>
+                    <span className="text-muted-foreground mt-0.5 block text-xs">
+                      {timeOf(tx.occurredAt)}
+                    </span>
+                  </span>
+                  <span className="text-right">
+                    {tx.amountMinorUnits != null && tx.currency && (
+                      <Money
+                        minorUnits={tx.amountMinorUnits}
+                        currency={tx.currency}
+                        signed={income}
+                        className={cn('block text-sm font-medium', income && 'text-money-positive')}
+                      />
                     )}
-                  </div>
-                  {tx.amountMinorUnits != null && tx.currency && (
-                    <Money
-                      minorUnits={tx.amountMinorUnits}
-                      currency={tx.currency}
-                      signed={income}
-                      className={cn(
-                        'shrink-0 text-sm font-medium',
-                        income && 'text-money-positive',
-                      )}
-                    />
-                  )}
+                    {tx.status === 'PENDING' && (
+                      <span className="text-muted-foreground mt-0.5 inline-block rounded-full border px-1.5 py-px text-[10px] font-medium">
+                        Pending
+                      </span>
+                    )}
+                  </span>
                 </li>
               )
             })}

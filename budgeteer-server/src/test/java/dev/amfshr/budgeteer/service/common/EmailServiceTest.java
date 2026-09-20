@@ -134,7 +134,7 @@ class EmailServiceTest {
             MimeMessage sent = sendAndCapture("test@example.com", "token-123");
 
             assertThat(sent.getContent()).isInstanceOf(Multipart.class);
-            assertThat(allContent(sent)).contains("Sign in to Budgeteer");
+            assertThat(allContent(sent)).contains("Sign in to budgeteer");
         }
 
         @Test
@@ -157,7 +157,7 @@ class EmailServiceTest {
 
             MimeMessage sent = sendAndCapture("test@example.com", "token-123");
 
-            assertThat(sent.getSubject()).isEqualTo("Login to Budgeteer");
+            assertThat(sent.getSubject()).startsWith("Sign in to budgeteer (");
         }
 
         @Test

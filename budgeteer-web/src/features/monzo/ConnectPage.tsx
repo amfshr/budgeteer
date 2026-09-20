@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { useAccounts } from '@/features/accounts/useAccounts'
 import { useTransactions } from '@/features/transactions/useTransactions'
+import { useConnections } from './useConnections'
 import { useSyncProgress } from './useSyncProgress'
 
 function Spinner({ label }: { label: string }) {
@@ -19,19 +20,30 @@ function Spinner({ label }: { label: string }) {
 /**
  * The four-phase connect onboarding (dec 28). The OAuth callback redirects here
  * (?monzo=connected|denied); phases are derived from live state, not stored:
- *   explain  — no monzo param, nothing syncing: CTA into the OAuth redirect
- *   approve  — connected, but the backfill hasn't started (Monzo SCA push wait)
- *   import   — backfill running: live transaction count
- *   done     — connected and data present: green tick, go to overview
+ *   explain   — no monzo param, nothing syncing: CTA into the OAuth redirect
+ *   reconnect — data exists but no ACTIVE connection (user unlinked): syncing is
+ *               paused, data is dormant — offer the OAuth entry again
+ *   approve   — connected, but the backfill hasn't started (Monzo SCA push wait)
+ *   import    — backfill running: live transaction count
+ *   done      — connected and data present: green tick, go to overview
  */
 export default function ConnectPage() {
   const [params] = useSearchParams()
   const monzo = params.get('monzo')
-  const { syncing, transactionCount } = useSyncProgress()
+  const { syncing, transactionCount, accounts: progressAccounts } = useSyncProgress()
   const accounts = useAccounts()
   const transactions = useTransactions(0, 1)
+  const connections = useConnections()
 
   const hasData = (accounts.data?.length ?? 0) > 0 && (transactions.data?.totalElements ?? 0) > 0
+  // Once the backfill has started, the progress response lists the account(s) —
+  // after that point we must never regress to "approve the push" even though
+  // syncing flips false before the ingest finishes (the ~25s ingest lag).
+  const importStarted = progressAccounts.length > 0
+  // The list endpoint returns ACTIVE connections only, so an empty list with data
+  // present means the user unlinked — data is dormant, not gone (unlink ≠ delete).
+  const unlinkedWithData =
+    !connections.isPending && (connections.data?.length ?? 0) === 0 && hasData
 
   const phase =
     monzo === 'error'
@@ -40,13 +52,15 @@ export default function ConnectPage() {
         ? 'denied'
         : syncing
           ? 'import'
-          : monzo === 'connected'
-            ? hasData
-              ? 'done'
-              : 'approve'
+          : unlinkedWithData
+            ? 'reconnect'
             : hasData
               ? 'done'
-              : 'explain'
+              : importStarted
+                ? 'finishing'
+                : monzo === 'connected'
+                  ? 'approve'
+                  : 'explain'
 
   return (
     <div className="mx-auto max-w-md space-y-4 pt-4">
@@ -98,6 +112,23 @@ export default function ConnectPage() {
         </Card>
       )}
 
+      {phase === 'reconnect' && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Reconnect Monzo</CardTitle>
+            <CardDescription>
+              Monzo is unlinked, so syncing is paused — your imported data is safe and stays put.
+              Reconnect to pick up where you left off; only what happened since gets fetched.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button asChild className="w-full">
+              <a href="/api/v1/monzo/connect">Reconnect Monzo</a>
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
       {phase === 'approve' && (
         <Card>
           <CardHeader>
@@ -107,6 +138,19 @@ export default function ConnectPage() {
             <CardDescription>
               Open the Monzo app on your phone and <strong>approve the notification</strong> — your
               import starts the moment you do.
+            </CardDescription>
+          </CardHeader>
+        </Card>
+      )}
+
+      {phase === 'finishing' && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-3">
+              <Spinner label="Finishing up" /> Finishing up
+            </CardTitle>
+            <CardDescription>
+              Transactions downloaded — preparing your accounts and balances. A few more seconds.
             </CardDescription>
           </CardHeader>
         </Card>

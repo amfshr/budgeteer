@@ -68,6 +68,23 @@ whatever pots Alexander models manually; that's enough to prove the loop.
 | 31 | V | **Transaction list polish set (all four)**: date group headers (Today/Yesterday/…), income in green via a new money-positive token, pending as a subtle badge, account filter dropdown | — |
 | 32 | B | **Branding: lowercase `budgeteer` wordmark (Geist); calm-precision tone; zinc near-mono base + EMERALD accent** (positive money, on-track targets, primary actions; red reserved for destructive/over-budget); light AND dark first-class, system-follow default | Rejected: warm/friendly (toy-like for money), dense pro-tool (wrong for glance), dark-first (sunlight glance), blue accent (money-positive needs green anyway) |
 
+**Decision 33 (2026-09-20, post-design-pass):** palette variant **3e — ink-first** chosen
+from the canvas (project 69558837…): primary buttons are foreground ink; emerald is purely
+semantic (money-positive, on-track) plus the wordmark dot. The design canvas also produced
+the FUTURE UI specs ahead of their backends: options 2a–2c (target card / pots tree /
+month-end) = #19's UI spec; 4a–4e (settings, connections, destructive dialogs) = #15's;
+4f–4h (OTP code entry) = auth-v2 phase 1's.
+
+**Decision 34 (2026-09-20, brand pass):** brand kit adopted from the design project's
+`brand/` folder. The mark = lowercase **b** as stem + emerald bowl (accent = "the money
+part", consistent with dec 33's semantic-emerald rule). Shipped: theme-adaptive
+`favicon.svg` + full icon set + webmanifest in `budgeteer-web/public/` (regenerated
+locally via headless Chrome, C2PA-free), lowercase `<title>budgeteer</title>`, and the
+magic-link email restyled to `brand/email-magic-link.html` (emerald Sign-in button,
+dark-mode overrides, "never moves money" footer; OTP-code section deferred to auth v2).
+Geometry + regeneration notes: `docs/brand/README.md`. Canvas copies vendored to
+`.agents/notes/product/design/` so the repo doesn't depend on the claude.ai link.
+
 ## The claude.ai/design brief (Branch B output — paste into the design tool)
 
 > **budgeteer** — a personal budgeting web app (React + Tailwind v4 + shadcn/ui, Geist font).

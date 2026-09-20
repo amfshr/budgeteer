@@ -23,3 +23,18 @@ export function groupByDay<T>(items: T[], getIso: (item: T) => string | undefine
   }
   return groups
 }
+
+/** "as of" stamp in the design's voice: time for today, day + time otherwise. */
+export function asOfLabel(iso: string, now: Date = new Date()): string {
+  const date = new Date(iso)
+  const time = date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
+  const label = dayLabel(iso, now)
+  if (label === 'Today') return `as of ${time} today`
+  if (label === 'Yesterday') return `as of ${time} yesterday`
+  return `as of ${label}`
+}
+
+/** "1–20 Sep" style month-to-date range label for the spend cards. */
+export function monthRangeLabel(now: Date = new Date()): string {
+  return `1\u2013${now.getDate()} ${now.toLocaleDateString('en-GB', { month: 'short' })}`
+}

@@ -21,6 +21,7 @@ export function useSpendSummary(accounts: AccountResponse[] | undefined) {
         summaries.reduce((total, s) => total + (pick(s) ?? 0), 0)
       return {
         weekOut: sum((s) => s.thisWeek?.outMinorUnits),
+        weekIn: sum((s) => s.thisWeek?.inMinorUnits),
         monthOut: sum((s) => s.monthToDate?.outMinorUnits),
         monthIn: sum((s) => s.monthToDate?.inMinorUnits),
       }

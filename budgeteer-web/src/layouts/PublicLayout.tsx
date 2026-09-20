@@ -1,4 +1,5 @@
 import { Link, Outlet } from 'react-router'
+import Wordmark from '@/components/Wordmark'
 
 /** Minimal chrome for unauthenticated pages: brand bar + centered content. */
 export default function PublicLayout() {
@@ -6,8 +7,8 @@ export default function PublicLayout() {
     <div className="flex min-h-svh flex-col">
       <header className="border-b">
         <div className="mx-auto w-full max-w-5xl px-4 py-3">
-          <Link to="/" className="text-lg font-semibold tracking-tight">
-            Budgeteer
+          <Link to="/">
+            <Wordmark className="text-lg" />
           </Link>
         </div>
       </header>

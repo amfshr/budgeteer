@@ -32,8 +32,13 @@ claude.ai/design pass lands.
 - [x] Tests updated/extended; all gates green
 
 **Visual (after Alexander's claude.ai/design pass with the Branch-B brief):**
-- [ ] Apply branding: lowercase wordmark, emerald accent token wiring, spacing/typography
-      refinements from the design output (adapted onto tokens, never pasted)
+- [x] Apply branding (design canvas option 1a + palette 3e, dec 33): page tint token,
+      Wordmark component (lowercase + emerald dot signature), balance hero with
+      de-emphasised pence + account chips + "as of · synced hourly" status line, spend
+      cards with range labels and in/out rows (weekIn added to the summary hook),
+      transaction rows with merchant-initial avatars + time sub-line + outline Pending
+      pill, safe-area padding on the tab bar. Future specs (pots 2a–2c, settings 4a–4e,
+      OTP 4f–4h) live in the canvas for their epics
 
 ## Non-goals
 

@@ -6,6 +6,9 @@ import dev.amfshr.budgeteer.config.JweProperties;
 import dev.amfshr.budgeteer.exception.ApiException;
 import dev.amfshr.budgeteer.util.LogSanitizer;
 import jakarta.mail.internet.MimeMessage;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -22,6 +25,12 @@ import org.springframework.stereotype.Service;
 public class EmailService {
 
     private static final Logger log = LoggerFactory.getLogger(EmailService.class);
+
+    // Gmail threads messages with the same sender + identical subject into one
+    // stacking conversation; a per-request time suffix keeps every sign-in email
+    // its own thread (auth v2 will put the OTP code here instead).
+    private static final DateTimeFormatter SUBJECT_TIME =
+            DateTimeFormatter.ofPattern("HH:mm").withZone(ZoneId.of("Europe/London"));
 
     private final JavaMailSender mailSender;
     private final AppProperties appProperties;
@@ -44,9 +53,9 @@ public class EmailService {
 
         if (appProperties.isEmailEnabled()) {
             long expiryMinutes = jweProperties.getMagicLinkExpiry().toMinutes();
-            sendEmail(email, "Login to Budgeteer",
+            sendEmail(email, "Sign in to budgeteer (" + SUBJECT_TIME.format(Instant.now()) + ")",
                     buildMagicLinkPlainBody(magicLink, expiryMinutes),
-                    buildMagicLinkHtmlBody(magicLink, expiryMinutes));
+                    buildMagicLinkHtmlBody(magicLink, expiryMinutes, email));
         } else {
             // Development mode - log to console
             logMagicLink(email, magicLink);
@@ -68,44 +77,71 @@ public class EmailService {
      */
     private String buildMagicLinkPlainBody(String magicLink, long expiryMinutes) {
         return """
-                Hi there,
-
-                Click the link below to log in to Budgeteer:
+                Sign in to budgeteer with this link:
 
                 %s
 
-                This link will expire in %d minutes.
-
-                If you didn't request this email, you can safely ignore it.
-
-                - The Budgeteer Team
+                It expires in %d minutes and works once. If you didn't request it,
+                you can ignore this email — nothing changes without it.
                 """.formatted(magicLink, expiryMinutes);
     }
 
     /**
-     * HTML part. Email HTML is deliberately archaic: inline styles only, no external
-     * CSS/fonts, layout that survives every client. The link appears twice — as a
-     * button and as a printed URL — so it is clickable AND copy-pasteable.
+     * HTML part, from the brand sheet's email template (design project, brand/
+     * email-magic-link.html). Email HTML is deliberately archaic: tables, inline
+     * styles, no external CSS/fonts — survives every client; the style block only
+     * adds dark-mode overrides for clients that honour it. The link appears twice —
+     * as a button and as a printed URL — so it is clickable AND copy-pasteable.
+     * The template's OTP-code section arrives with auth methods v2.
      */
-    private String buildMagicLinkHtmlBody(String magicLink, long expiryMinutes) {
+    private String buildMagicLinkHtmlBody(String magicLink, long expiryMinutes, String recipient) {
         return """
                 <!doctype html>
-                <html>
-                <body style="margin:0;padding:0;background-color:#f4f4f5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
-                  <div style="max-width:480px;margin:0 auto;padding:32px 16px;">
-                    <div style="background-color:#ffffff;border:1px solid #e4e4e7;border-radius:8px;padding:32px;">
-                      <p style="margin:0 0 4px;font-size:20px;font-weight:700;color:#18181b;">Budgeteer</p>
-                      <p style="margin:0 0 24px;font-size:14px;color:#71717a;">Your money, one place.</p>
-                      <p style="margin:0 0 24px;font-size:15px;color:#18181b;">Click the button below to sign in. This link expires in %d minutes.</p>
-                      <a href="%s" style="display:inline-block;background-color:#18181b;color:#ffffff;text-decoration:none;font-size:15px;font-weight:600;padding:12px 24px;border-radius:6px;">Sign in to Budgeteer</a>
-                      <p style="margin:24px 0 0;font-size:13px;color:#71717a;">Or paste this link into your browser:</p>
-                      <p style="margin:4px 0 0;font-size:13px;color:#71717a;word-break:break-all;">%s</p>
-                    </div>
-                    <p style="margin:16px 0 0;font-size:12px;color:#a1a1aa;text-align:center;">If you didn't request this email, you can safely ignore it.</p>
-                  </div>
+                <html lang="en">
+                <head>
+                <meta charset="utf-8">
+                <meta name="color-scheme" content="light dark">
+                <meta name="supported-color-schemes" content="light dark">
+                <style>
+                  @media (prefers-color-scheme: dark) {
+                    .bg { background-color: #09090b !important; }
+                    .card { background-color: #131316 !important; border-color: #27272a !important; }
+                    .fg { color: #fafafa !important; }
+                    .mfg { color: #a1a1aa !important; }
+                  }
+                </style>
+                </head>
+                <body class="bg" style="margin:0;padding:0;background-color:#fafafa;">
+                <span style="display:none;font-size:1px;color:#fafafa;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;">Tap Sign in to open budgeteer. Expires in %d minutes.</span>
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%%" class="bg" style="background-color:#fafafa;">
+                <tr><td align="center" style="padding:40px 16px;">
+                  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" style="width:600px;max-width:600px;">
+                    <tr><td style="padding:0 0 20px 0;font-family:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;font-size:20px;font-weight:600;letter-spacing:-0.4px;color:#09090b;" class="fg">budgeteer<span style="display:inline-block;width:6px;height:6px;background-color:#059669;border-radius:2px;margin-left:2px;">&nbsp;</span></td></tr>
+                    <tr><td class="card" style="background-color:#ffffff;border:1px solid #e4e4e7;border-radius:14px;padding:36px 36px 32px 36px;">
+                      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%%">
+                        <tr><td class="fg" style="font-family:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;font-size:24px;line-height:30px;font-weight:600;letter-spacing:-0.4px;color:#09090b;padding:0 0 10px 0;">Sign in to budgeteer</td></tr>
+                        <tr><td class="mfg" style="font-family:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;font-size:15px;line-height:23px;color:#71717a;padding:0 0 28px 0;">Tap the button if you're reading this on the device you're signing in from.</td></tr>
+                        <tr><td align="left" style="padding:0 0 28px 0;">
+                          <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
+                            <td bgcolor="#059669" style="background-color:#059669;border-radius:10px;">
+                              <a href="%s" style="display:block;padding:13px 22px;font-family:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;font-size:15px;line-height:18px;font-weight:600;color:#ffffff;text-decoration:none;">Sign in</a>
+                            </td>
+                          </tr></table>
+                        </td></tr>
+                        <tr><td style="border-top:1px solid #e4e4e7;font-size:0;line-height:0;padding:0 0 24px 0;" class="card">&nbsp;</td></tr>
+                        <tr><td class="fg" style="font-family:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;font-size:14px;line-height:20px;font-weight:600;color:#09090b;padding:0 0 4px 0;">Or paste this link</td></tr>
+                        <tr><td class="mfg" style="font-family:Menlo,Consolas,'Courier New',monospace;font-size:13px;line-height:19px;color:#71717a;word-break:break-all;">%s</td></tr>
+                        <tr><td class="mfg" style="font-family:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;font-size:13px;line-height:19px;color:#71717a;padding:24px 0 0 0;">This link expires in %d minutes and works once. If you didn't request it, you can ignore this email — nothing changes without it.</td></tr>
+                      </table>
+                    </td></tr>
+                    <tr><td class="mfg" style="font-family:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;font-size:12px;line-height:18px;color:#71717a;padding:20px 4px 0 4px;">Sent to %s because a sign-in was requested at %s.<br>budgeteer is a personal budgeting tool and never moves money.</td></tr>
+                  </table>
+                </td></tr>
+                </table>
                 </body>
                 </html>
-                """.formatted(expiryMinutes, magicLink, magicLink);
+                """.formatted(expiryMinutes, magicLink, magicLink, expiryMinutes,
+                        recipient, appProperties.getBaseUrl());
     }
 
     /**
@@ -138,7 +174,7 @@ public class EmailService {
             mailSender.send(message);
             log.info("Email sent to {} from {}", LogSanitizer.maskEmail(to), appProperties.getMail().getFrom());
         } catch (Exception e) {
-            log.error("Failed to send email to {}: {}", to, e.getMessage());
+            log.error("Failed to send email to {}: {}", LogSanitizer.maskEmail(to), e.getMessage());
             // Typed so the API answers 502 EMAIL_SERVICE_ERROR with an actionable message
             // instead of a generic 500 — the login form surfaces this text directly.
             throw new ApiException(ErrorCode.EMAIL_SERVICE_ERROR,

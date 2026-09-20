@@ -8,6 +8,7 @@ import {
   SpendBlock,
 } from '@/features/dashboard/DashboardBlocks'
 import { useSpendSummary } from '@/features/dashboard/useSpendSummary'
+import { monthRangeLabel } from '@/lib/dates'
 import { useTransactions } from '@/features/transactions/useTransactions'
 
 /** Overview = dashboard v1: the fixed four-block stack (dec 27). Connect states live on /app/connect. */
@@ -49,15 +50,17 @@ export default function Home() {
       <div className="grid grid-cols-2 gap-4">
         <SpendBlock
           label="This month"
+          rangeLabel={monthRangeLabel()}
           outMinorUnits={summary.data?.monthOut}
+          inMinorUnits={summary.data?.monthIn}
           currency={currency}
-          hint="spent month to date"
         />
         <SpendBlock
           label="This week"
+          rangeLabel="Mon–Sun"
           outMinorUnits={summary.data?.weekOut}
+          inMinorUnits={summary.data?.weekIn}
           currency={currency}
-          hint="spent this week"
         />
       </div>
       <RecentTransactionsBlock transactions={recent.data?.items ?? []} />
