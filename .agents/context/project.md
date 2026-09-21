@@ -18,17 +18,21 @@ login (magic link end-to-end, HttpOnly JWE cookies, single-session), **#16** mon
 progress), **#18** views polish & app shell (bottom tabs / top nav, dashboard v1 blocks,
 design pass: palette 3e ink-first, brand kit, branded email — PR #97).
 
-Product direction lives in the two design-session docs
-(`.agents/notes/product/design-session-0{1,2}-*.md`, decisions 1–34) and the design
-canvas (vendored at `.agents/notes/product/design/`). Money model decided: pots =
+Product direction lives in the three design-session docs
+(`.agents/notes/product/design-session-0{1,2,3}-*.md`, decisions 1–43) and the design
+canvas (vendored at `.agents/notes/product/design/`; readable/writable live via the
+DesignSync tool, project 69558837…). Session 03 (2026-09-21) designed the supporting
+views: landing (5c split door), full auth state map + passkeys (6a–6h), widget frame
+contract + bento layout (7a–7e, customize parked), settings deep pass (8a–8g). Money model decided: pots =
 exclusive folders in a tree with rollups; labels = free tags; conservation invariant §2a.
 
 ## Next (the board is authoritative: `.agents/tasks/tasks.md`)
 
 1. **#19 Pots, targets & labels** — `/grill-me` first; UI already designed (canvas 2a–2c)
-2. **#15 Settings & data rights** (grill first; canvas 4a–4e) → **#17 edge & deploy**
-   (Cloudflare Tunnel + Access, one URL) → **auth v2 phase 1** (nonce cookie + email OTP;
-   never passwords)
+2. **#15 Settings & data rights** (grill first; canvas 4a–4e + 8a–8g; grill decides
+   single- vs multi-session — see dec 41) → **#17 edge & deploy** (Cloudflare Tunnel +
+   Access, one URL) → **auth v2 phase 1** (nonce cookie + email OTP; never passwords;
+   designs: canvas 6a–6h)
 3. Before #17: per-request session validation (DECIDED 2026-09-20 — drops pure
    statelessness) and login rate-limiting
 4. Parallel-friendly: pending-fossil stopgap (P2) — id-based delta never re-fetches
