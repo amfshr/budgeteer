@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import App from '../App'
 
 /** Renders the real app (routes + providers) at a given URL. */
-export function renderApp(route: string) {
+export function renderApp(route: string | { pathname: string; state?: unknown }) {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: { retry: false },
@@ -43,7 +43,7 @@ export function err(status: number, code: string, message = 'Request failed'): R
  */
 export function mockApi(routes: Record<string, unknown | (() => Response)>) {
   const entries = Object.entries(routes).sort((a, b) => b[0].length - a[0].length)
-  const fetchMock = vi.fn((input: RequestInfo | URL) => {
+  const fetchMock = vi.fn((...[input]: [RequestInfo | URL, RequestInit?]) => {
     const url = String(input)
     for (const [prefix, value] of entries) {
       if (url.startsWith(prefix)) {

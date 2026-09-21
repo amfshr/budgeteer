@@ -58,8 +58,18 @@ const idleProgress = {
   accounts: [{ accountId: 'acc_1', status: 'COMPLETED', transactionCount: 1 }],
 }
 
+const activeConnection = {
+  id: 'c1',
+  monzoUserId: 'user_000',
+  connectedAt: '2026-09-19T21:00:00Z',
+  expiresAt: '2026-12-19T21:00:00Z',
+  isActive: true,
+  isTokenExpired: false,
+}
+
 const baseRoutes = {
   '/api/v1/auth/me': testUser,
+  '/api/v1/monzo/connections': [activeConnection],
   '/api/v1/accounts/a1/summary': summary,
   '/api/v1/accounts': [account],
   '/api/v1/transactions': page([transaction, income]),
@@ -163,6 +173,32 @@ describe('connect onboarding phases', () => {
     )
   })
 
+  it('offers a reconnect path when data exists but the connection was unlinked', async () => {
+    mockApi({ ...baseRoutes, '/api/v1/monzo/connections': [] })
+    renderApp('/app/connect')
+
+    expect(await screen.findByText(/syncing is paused/)).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Reconnect Monzo' })).toHaveAttribute(
+      'href',
+      '/api/v1/monzo/connect',
+    )
+  })
+
+  it('shows a finishing state, not the approve prompt, during the ingest lag', async () => {
+    mockApi({
+      ...baseRoutes,
+      '/api/v1/accounts': [],
+      '/api/v1/transactions': page([]),
+      '/api/v1/monzo/sync/progress': {
+        accounts: [{ accountId: 'acc_1', status: 'COMPLETED', transactionCount: 4557 }],
+      },
+    })
+    renderApp('/app/connect?monzo=connected')
+
+    expect(await screen.findByText('Finishing up')).toBeInTheDocument()
+    expect(screen.queryByText(/approve the notification/)).not.toBeInTheDocument()
+  })
+
   it('shows a generic error phase for failed callbacks (replayed state etc.)', async () => {
     mockApi({
       ...baseRoutes,
@@ -205,6 +241,78 @@ describe('transactions page', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Next' }))
 
     expect(fetchMock.mock.calls.some(([url]) => String(url).includes('page=1'))).toBe(true)
+  })
+})
+
+describe('settings — connected banks', () => {
+  const connection = {
+    id: 'c1',
+    monzoUserId: 'user_000',
+    connectedAt: '2026-09-19T21:00:00Z',
+    expiresAt: '2026-12-19T21:00:00Z',
+    isActive: true,
+    isTokenExpired: false,
+  }
+
+  it('lists the connection with its status and connected date', async () => {
+    mockApi({ ...baseRoutes, '/api/v1/monzo/connections': [connection] })
+    renderApp('/app/settings')
+
+    expect(await screen.findByText('Monzo')).toBeInTheDocument()
+    expect(screen.getByText('Active')).toBeInTheDocument()
+    expect(screen.getByText(/Connected 19 Sept? 2026/)).toBeInTheDocument()
+  })
+
+  it('flags an expired token as needing re-auth', async () => {
+    mockApi({
+      ...baseRoutes,
+      '/api/v1/monzo/connections': [{ ...connection, isTokenExpired: true }],
+    })
+    renderApp('/app/settings')
+
+    expect(await screen.findByText('Needs re-auth')).toBeInTheDocument()
+  })
+
+  it('sync now posts to the manual sync endpoint', async () => {
+    const fetchMock = mockApi({
+      ...baseRoutes,
+      '/api/v1/monzo/connections': [connection],
+      '/api/v1/monzo/sync': { accounts: [] },
+    })
+    renderApp('/app/settings')
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Sync now' }))
+
+    expect(
+      fetchMock.mock.calls.some(
+        ([url, init]) => String(url) === '/api/v1/monzo/sync' && init?.method === 'POST',
+      ),
+    ).toBe(true)
+  })
+
+  it('unlinks after confirmation', async () => {
+    const fetchMock = mockApi({ ...baseRoutes, '/api/v1/monzo/connections': [connection] })
+    vi.spyOn(window, 'confirm').mockReturnValue(true)
+    renderApp('/app/settings')
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Unlink' }))
+
+    expect(
+      fetchMock.mock.calls.some(
+        ([url, init]) =>
+          String(url).includes('/api/v1/monzo/connections/c1') && init?.method === 'DELETE',
+      ),
+    ).toBe(true)
+  })
+
+  it('offers the connect link when nothing is linked', async () => {
+    mockApi({ ...baseRoutes, '/api/v1/monzo/connections': [] })
+    renderApp('/app/settings')
+
+    expect(await screen.findByRole('link', { name: 'connect Monzo' })).toHaveAttribute(
+      'href',
+      '/app/connect',
+    )
   })
 })
 

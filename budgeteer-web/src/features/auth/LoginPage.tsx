@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { ApiClientError } from '@/api/client'
 import { requestMagicLink } from './api'
+import Wordmark from '@/components/Wordmark'
 
 /** The entry page: landing folded into login (Session 01 dec 6). */
 export default function LoginPage() {
@@ -24,7 +25,9 @@ export default function LoginPage() {
   return (
     <div className="w-full max-w-sm space-y-8">
       <div className="text-center">
-        <h1 className="text-4xl font-bold tracking-tight">Budgeteer</h1>
+        <h1 className="text-4xl font-bold tracking-tight">
+          <Wordmark />
+        </h1>
         <p className="text-muted-foreground mt-3">Your money, one place.</p>
       </div>
 

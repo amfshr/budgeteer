@@ -150,6 +150,19 @@ public class TransactionSyncService {
                     return null;
                 });
             }
+
+            // Reconnect catch-up (unlink → relink): a COMPLETED account whose backfill
+            // fetched zero windows still has a dormant-period gap after its stored
+            // cursor — close it now, in this pass, instead of waiting for the hourly
+            // job. Wrapped in txTemplate because a self-call bypasses @Transactional.
+            if (account.getBackfillStatus() == MonzoAccount.BackfillStatus.COMPLETED
+                    && latestTxId == null
+                    && account.getLastTransactionId() != null) {
+                txTemplate.execute(status -> {
+                    deltaSync(account.getId());
+                    return null;
+                });
+            }
         }
 
         log.info("Backfill finished [connectionId={}, accounts={}]", connectionId, accountResponses.size());
@@ -184,6 +197,37 @@ public class TransactionSyncService {
         accountRepository.save(account);
 
         log.info("Delta sync complete [account={}]", label(account));
+    }
+
+    /**
+     * User-triggered catch-up: delta-syncs every completed account on the user's
+     * active connections, then one ingest+balance pass — the hourly job's exact
+     * semantics, on demand. Cheap by construction: id-based deltas fetch only what
+     * is newer than the stored cursor.
+     */
+    public MonzoSyncProgressResponse syncNow(UUID userId) {
+        List<MonzoAccount> accounts = accountRepository.findActiveByUserId(userId).stream()
+                .filter(a -> a.getBackfillStatus() == MonzoAccount.BackfillStatus.COMPLETED)
+                .filter(a -> a.getConnection().isActive())
+                .toList();
+
+        log.info("Manual sync requested [userId={}, accounts={}]", userId, accounts.size());
+
+        for (MonzoAccount account : accounts) {
+            try {
+                txTemplate.execute(status -> {
+                    deltaSync(account.getId());
+                    return null;
+                });
+            } catch (Exception e) {
+                log.error("Manual sync failed [account={}] - {}", account.getId(), e.getMessage(), e);
+            }
+        }
+
+        if (!accounts.isEmpty()) {
+            ingestOrchestrator.runFullPass();
+        }
+        return getSyncProgress(userId);
     }
 
     public MonzoSyncProgressResponse getSyncProgress(UUID userId) {

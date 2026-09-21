@@ -3,10 +3,12 @@
 [![Build & Test](https://github.com/amfshr/budgeteer/actions/workflows/ci.yml/badge.svg)](https://github.com/amfshr/budgeteer/actions/workflows/ci.yml)
 [![CodeQL](https://github.com/amfshr/budgeteer/actions/workflows/codeql.yml/badge.svg)](https://github.com/amfshr/budgeteer/actions/workflows/codeql.yml)
 [![Java](https://img.shields.io/badge/Java-25-orange?logo=openjdk)](https://openjdk.org/)
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.5-brightgreen?logo=springboot)](https://spring.io/projects/spring-boot)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.1-brightgreen?logo=springboot)](https://spring.io/projects/spring-boot)
 [![License](https://img.shields.io/badge/License-Private-red)](LICENSE)
 
-A personal budgeting application integrated with the Monzo API to automatically track expenses, categorize transactions, and provide financial insights.
+A personal budgeting application integrated with the Monzo API: full transaction history
+sync into a provider-agnostic domain model, live balances and spend views in a React web
+app, with pots/targets/budgeting on the roadmap.
 
 ## Project Structure
 
@@ -14,14 +16,13 @@ This is a **mono-repo** containing:
 
 ```
 budgeteer/
-├── backend/          # Spring Boot API (Java 25)
-├── frontend/         # Web UI (coming soon)
-├── docs/             # Documentation
-├── scripts/          # Development scripts
-├── provider-api/   # Provider-neutral capability contracts (auth, accounts, balance, transactions)
-├── provider-monzo/ # Monzo implementation
-├── budgeteer-server/  # Spring Boot application
-└── compose.yaml      # Docker services
+├── provider-api/      # Provider-neutral capability contracts (auth, accounts, balance, transactions)
+├── provider-monzo/    # Monzo implementation (HTTP client jar — never touches the DB)
+├── budgeteer-server/  # Spring Boot application (API, auth, sync, ingest, domain model)
+├── budgeteer-web/     # React SPA (Vite, TypeScript, Tailwind v4 + shadcn/ui)
+├── docs/              # Documentation + committed OpenAPI contract (docs/api/openapi.json)
+├── scripts/           # Development scripts (dev.sh, generate-openapi.sh)
+└── compose.yaml       # Docker services (PostgreSQL 16)
 ```
 
 ## Quick Start
@@ -60,9 +61,15 @@ budgeteer/
    ./scripts/dev.sh start
    ```
 
-5. **Access the app:**
-   - API: http://localhost:8080
-   - Health: http://localhost:8080/actuator/health
+5. **Run the web app:**
+   ```bash
+   cd budgeteer-web && npm install && npm run dev
+   ```
+
+6. **Access the app:**
+   - Web app: http://localhost:5173 (Vite proxies `/api` to the backend — same-origin cookies)
+   - API: http://localhost:8080 · Health: http://localhost:8080/actuator/health
+   - Swagger UI (dev): http://localhost:8080/swagger-ui.html
 
 See [docs/setup/SETUP.md](docs/setup/SETUP.md) for detailed setup instructions.
 
@@ -70,25 +77,26 @@ See [docs/setup/SETUP.md](docs/setup/SETUP.md) for detailed setup instructions.
 
 | Component | Technology |
 |-----------|------------|
-| **Backend** | Spring Boot 4.0.5, Java 25 |
+| **Backend** | Spring Boot 4.1, Java 25 (multi-module Maven reactor) |
+| **Frontend** | React 19, Vite, TypeScript (strict), Tailwind v4, shadcn/ui, TanStack Query, React Router v7 |
+| **API contract** | springdoc OpenAPI snapshot → generated TypeScript types |
 | **Database** | PostgreSQL 16 |
 | **Migrations** | Flyway |
-| **Authentication** | Passwordless magic links + JWE tokens |
-| **Monzo integration** | OAuth 2.0, AES-256-GCM encrypted token storage |
-| **Email** | Resend SMTP |
-| **Testing** | JUnit 5, Testcontainers 2.x, WireMock |
-| **CI/CD** | GitHub Actions |
+| **Authentication** | Passwordless magic links + JWE cookie tokens (single-session) |
+| **Monzo integration** | OAuth 2.0, AES-256-GCM encrypted token storage, windowed backfill + hourly delta |
+| **Email** | Resend SMTP (branded HTML magic-link email) |
+| **Testing** | JUnit 5, Testcontainers, WireMock (server) · Vitest + Testing Library (web) |
+| **CI/CD** | GitHub Actions (server + web jobs) |
 | **Security scanning** | CodeQL |
-| **Frontend** | TBD (React / Vue / HTMX) |
 
 ## Authentication
 
 Budgeteer uses a **passwordless authentication** system:
 
-1. User enters email → receives a magic link
+1. User enters email → receives a magic link (single-use, 15-minute, hash-stored)
 2. Magic link validates → JWE access token (15 min) + refresh token (7 days) issued as HttpOnly cookies
-3. Multi-session supported — users can be logged in on multiple devices simultaneously
-4. Monzo connection is user-scoped and shared across all sessions
+3. Single-session policy — a new login revokes existing sessions everywhere else
+4. Monzo connection is user-scoped; unlinking stops syncing but keeps imported data until deletion
 
 See [docs/features/USER-AUTHENTICATION.md](docs/features/USER-AUTHENTICATION.md) for details.
 
@@ -105,17 +113,16 @@ See [docs/features/USER-AUTHENTICATION.md](docs/features/USER-AUTHENTICATION.md)
 ## Testing
 
 ```bash
-# Run all tests
-cd backend && mvn test
+# Server (repo root)
+mvn test                              # all
+mvn test -DexcludedGroups=integration # unit only
+mvn test -Dgroups=integration         # ITs (requires Docker)
 
-# Unit tests only
-mvn test -DexcludedGroups=integration
-
-# Integration tests (requires Docker)
-mvn test -Dgroups=integration
+# Web
+cd budgeteer-web && npm test
 ```
 
-485+ unit tests, 40+ integration tests.
+526 unit + 133 integration tests (server), 39 web tests.
 
 ## CI/CD
 
@@ -128,18 +135,18 @@ Every push and PR runs:
 
 ## Current Status
 
-**Phases 1 & 2 complete. Phase 3 (token auto-refresh) is next.**
+**Backend platform complete; frontend era well underway.**
 
-- [x] Project setup & mono-repo structure
-- [x] CI/CD pipeline (GitHub Actions + CodeQL)
-- [x] Phase 1: User authentication — magic links, JWE tokens, multi-session
-- [x] Phase 2: Monzo integration — OAuth 2.0, encrypted token storage, MonzoClient
-- [x] Email service (Resend SMTP)
-- [x] 485+ tests (unit + integration with Testcontainers + WireMock)
-- [ ] Phase 3: Token auto-refresh
-- [ ] Phase 4: Transaction sync (backfill + delta)
-- [ ] Phase 5: Webhooks
-- [ ] Frontend UI
+- [x] User authentication — magic links, JWE cookies, single-session
+- [x] Monzo integration — OAuth, encrypted tokens, auto-refresh, full-history backfill + hourly delta
+- [x] Domain model — raw→domain ingest, provider-agnostic accounts/transactions, read APIs
+- [x] Web app — real login, dashboard (balances, spend windows, recent activity),
+      transactions, connect onboarding with live progress, settings (connected banks,
+      sync-now, unlink)
+- [x] Brand — b-mark icon set, wordmark, branded email
+- [ ] Pots, targets & labels (next — designed, awaiting build)
+- [ ] Data rights (export + delete), edge deployment (Cloudflare Tunnel + Access)
+- [ ] Webhooks (near-real-time sync), TrueLayer multi-bank
 
 ## Contributing
 

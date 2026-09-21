@@ -6,9 +6,11 @@
 
 | Layer | Technology |
 |-------|-----------|
-| Backend | Spring Boot 4.1.0, Java 25 |
+| Backend | Spring Boot 4.1.1, Java 25 (multi-module Maven reactor) |
+| Frontend | `budgeteer-web/`: Vite 8, React 19, TypeScript strict, Tailwind v4 (CSS-first), shadcn/ui, TanStack Query, React Router v7, Vitest/RTL |
+| API contract | springdoc (dev-gated) → committed `docs/api/openapi.json` → generated TS types (`npm run generate:types`, prettier the output) |
 | Database | PostgreSQL 16 (Alpine via Docker) |
-| Migrations | Flyway — `backend/src/main/resources/db/migration/` |
+| Migrations | Flyway — `budgeteer-server/src/main/resources/db/migration/` |
 | Auth | Magic links + JWE tokens (JOSE library) |
 | Encryption | AES-256-GCM (Monzo OAuth tokens at rest) |
 | Email | Resend SMTP (`spring-boot-starter-mail`) |
@@ -19,24 +21,27 @@
 ## Package Structure
 
 ```
-dev.amf.budgeteer/
-├── api/              # REST controllers + DTOs, organised by feature
-│   ├── auth/         #   magic-link + session endpoints
-│   ├── dev/          #   dev-only shortcuts (not in prod)
-│   ├── health/       #   /actuator/health wrapper
-│   ├── monzo/        #   Monzo OAuth endpoints
-│   └── common/       #   ApiResponse, ApiError, GlobalExceptionHandler
-├── config/           # Spring @Configuration classes, properties bindings
-├── domain/           # JPA entities + repositories, organised by aggregate
-│   ├── user/         #   User entity + UserRepository
-│   └── session/      #   MagicLinkToken, AppRefreshToken + repos
-├── service/          # Business logic
-├── security/         # JweAuthenticationFilter, SecurityConfig
-├── exception/        # ApiException + error codes
-└── util/             # LogSanitizer, etc.
+dev.amfshr.budgeteer/            (budgeteer-server; contracts live in provider-api,
+├── api/                          Monzo HTTP client in provider-monzo)
+│   ├── common/       #   ApiResponse, ApiError, GlobalExceptionHandler, PageResponse
+│   ├── dev/          #   dev-only shortcuts (dev profile)
+│   ├── health/       #   health wrapper
+│   └── v1/           #   by-resource: account/ auth/ monzo/ transaction/ (each with dto/ + mapper)
+├── config/           # @Configuration + properties bindings
+├── domain/           # JPA entities + repos: user/ session/ monzo/ account/ transaction/
+├── repository/       # Spring Data repositories
+├── service/          # auth/ common/ ingest/ monzo/ (orchestrator + per-provider ingestors)
+├── security/         # JweAuthenticationFilter, CurrentUserArgumentResolver
+├── exception/        # ApiException + ErrorCode
+└── util/             # LogSanitizer (char-loop — CodeQL taint barrier)
 ```
 
-## Database Schema (6 migrations)
+`budgeteer-web/src/`: `api/` (envelope client + generated types), `features/` (auth,
+accounts, dashboard, monzo, transactions — hooks own server state, components never
+fetch), `components/` (ui/ = shadcn copy-in, Wordmark, Money), `layouts/`, `pages/`,
+`lib/`, `test/`.
+
+## Database Schema (13 migrations)
 
 | Migration | Table | Purpose |
 |-----------|-------|---------|
@@ -44,10 +49,15 @@ dev.amf.budgeteer/
 | V2 | `users` | UUID PK, email (unique), email_verified |
 | V3 | `magic_link_tokens` | SHA-256 hash, expires_at, used_at (replay prevention) |
 | V4 | `app_refresh_tokens` | SHA-256 hash, revoked_at, user_agent, ip_address |
-| V5 | `monzo_connections` | Encrypted access/refresh tokens, soft-delete via disconnected_at |
-| V6 | `oauth_states` | CSRF state tokens for Monzo OAuth, 10-min expiry, used flag |
+| V5 | `monzo_connections` | Encrypted tokens, soft-delete via disconnected_at |
+| V6 | `oauth_states` | CSRF state for Monzo OAuth, 10-min expiry, used flag |
+| V7–V10 | `monzo_accounts` | Raw accounts + created-at + backfill state/cursor |
+| V8 | `monzo_transactions` | Raw transactions (id-keyed, idempotent upsert) |
+| V11 | (both raw) | Encrypted raw payload capture + mapping index |
+| V12 | `bank_accounts` | Domain accounts (provider-agnostic; balance = provider snapshot) |
+| V13 | `transactions` | Domain transactions (user-owned notes/exclusions survive upsert) |
 
-Next migration will be **V7**.
+Next migration will be **V14** (use `/new-migration`).
 
 ## Key Architectural Decisions
 
@@ -57,7 +67,16 @@ Next migration will be **V7**.
 - **JWE for session tokens**: Stateless access tokens, refresh tokens backed by DB for revocation.
 - **Testcontainers for ITs**: Integration tests spin up a real PostgreSQL — no mocking the DB.
 - **Database-backed OAuth state**: State tokens linked to `user_id` for CSRF protection + user binding.
-- **Soft delete on `monzo_connections`**: `disconnected_at` instead of hard delete, preserves audit trail.
+- **Soft delete on `monzo_connections`**: `disconnected_at` instead of hard delete. Unlink keeps
+  all imported data (dormant); reconnect reactivates the same row, backfill no-ops (resume
+  cursor doubles as done-detection) and a chained delta closes the dormant gap.
+- **Two-layer data model**: raw `monzo_*` tables → domain `bank_accounts`/`transactions` via
+  ingest; cursor `raw_synced_through` = max processed raw `updated_at` (never `now()`);
+  per-account transactions (failure unit = retry unit); balance is a provider snapshot, never derived.
+- **Single-session policy**: a new login revokes all existing sessions (`revokeAllSessions`).
+- **DECIDED 2026-09-20 (lands before #17)**: per-request session validation in
+  `JweAuthenticationFilter` — drops pure statelessness so logout/delete kill access tokens
+  instantly (also fixes ghost-session inconsistency after DB wipes/user deletion).
 
 ## Glossary: Provider vs Institution (decided 2026-08-22)
 
@@ -97,4 +116,4 @@ the database.
 - `dev` — DEBUG logging, show SQL, hot reload via `./scripts/dev.sh`
 - `prod` — INFO logging, connection pooling (max 10), batch size 20
 
-Config files: `backend/src/main/resources/application*.properties`
+Config files: `budgeteer-server/src/main/resources/application*.properties` (dev imports `.env`)

@@ -2,58 +2,61 @@
 
 ## What It Is
 
-Budgeteer is a personal finance app that syncs with Monzo via OAuth, stores and encrypts tokens, and will provide transaction sync, categorisation, and budgeting features. Solo project by @amfshr.
+Budgeteer is a personal finance app: a Spring Boot API that syncs with Monzo (OAuth,
+encrypted tokens, full-history backfill + hourly delta into a provider-agnostic domain
+model) and a React SPA (`budgeteer-web/`) with real login and live money views.
+Solo project by @amfshr.
 
-## Current Phase (August 2026)
+## Current Phase (September 2026) — the frontend era
 
-**Provider-contract naming is in place** (2026-08-24): 3-module reactor — `provider-api`
-(contract) / `provider-monzo` (impl) / `budgeteer-server` (app). The Monzo HTTP client lives in
-its own jar behind neutral per-capability contracts — `ProviderConnectionAuth`,
-`AccountsCapability`, `BalanceCapability`, `TransactionsCapability` (PSD2 AIS vocabulary; see
-the Provider-vs-Institution glossary in `architecture.md`). Provider-neutral exceptions are
-`ProviderException` / `ProviderConnectionRevokedException` / `ProviderReauthRequiredException`,
-surfaced as `PROVIDER_*` error codes. Data records stay `Bank*` — they describe the
-institution's artifacts. The backend domain design (accounts, transactions, categories, budgets,
-virtual pots, reports) is complete at `.agents/notes/domain-model-design.md`.
-Next per the board: #11 domain model mapping (spec ready, branch `feature/domain-model-mapping`),
-then Phase 5 (webhooks).
+The backend platform (auth, Monzo sync, raw→domain ingest, read APIs) is done; work now
+runs frontend-first through the Session-01/02 epics. Shipped in order: **#13** web
+scaffold (Vite 8 / React 19 / TS strict / Tailwind v4 + shadcn/ui / TanStack Query /
+Router v7), **OpenAPI contract** (springdoc snapshot → generated TS types), **#14** real
+login (magic link end-to-end, HttpOnly JWE cookies, single-session), **#16** money views
+(accounts/balances/transactions/spend summaries + first-connect onboarding with live
+progress), **#18** views polish & app shell (bottom tabs / top nav, dashboard v1 blocks,
+design pass: palette 3e ink-first, brand kit, branded email — PR #97).
 
-## Completed
+Product direction lives in the three design-session docs
+(`.agents/notes/product/design-session-0{1,2,3}-*.md`, decisions 1–43) and the design
+canvas (vendored at `.agents/notes/product/design/`; readable/writable live via the
+DesignSync tool, project 69558837…). Session 03 (2026-09-21) designed the supporting
+views: landing (5c split door), full auth state map + passkeys (6a–6h), widget frame
+contract + bento layout (7a–7e, customize parked), settings deep pass (8a–8g). Money model decided: pots =
+exclusive folders in a tree with rollups; labels = free tags; conservation invariant §2a.
 
-- [x] Project setup, CI/CD (GitHub Actions), CodeQL, Checkstyle, Dependabot
-- [x] Branch protection on `main` (PRs + CI required)
-- [x] PostgreSQL + Flyway (V1–V10 migrations)
-- [x] Magic-link passwordless auth
-- [x] JWE session tokens (15m access / 7d refresh, HttpOnly cookies)
-- [x] Multi-session support (concurrent logins across devices)
-- [x] Monzo OAuth flow (state token CSRF protection, database-backed)
-- [x] Monzo token persistence (AES-256-GCM encrypted in `monzo_connections`)
-- [x] **Phase 3:** Monzo token auto-refresh (background job + eager inline guard, `tokenStatus` on status endpoint)
-- [x] **Phase 4:** Transaction sync — async post-OAuth backfill, windowed historical sync (≤350-day windows, resumable across SCA re-auth via per-window commits), 60-min delta job, `GET /api/monzo/sync/progress`
-- [x] **Package & groupId rename** `dev.amf` → `dev.amfshr` (PR #61) — 145 Java files, `pom.xml`, logback, 4 properties files; done before multi-module split
-- [x] **Multi-module restructure + Monzo client extraction** (PR #67) — 3-module reactor; Monzo HTTP client in its own jar behind the neutral `BankClient` contract; API programs to the interface; behaviour-preserving
-- [x] Structured request logging + LogSanitizer (no PII/tokens in logs)
-- [x] Email service via Resend SMTP (magic link delivery)
-- [x] Input validation hardening (Bean Validation on all user-input boundaries, IP sanitization)
-- [x] Security hardening: production headers (HSTS/CSP/CORS), no default DB credentials, Postgres bound to localhost + connection audit logging
-- [x] ~590 tests (unit + integration, Testcontainers + WireMock)
+## Next (the board is authoritative: `.agents/tasks/tasks.md`)
 
-## Backlog
+1. **#19 Pots, targets & labels** — `/grill-me` first; UI already designed (canvas 2a–2c)
+2. **#15 Settings & data rights** (grill first; canvas 4a–4e + 8a–8g; grill decides
+   single- vs multi-session — see dec 41) → **#17 edge & deploy** (Cloudflare Tunnel +
+   Access, one URL) → **auth v2 phase 1** (nonce cookie + email OTP; never passwords;
+   designs: canvas 6a–6h)
+3. Before #17: per-request session validation (DECIDED 2026-09-20 — drops pure
+   statelessness) and login rate-limiting
+4. Parallel-friendly: pending-fossil stopgap (P2) — id-based delta never re-fetches
+   updates, so pending→settled statuses fossilise until webhooks (#5)
 
-> The authoritative, prioritised board is `.agents/tasks/tasks.md`. Summary:
+## Completed (chronological)
 
-1. #11 Domain model mapping (P2) — raw → provider-agnostic `user_accounts`/`transactions`,
-   ingest pipeline, first product endpoints (spec: `.agents/tasks/open/domain-model-mapping/plan.md`)
-2. #5 Phase 5: Webhook ingestion (real-time transactions via Cloudflare Tunnel) — after #11
-3. TrueLayer (multi-bank) integration — `provider-truelayer` as 2nd implementation of the provider capability contracts
-5. Budgeting / analytics features (categories, budgets, pots, reports — designed, built in slices)
-6. Frontend UI (React / Vue / HTMX — not decided)
+- [x] Platform: CI/CD, CodeQL, Checkstyle, Dependabot, branch protection, PG16 + Flyway (V1–V13)
+- [x] Auth: magic links (hashed, single-use, 15 min), JWE cookies (15m/7d), single-session policy
+- [x] Monzo: OAuth (DB-backed state), AES-256-GCM token storage, auto-refresh, windowed
+      backfill (SCA-resumable) + hourly delta, sync progress endpoint
+- [x] Multi-module reactor: `provider-api` / `provider-monzo` / `budgeteer-server`
+      (capability contracts, PSD2 vocabulary, sealed `SyncPosition`)
+- [x] #11 domain model: raw→domain ingest (`bank_accounts`/`transactions`), read APIs
+      (accounts, summaries, paged transactions), 654+ tests (PR #87)
+- [x] #13/#14/#16/#18 frontend epics + OpenAPI contract (PRs #92–#97)
+- [x] Brand: b-mark icon set, wordmark, branded magic-link email (design canvas dec 33/34)
+- [x] Test suite: 526 unit + 133 integration (server) + 39 web tests
 
 ## Key Docs
 
-> Full docs index: `docs/README.md`
+> Full docs index: `docs/README.md` · shared agent state: `.agents/`
 
-- `docs/architecture/` — tech design decisions
-- `docs/features/` — per-feature documentation
-- `docs/testing/` — test strategy and manual test scenarios
-- `CHANGELOG.md` — version history
+- `.agents/tasks/tasks.md` — the board (single source of truth for what's next)
+- `.agents/notes/product/` — design sessions, user stories, design canvas
+- `docs/api/openapi.json` — committed API contract (regenerate via script on API change)
+- `docs/brand/` — brand marks + regeneration notes

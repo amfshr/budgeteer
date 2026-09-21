@@ -2147,6 +2147,36 @@
         ]
       }
     },
+    "/api/v1/monzo/sync": {
+      "post": {
+        "operationId": "syncNow",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "user",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/User"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseMonzoSyncProgressResponse"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "monzo-controller"
+        ]
+      }
+    },
     "/api/v1/monzo/sync/progress": {
       "get": {
         "operationId": "getSyncProgress",

@@ -1,18 +1,21 @@
 import { Link } from 'react-router'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card'
 import Money from '@/components/Money'
+import { formatMoneyParts } from '@/lib/money'
+import { asOfLabel } from '@/lib/dates'
 import { accountLabel } from '@/features/accounts/accountLabel'
 import TransactionList from '@/features/transactions/TransactionList'
 import type { AccountResponse, TransactionResponse } from '@/api/types'
 
 /**
- * Dashboard v1 blocks (dec 27) — each self-contained and "widget-shaped" so the
- * future pick-and-choose dashboard can adopt them unchanged.
+ * Dashboard v1 blocks, restyled per the design pass (canvas option 1a, palette 3e).
+ * Each block stays self-contained and widget-shaped.
  */
 
 export function BalanceBlock({ accounts }: { accounts: AccountResponse[] }) {
   const total = accounts.reduce((sum, a) => sum + (a.balanceMinorUnits ?? 0), 0)
   const currency = accounts[0]?.currency ?? 'GBP'
+  const { major, minor } = formatMoneyParts(total, currency)
   const newestAsOf = accounts
     .map((a) => a.balanceAsOf)
     .filter((x): x is string => !!x)
@@ -22,60 +25,87 @@ export function BalanceBlock({ accounts }: { accounts: AccountResponse[] }) {
   return (
     <Card>
       <CardHeader>
-        <CardDescription>Balance</CardDescription>
-        <CardTitle>
-          <Money minorUnits={total} currency={currency} className="text-3xl font-semibold" />
-        </CardTitle>
-        {newestAsOf && (
-          <CardDescription className="text-xs">
-            as of {new Date(newestAsOf).toLocaleString()}
-          </CardDescription>
-        )}
+        <CardDescription>Total balance</CardDescription>
+        <div className="text-4xl font-semibold tracking-tight tabular-nums">
+          {major}
+          <span className="text-muted-foreground font-medium">{minor}</span>
+        </div>
       </CardHeader>
-      {accounts.length > 1 && (
-        <CardContent className="space-y-1.5">
+      <CardContent className="space-y-3.5">
+        <div className="flex flex-wrap gap-2">
           {accounts.map((account) => (
-            <div key={account.id} className="flex items-center justify-between text-sm">
+            <span
+              key={account.id}
+              className="bg-muted inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1.5 text-sm"
+            >
               <span className="text-muted-foreground">{accountLabel(account)}</span>
               {account.balanceMinorUnits != null && account.currency && (
-                <Money minorUnits={account.balanceMinorUnits} currency={account.currency} />
+                <Money
+                  minorUnits={account.balanceMinorUnits}
+                  currency={account.currency}
+                  className="font-medium"
+                />
               )}
-            </div>
+            </span>
           ))}
-        </CardContent>
-      )}
+        </div>
+        {newestAsOf && (
+          <p className="text-muted-foreground flex items-center gap-1.5 text-xs">
+            <span aria-hidden className="bg-money-positive size-1.5 rounded-full" />
+            {asOfLabel(newestAsOf)} · synced hourly
+          </p>
+        )}
+      </CardContent>
     </Card>
   )
 }
 
 export function SpendBlock({
   label,
+  rangeLabel,
   outMinorUnits,
+  inMinorUnits,
   currency,
-  hint,
 }: {
   label: string
+  rangeLabel: string
   outMinorUnits: number | undefined
+  inMinorUnits: number | undefined
   currency: string
-  hint?: string
 }) {
   return (
     <Card>
       <CardHeader>
-        <CardDescription>{label}</CardDescription>
-        <CardTitle>
+        <div className="flex items-baseline justify-between">
+          <CardDescription>{label}</CardDescription>
+          <span className="text-muted-foreground text-xs">{rangeLabel}</span>
+        </div>
+        <div className="text-2xl font-semibold tracking-tight tabular-nums">
           {outMinorUnits != null ? (
-            <Money
-              minorUnits={outMinorUnits}
-              currency={currency}
-              className="text-2xl font-semibold"
-            />
+            <Money minorUnits={outMinorUnits} currency={currency} />
           ) : (
-            <span className="text-muted-foreground text-2xl">—</span>
+            <span className="text-muted-foreground">—</span>
           )}
-        </CardTitle>
-        {hint && <CardDescription className="text-xs">{hint}</CardDescription>}
+        </div>
+        <CardDescription className="text-xs">out</CardDescription>
       </CardHeader>
+      <CardContent>
+        <div className="border-t pt-2.5">
+          <div className="flex items-baseline justify-between text-sm">
+            <span className="text-muted-foreground">in</span>
+            {inMinorUnits != null && inMinorUnits > 0 ? (
+              <Money
+                minorUnits={inMinorUnits}
+                currency={currency}
+                signed
+                className="text-money-positive font-medium"
+              />
+            ) : (
+              <Money minorUnits={inMinorUnits ?? 0} currency={currency} className="font-medium" />
+            )}
+          </div>
+        </div>
+      </CardContent>
     </Card>
   )
 }
@@ -84,12 +114,12 @@ export function RecentTransactionsBlock({ transactions }: { transactions: Transa
   return (
     <Card>
       <CardHeader className="flex-row items-center justify-between">
-        <CardDescription>Recent transactions</CardDescription>
+        <span className="text-[15px] font-semibold tracking-tight">Recent</span>
         <Link
           to="/app/transactions"
-          className="text-muted-foreground hover:text-foreground text-sm underline-offset-4 hover:underline"
+          className="text-muted-foreground hover:text-foreground text-sm font-medium underline-offset-4 hover:underline"
         >
-          View all
+          See all →
         </Link>
       </CardHeader>
       <CardContent>

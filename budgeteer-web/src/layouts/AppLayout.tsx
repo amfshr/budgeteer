@@ -2,6 +2,7 @@ import { Link, NavLink, Outlet } from 'react-router'
 import { House, List, Settings } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useSyncProgress } from '@/features/monzo/useSyncProgress'
+import Wordmark from '@/components/Wordmark'
 
 const destinations = [
   { to: '/app', label: 'Overview', icon: House, end: true },
@@ -23,8 +24,8 @@ export default function AppLayout() {
     <div className="flex min-h-svh flex-col">
       <header className="border-b">
         <div className="mx-auto flex w-full max-w-5xl items-center justify-between px-4 py-3">
-          <Link to="/app" className="text-lg font-semibold tracking-tight">
-            budgeteer
+          <Link to="/app">
+            <Wordmark className="text-lg" />
           </Link>
           <nav className="hidden items-center gap-5 sm:flex">
             {destinations.map(({ to, label, end }) => (
@@ -53,7 +54,7 @@ export default function AppLayout() {
       {/* Mobile bottom tab bar — thumb-reachable, the glance is Tab 1 */}
       <nav
         aria-label="Primary"
-        className="bg-background/95 fixed inset-x-0 bottom-0 border-t backdrop-blur sm:hidden"
+        className="bg-background/95 fixed inset-x-0 bottom-0 border-t pb-[env(safe-area-inset-bottom)] backdrop-blur sm:hidden"
       >
         <div className="mx-auto grid max-w-md grid-cols-3">
           {destinations.map(({ to, label, icon: Icon, end }) => (

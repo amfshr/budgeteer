@@ -332,6 +332,20 @@ public class MonzoController {
         return ResponseEntity.ok(ApiResponse.of(progress));
     }
 
+    /**
+     * Manual sync-now: id-based delta per account + one ingest pass — the hourly
+     * job on demand. Synchronous by design (recent deltas are small); responds with
+     * fresh progress so the client can render the result immediately.
+     *
+     * <p>POST /api/v1/monzo/sync
+     */
+    @PostMapping("/sync")
+    public ResponseEntity<ApiResponse<MonzoSyncProgressResponse>> syncNow(@CurrentUser User user) {
+        log.info("User {} requested manual sync", user.getId());
+        MonzoSyncProgressResponse progress = syncService.syncNow(user.getId());
+        return ResponseEntity.ok(ApiResponse.of(progress));
+    }
+
     @GetMapping("/status")
     public ResponseEntity<ApiResponse<MonzoStatusResponse>> getStatus(@CurrentUser User user) {
         boolean hasConnection = connectionService.hasActiveConnection(user.getId());

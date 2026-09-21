@@ -1,6 +1,6 @@
 # Budgeteer
 
-Personal Monzo-integrated budgeting app. Spring Boot 3.4 / Java 25 backend, PostgreSQL 16.
+Personal Monzo-integrated budgeting app. Spring Boot 4.1 / Java 25 backend (multi-module Maven), PostgreSQL 16, React SPA in `budgeteer-web/` (Vite, TS strict, Tailwind v4 + shadcn/ui).
 
 > All shared AI agent context lives in `.agents/` — read the relevant file before working on any area.
 

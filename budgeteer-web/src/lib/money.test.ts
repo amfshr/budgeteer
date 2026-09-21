@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { formatMoney } from './money'
+import { formatMoney, formatMoneyParts } from './money'
 
 describe('formatMoney', () => {
   it('formats minor units as GBP', () => {
@@ -16,5 +16,15 @@ describe('formatMoney', () => {
 
   it('respects the currency argument', () => {
     expect(formatMoney(1000, 'EUR')).toBe('€10.00')
+  })
+})
+
+describe('formatMoneyParts', () => {
+  it('splits major and de-emphasised pence', () => {
+    expect(formatMoneyParts(128420, 'GBP')).toEqual({ major: '£1,284', minor: '.20' })
+  })
+
+  it('handles negatives', () => {
+    expect(formatMoneyParts(-450, 'GBP')).toEqual({ major: '-£4', minor: '.50' })
   })
 })

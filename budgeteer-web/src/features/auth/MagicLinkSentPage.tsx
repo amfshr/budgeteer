@@ -1,5 +1,8 @@
-import { Link, Navigate, useLocation } from 'react-router'
-import { useMutation } from '@tanstack/react-query'
+import { useEffect } from 'react'
+import { Link, Navigate, useLocation, useNavigate } from 'react-router'
+import { useMutation, useQuery } from '@tanstack/react-query'
+import { ApiClientError } from '@/api/client'
+import { fetchCurrentUser } from './api'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { requestMagicLink } from './api'
@@ -9,6 +12,26 @@ export default function MagicLinkSentPage() {
   const email = (location.state as { email?: string } | null)?.email
 
   const resend = useMutation({ mutationFn: requestMagicLink })
+  const navigate = useNavigate()
+
+  // The emailed link usually opens a NEW tab; cookies are browser-wide, so this
+  // waiting tab polls the session and follows the moment the other tab signs in.
+  const session = useQuery({
+    queryKey: ['session-watch'],
+    queryFn: async () => {
+      try {
+        return await fetchCurrentUser()
+      } catch (error) {
+        if (error instanceof ApiClientError && error.status === 401) return null
+        throw error
+      }
+    },
+    refetchInterval: 3000,
+  })
+
+  useEffect(() => {
+    if (session.data) navigate('/app', { replace: true })
+  }, [session.data, navigate])
 
   // Deep-linking here without having submitted an email makes no sense — start over.
   if (!email) {
